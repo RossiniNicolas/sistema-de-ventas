@@ -345,7 +345,9 @@
                     <div>
                         <h2 class="text-2xl font-black text-white flex items-center gap-3">
                             <span>Gestión Integral ExperienceQR</span>
-                            <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold">En Vivo</span>
+                            <span id="firebaseStatusBadge" class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Conectando Nube...
+                            </span>
                         </h2>
                         <p class="text-xs text-slate-400">Control de eventos, recaudación en ARS $, costo de servicio y validación de puertas.</p>
                     </div>
@@ -1394,6 +1396,7 @@
             let isFirebaseConnected = false;
             let authInstance = null;
             let authMethods = null;
+            let pendingCloudQueue = [];
 
             let state = {
                 serviceFee: {
@@ -1513,6 +1516,16 @@
                     }
 
                     isFirebaseConnected = true;
+                    updateCloudStatusBadge('connected');
+
+                    // Vaciar cola de documentos pendientes si se guardaron antes de conectar
+                    if (pendingCloudQueue.length > 0) {
+                        const queue = [...pendingCloudQueue];
+                        pendingCloudQueue = [];
+                        for (const item of queue) {
+                            await saveDocument(item.colName, item.docId, item.data);
+                        }
+                    }
 
                     // Suscripciones en tiempo real protegidas
                     setupCollectionListener('events', (data) => {
@@ -1520,7 +1533,7 @@
                             state.events = data;
                             persistLocalFallback('events', state.events);
                         } else if (state.events.length > 0) {
-                            // Si la nube está vacía pero tenemos eventos locales, subirlos a Firestore
+                            // Si la nube está vacía pero tenemos eventos locales, subirlos de inmediato
                             state.events.forEach(evt => saveDocument('events', evt.id, evt));
                         }
                         UIModule.renderStoreEvents();
@@ -1576,6 +1589,23 @@
 
                 } catch (err) {
                     console.warn("Firebase funcionará en modo local resiliente:", err);
+                    updateCloudStatusBadge('error', err.message);
+                }
+            };
+
+            const updateCloudStatusBadge = (status, extra = '') => {
+                const badge = document.getElementById('firebaseStatusBadge');
+                if (!badge) return;
+                if (status === 'connected') {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Nube Sincronizada`;
+                    badge.className = 'text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                } else if (status === 'saving') {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span> Guardando en Firestore...`;
+                    badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                } else if (status === 'permission_denied') {
+                    badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Reglas de Firestore Bloqueadas`;
+                    badge.className = 'text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
+                    badge.title = 'Revisá la pestaña Reglas en tu consola de Firestore';
                 }
             };
 
@@ -1591,6 +1621,9 @@
                         callback(items);
                     }, (err) => {
                         console.warn(`Lectura de colección ${colName}:`, err.message);
+                        if (err.code === 'permission-denied') {
+                            updateCloudStatusBadge('permission_denied');
+                        }
                     });
                 } catch (e) {
                     console.warn(`Error al suscribir a ${colName}:`, e);
@@ -1598,21 +1631,54 @@
             };
 
             const saveDocument = async (colName, docId, data) => {
-                // Guardar primero en respaldo local para garantizar que nunca se borre
+                // Guardar siempre en respaldo local
                 if (colName === 'events') persistLocalFallback('events', state.events);
                 if (colName === 'busCombos') persistLocalFallback('busCombos', state.busCombos);
                 if (colName === 'vendors') persistLocalFallback('vendors', state.vendors);
                 if (colName === 'tickets') persistLocalFallback('tickets', state.tickets);
 
-                if (!db || !firestoreMethods || !isFirebaseConnected) return;
+                if (!db || !firestoreMethods || !isFirebaseConnected) {
+                    pendingCloudQueue.push({ colName, docId, data });
+                    return;
+                }
+
                 try {
+                    updateCloudStatusBadge('saving');
                     const { doc, setDoc } = firestoreMethods;
                     const cleanData = JSON.parse(JSON.stringify(data));
                     delete cleanData.id;
                     await setDoc(doc(db, colName, String(docId)), cleanData, { merge: true });
+                    updateCloudStatusBadge('connected');
                 } catch (err) {
-                    console.error(`Error crítico al guardar en Firebase (${colName}/${docId}):`, err.message);
+                    console.error(`Error crítico al guardar en Firestore (${colName}/${docId}):`, err);
+                    if (err.code === 'permission-denied') {
+                        updateCloudStatusBadge('permission_denied');
+                    }
                 }
+            };
+
+            const forceSyncAllToCloud = async () => {
+                if (!isFirebaseConnected) {
+                    alert('Conectando a Firebase... Esperá unos segundos y volvé a presionar.');
+                    return;
+                }
+                updateCloudStatusBadge('saving');
+                let count = 0;
+                for (const evt of state.events) {
+                    await saveDocument('events', evt.id, evt);
+                    count++;
+                }
+                for (const b of state.busCombos) {
+                    await saveDocument('busCombos', b.id, b);
+                }
+                for (const v of state.vendors) {
+                    await saveDocument('vendors', v.id, v);
+                }
+                for (const t of state.tickets) {
+                    await saveDocument('tickets', t.id, t);
+                }
+                updateCloudStatusBadge('connected');
+                alert(`¡Sincronización forzada completada! Se enviaron ${count} evento(s) a Cloud Firestore.`);
             };
 
             const saveSettingsCloud = async () => {
@@ -1647,6 +1713,7 @@
                 isEventConcluded,
                 initFirebaseCloud,
                 saveDocument,
+                forceSyncAllToCloud,
                 saveSettingsCloud,
                 adminSignIn,
                 adminSignOut,
