@@ -744,13 +744,16 @@
 
                 <!-- Payment Choice Container (Auto hidden if $0) -->
                 <div id="paymentChoiceContainer" class="grid grid-cols-2 gap-3">
-                    <label class="flex items-center gap-2 p-3 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer">
-                        <input type="radio" name="purchaseFlow" value="MP" checked onchange="UIModule.togglePurchaseChoice('MP')">
-                        <span class="text-xs font-bold text-sky-300"><i class="fa-solid fa-credit-card mr-1"></i> Mercado Pago</span>
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-800 bg-slate-900/50 cursor-not-allowed opacity-50 relative overflow-hidden" title="Temporalmente deshabilitado">
+                        <input type="radio" name="purchaseFlow" value="MP" disabled onchange="UIModule.togglePurchaseChoice('MP')">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-credit-card mr-1"></i> Mercado Pago</span>
+                            <span class="text-[9px] text-amber-400 font-semibold">(Temporalmente deshabilitado)</span>
+                        </div>
                     </label>
-                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-700 bg-slate-900 cursor-pointer">
-                        <input type="radio" name="purchaseFlow" value="CASH" onchange="UIModule.togglePurchaseChoice('CASH')">
-                        <span class="text-xs font-bold text-slate-300"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Vendedor Efectivo</span>
+                    <label class="flex items-center gap-2 p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer">
+                        <input type="radio" name="purchaseFlow" value="CASH" checked onchange="UIModule.togglePurchaseChoice('CASH')">
+                        <span class="text-xs font-bold text-emerald-300"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Vendedor Efectivo</span>
                     </label>
                 </div>
 
@@ -2907,6 +2910,14 @@
                 document.getElementById('detailEvtVenue').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i> ${evt.venue} • ${evt.date}`;
 
                 calculatePurchaseTotal();
+                
+                // Si el evento tiene costo, forzar la opción de Vendedor Efectivo
+                if (evt.price > 0) {
+                    togglePurchaseChoice('CASH');
+                    const cashRadio = document.querySelector('input[name="purchaseFlow"][value="CASH"]');
+                    if (cashRadio) cashRadio.checked = true;
+                }
+
                 openModal('modalEventDetail');
             };
 
@@ -2965,17 +2976,50 @@
                         miniList.innerHTML = `<p class="text-slate-400 py-3 text-center italic text-xs">No hay vendedores registrados en este momento.</p>`;
                         return;
                     }
-                    miniList.innerHTML = state.vendors.map(v => `
-                        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-all">
-                            <div class="min-w-0 pr-2">
-                                <strong class="text-white block text-xs truncate">${v.name}</strong>
-                                <span class="text-[10px] text-slate-400 flex items-center gap-1 truncate"><i class="fa-solid fa-location-dot text-[9px] text-emerald-400"></i> ${v.zone}</span>
+
+                    // Agrupar promotores por localidad / zona
+                    const vendorsByZone = {};
+                    state.vendors.forEach(v => {
+                        const zoneKey = (v.zone || 'Otras Localidades').trim();
+                        if (!vendorsByZone[zoneKey]) {
+                            vendorsByZone[zoneKey] = [];
+                        }
+                        vendorsByZone[zoneKey].push(v);
+                    });
+
+                    // Renderizar lista seccionada por localidad
+                    let groupedHtml = '';
+                    const sortedZones = Object.keys(vendorsByZone).sort();
+
+                    sortedZones.forEach(zone => {
+                        groupedHtml += `
+                            <div class="space-y-1.5 pt-1.5 first:pt-0">
+                                <div class="sticky top-0 bg-slate-950/95 backdrop-blur-sm z-10 px-2 py-1 rounded-lg border border-slate-800 flex items-center justify-between">
+                                    <span class="text-[11px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-location-dot text-emerald-400"></i> ${zone}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-semibold font-mono">
+                                        ${vendorsByZone[zone].length} ${vendorsByZone[zone].length === 1 ? 'vendedor' : 'vendedores'}
+                                    </span>
+                                </div>
+                                <div class="space-y-1 pl-1">
+                                    ${vendorsByZone[zone].map(v => `
+                                        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-all">
+                                            <div class="min-w-0 pr-2">
+                                                <strong class="text-white block text-xs truncate">${v.name}</strong>
+                                                <span class="text-[10px] text-slate-400 font-mono">${v.code}</span>
+                                            </div>
+                                            <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te contacto desde ExperienceQR para comprar una entrada en efectivo.`)}" target="_blank" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm transition-all">
+                                                <i class="fa-brands fa-whatsapp text-xs"></i> Chat
+                                            </a>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
-                            <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te contacto desde ExperienceQR para comprar una entrada en efectivo.`)}" target="_blank" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm transition-all">
-                                <i class="fa-brands fa-whatsapp text-xs"></i> Chat
-                            </a>
-                        </div>
-                    `).join('');
+                        `;
+                    });
+
+                    miniList.innerHTML = groupedHtml;
                 } else {
                     cashBox.classList.add('hidden');
                     submitBtn.innerHTML = `<i class="fa-solid fa-lock"></i> Proceder al Pago Seguro`;
