@@ -1278,15 +1278,16 @@
 
             <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
-                    <i class="fa-solid fa-user-plus"></i>
+                    <i class="fa-solid fa-user-plus" id="vendorModalIcon"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-white">Registrar Promotor Oficial</h3>
-                    <p class="text-xs text-slate-400">Creá un usuario de venta y vinculá su WhatsApp.</p>
+                    <h3 class="text-lg font-black text-white" id="vendorModalHeading">Registrar Promotor Oficial</h3>
+                    <p class="text-xs text-slate-400" id="vendorModalSubtitle">Creá un usuario de venta y vinculá su WhatsApp.</p>
                 </div>
             </div>
 
             <form onsubmit="UIModule.handleSaveVendorSubmit(event)" class="space-y-4">
+                <input type="hidden" id="vendorFormId">
                 <div>
                     <label class="text-xs font-bold text-slate-300 block mb-1">Nombre Completo *</label>
                     <input type="text" id="vendorFormName" placeholder="Martín Gómez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-emerald-500">
@@ -1306,7 +1307,7 @@
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="UIModule.closeModal('modalCreateVendor')" class="px-4 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancelar</button>
                     <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Promotor
+                        <i class="fa-solid fa-floppy-disk"></i> <span id="vendorFormSubmitText">Guardar Promotor</span>
                     </button>
                 </div>
             </form>
@@ -3759,14 +3760,20 @@
                 if (!canvas) return;
                 const state = StateModule.get();
 
-                const labels = [];
-                const dataCounts = [];
-
-                state.vendors.forEach(v => {
+                // Calcular ventas por promotor, ordenar de mayor a menor y tomar el Top 10
+                const vendorStats = state.vendors.map(v => {
                     const count = state.tickets.filter(t => t.channel === v.code).length;
-                    labels.push(`${v.name} (${v.code})`);
-                    dataCounts.push(count);
+                    return {
+                        label: `${v.name} (${v.code})`,
+                        count: count
+                    };
                 });
+
+                vendorStats.sort((a, b) => b.count - a.count);
+                const top10Vendors = vendorStats.slice(0, 10);
+
+                const labels = top10Vendors.map(v => v.label);
+                const dataCounts = top10Vendors.map(v => v.count);
 
                 // Si no hay promotores registrados aún
                 if (labels.length === 0) {
@@ -4106,7 +4113,10 @@
                             <td class="py-3 font-mono font-bold">${vendorTickets.length}</td>
                             <td class="py-3 font-mono font-bold text-indigo-400">${StateModule.formatARS(totalCash)}</td>
                             <td class="py-3 font-mono font-bold text-amber-400">${StateModule.formatARS(totalCash)}</td>
-                            <td class="py-3 text-right">
+                            <td class="py-3 text-right space-x-1.5 whitespace-nowrap">
+                                <button onclick="UIModule.openEditVendorModal('${v.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-slate-700/80" title="Editar Promotor">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
                                 <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te recordamos rendir la caja de $ ${totalCash} correspondiente a tus ventas de ExperienceQR.`)}" target="_blank" class="px-2.5 py-1 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1">
                                     <i class="fa-brands fa-whatsapp"></i> Rendición
                                 </a>
@@ -4278,34 +4288,77 @@
             };
 
             const openCreateVendorModal = () => {
+                document.getElementById('vendorFormId').value = '';
+                document.getElementById('vendorModalHeading').innerText = 'Registrar Promotor Oficial';
+                document.getElementById('vendorModalSubtitle').innerText = 'Creá un usuario de venta y vinculá su WhatsApp.';
+                document.getElementById('vendorFormSubmitText').innerText = 'Guardar Promotor';
+                const icon = document.getElementById('vendorModalIcon');
+                if (icon) icon.className = 'fa-solid fa-user-plus';
+
+                document.getElementById('vendorFormName').value = '';
+                document.getElementById('vendorFormCode').value = '';
+                document.getElementById('vendorFormPhone').value = '';
+                document.getElementById('vendorFormZone').value = '';
+                openModal('modalCreateVendor');
+            };
+
+            const openEditVendorModal = (vendorId) => {
+                const state = StateModule.get();
+                const v = state.vendors.find(item => item.id === vendorId);
+                if (!v) return;
+
+                document.getElementById('vendorFormId').value = v.id;
+                document.getElementById('vendorModalHeading').innerText = 'Editar Promotor';
+                document.getElementById('vendorModalSubtitle').innerText = 'Modificá los datos o zona del vendedor oficial.';
+                document.getElementById('vendorFormSubmitText').innerText = 'Actualizar Promotor';
+                const icon = document.getElementById('vendorModalIcon');
+                if (icon) icon.className = 'fa-solid fa-user-pen';
+
+                document.getElementById('vendorFormName').value = v.name || '';
+                document.getElementById('vendorFormCode').value = v.code || '';
+                document.getElementById('vendorFormPhone').value = v.phone || '';
+                document.getElementById('vendorFormZone').value = v.zone || '';
                 openModal('modalCreateVendor');
             };
 
             const handleSaveVendorSubmit = (e) => {
                 e.preventDefault();
                 const state = StateModule.get();
+                const id = document.getElementById('vendorFormId').value;
                 const name = document.getElementById('vendorFormName').value.trim();
                 const code = document.getElementById('vendorFormCode').value.trim().toUpperCase();
                 const phone = document.getElementById('vendorFormPhone').value.trim();
                 const zone = document.getElementById('vendorFormZone').value.trim();
 
-                const newVendor = {
-                    id: 'ven-' + Date.now(),
-                    name,
-                    code,
-                    phone,
-                    zone,
-                    ticketsSold: 0,
-                    totalCollected: 0,
-                    cashDue: 0
-                };
+                if (id) {
+                    const existing = state.vendors.find(v => v.id === id);
+                    if (existing) {
+                        existing.name = name;
+                        existing.code = code;
+                        existing.phone = phone;
+                        existing.zone = zone;
+                        StateModule.saveDocument('vendors', existing.id, existing);
+                    }
+                } else {
+                    const newVendor = {
+                        id: 'ven-' + Date.now(),
+                        name,
+                        code,
+                        phone,
+                        zone,
+                        ticketsSold: 0,
+                        totalCollected: 0,
+                        cashDue: 0
+                    };
 
-                state.vendors.push(newVendor);
-                StateModule.saveDocument('vendors', newVendor.id, newVendor);
+                    state.vendors.push(newVendor);
+                    StateModule.saveDocument('vendors', newVendor.id, newVendor);
+                }
 
                 closeModal('modalCreateVendor');
                 renderAdminVendorsTable();
                 renderPublicVendorsContact();
+                initOrUpdateVendorsHorizontalBarChart();
             };
 
             const previewTicketById = (ticketId) => {
@@ -4360,6 +4413,7 @@
                 openCreateBusModal,
                 handleSaveBusSubmit,
                 openCreateVendorModal,
+                openEditVendorModal,
                 handleSaveVendorSubmit,
                 previewTicketById,
                 getActiveAuditEvtId,
