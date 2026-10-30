@@ -754,9 +754,14 @@
                     </label>
                 </div>
 
-                <div id="cashVendorSelectionBox" class="hidden p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-1">
-                    <p class="font-bold text-emerald-300">Coordiná con tu vendedor más cercano:</p>
-                    <div id="cashVendorsContactMiniList" class="space-y-1 pt-1"></div>
+                <div id="cashVendorSelectionBox" class="hidden p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
+                    <div class="flex items-center justify-between pb-1 border-b border-emerald-500/20">
+                        <p class="font-bold text-emerald-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                            <i class="fa-brands fa-whatsapp text-emerald-400"></i> Seleccioná tu promotor oficial:
+                        </p>
+                        <span class="text-[10px] text-emerald-400/80 font-medium">Pago en efectivo</span>
+                    </div>
+                    <div id="cashVendorsContactMiniList" class="space-y-1.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
                 </div>
 
                 <!-- Action Button: Says "Generar Entrada" for $0 or "Proceder al Pago Seguro" for >$0 -->
@@ -2955,14 +2960,18 @@
                     submitBtn.className = "w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold rounded-xl shadow-lg shadow-emerald-600/30 text-sm transition-all flex items-center justify-center gap-2";
 
                     const miniList = document.getElementById('cashVendorsContactMiniList');
+                    if (state.vendors.length === 0) {
+                        miniList.innerHTML = `<p class="text-slate-400 py-3 text-center italic text-xs">No hay vendedores registrados en este momento.</p>`;
+                        return;
+                    }
                     miniList.innerHTML = state.vendors.map(v => `
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-slate-800">
-                            <div>
-                                <strong class="text-white block">${v.name}</strong>
-                                <span class="text-[10px] text-slate-400">${v.zone}</span>
+                        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-all">
+                            <div class="min-w-0 pr-2">
+                                <strong class="text-white block text-xs truncate">${v.name}</strong>
+                                <span class="text-[10px] text-slate-400 flex items-center gap-1 truncate"><i class="fa-solid fa-location-dot text-[9px] text-emerald-400"></i> ${v.zone}</span>
                             </div>
-                            <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, quiero comprar entradas para el evento.`)}" target="_blank" class="px-2.5 py-1 bg-emerald-600 text-white text-[11px] font-bold rounded-lg flex items-center gap-1">
-                                <i class="fa-brands fa-whatsapp"></i> Chat
+                            <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te contacto desde ExperienceQR para comprar una entrada en efectivo.`)}" target="_blank" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm transition-all">
+                                <i class="fa-brands fa-whatsapp text-xs"></i> Chat
                             </a>
                         </div>
                     `).join('');
