@@ -841,17 +841,21 @@
             </div>
 
             <form onsubmit="UIModule.handleVendorDirectSaleSubmit(event)" class="space-y-4">
-                <!-- Tipo de Producto a Vender: Evento o Colectivo -->
+                <!-- Tipo de Producto a Vender: Evento, Combo o Colectivo -->
                 <div>
                     <label class="text-xs font-bold text-slate-300 block mb-1">Tipo de Venta *</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all">
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
                             <input type="radio" name="vdsSaleType" value="EVENT" checked onchange="UIModule.toggleVendorSaleType(this.value)">
                             <i class="fa-solid fa-ticket text-indigo-400"></i> Evento
                         </label>
-                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer text-xs font-bold text-white transition-all">
+                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
+                            <input type="radio" name="vdsSaleType" value="COMBO_DIRECT" onchange="UIModule.toggleVendorSaleType(this.value)">
+                            <i class="fa-solid fa-tags text-purple-400"></i> Combo
+                        </label>
+                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
                             <input type="radio" name="vdsSaleType" value="BUS" onchange="UIModule.toggleVendorSaleType(this.value)">
-                            <i class="fa-solid fa-bus text-sky-400"></i> Colectivo / Traslado
+                            <i class="fa-solid fa-bus text-sky-400"></i> Colectivo
                         </label>
                     </div>
                 </div>
@@ -860,6 +864,13 @@
                 <div id="vdsEventSelectContainer">
                     <label class="text-xs font-bold text-slate-300 block mb-1">Evento *</label>
                     <select id="vdsEventSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-emerald-500"></select>
+                </div>
+
+                <!-- Campo para selección de Combo Promocional dedicado -->
+                <div id="vdsComboDirectSelectContainer" class="hidden space-y-2">
+                    <label class="text-xs font-bold text-purple-300 block mb-1">Seleccionar Combo Promocional *</label>
+                    <select id="vdsComboDirectSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-purple-500/50 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-purple-400"></select>
+                    <p id="vdsComboDirectDetailNote" class="text-[11px] text-purple-300 font-semibold"></p>
                 </div>
 
                 <!-- Campo para selección de Colectivo y Butaca (oculto por defecto) -->
@@ -3820,13 +3831,25 @@ service cloud.firestore {
                 // Restablecer selección a Evento
                 const eventRadio = document.querySelector('input[name="vdsSaleType"][value="EVENT"]');
                 if (eventRadio) eventRadio.checked = true;
-                toggleVendorSaleType('EVENT');
 
                 const selectEvt = document.getElementById('vdsEventSelect');
                 if (selectEvt) {
                     const activeEvents = state.events.filter(e => !StateModule.isEventConcluded(e));
                     const listToUse = activeEvents.length > 0 ? activeEvents : state.events;
                     selectEvt.innerHTML = listToUse.map(e => `<option value="${e.id}">${e.title} (${e.price === 0 ? '$ 0' : StateModule.formatARS(e.price)})</option>`).join('');
+                }
+
+                // Cargar combos disponibles en el selector de combos directos
+                const selectComboDirect = document.getElementById('vdsComboDirectSelect');
+                if (selectComboDirect) {
+                    const eventsWithCombos = state.events.filter(e => e.combo && e.combo.enabled);
+                    if (eventsWithCombos.length === 0) {
+                        selectComboDirect.innerHTML = `<option value="">No hay combos o promociones activas</option>`;
+                    } else {
+                        selectComboDirect.innerHTML = eventsWithCombos.map(e => {
+                            return `<option value="${e.id}">${e.combo.name || 'Combo'} - ${e.title} (${e.combo.ticketsCount} QRs por ${StateModule.formatARS(e.combo.price)})</option>`;
+                        }).join('');
+                    }
                 }
 
                 const selectBus = document.getElementById('vdsBusSelect');
@@ -3847,6 +3870,7 @@ service cloud.firestore {
                 if (dniInput) dniInput.value = '';
                 document.getElementById('vdsBuyerQty').value = '1';
 
+                toggleVendorSaleType('EVENT');
                 handleVendorEventSelectChange();
                 handleVendorBusSelectChange();
                 calculateVendorDirectSaleTotal();
@@ -3894,6 +3918,7 @@ service cloud.firestore {
 
             const toggleVendorSaleType = (type) => {
                 const eventBox = document.getElementById('vdsEventSelectContainer');
+                const comboDirectBox = document.getElementById('vdsComboDirectSelectContainer');
                 const busBox = document.getElementById('vdsBusSelectContainer');
                 const modeBox = document.getElementById('vdsTicketModeContainer');
                 const qtyBox = document.getElementById('vdsBuyerQtyContainer');
@@ -3902,14 +3927,32 @@ service cloud.firestore {
 
                 if (type === 'BUS') {
                     if (eventBox) eventBox.classList.add('hidden');
+                    if (comboDirectBox) comboDirectBox.classList.add('hidden');
                     if (modeBox) modeBox.classList.add('hidden');
                     if (busBox) busBox.classList.remove('hidden');
                     if (qtyBox) qtyBox.classList.add('hidden');
                     if (comboQtyBox) comboQtyBox.classList.add('hidden');
                     if (dniInput) dniInput.required = true;
                     handleVendorBusSelectChange();
+                } else if (type === 'COMBO_DIRECT') {
+                    if (eventBox) eventBox.classList.add('hidden');
+                    if (comboDirectBox) comboDirectBox.classList.remove('hidden');
+                    if (modeBox) modeBox.classList.add('hidden');
+                    if (busBox) busBox.classList.add('hidden');
+                    if (qtyBox) qtyBox.classList.add('hidden');
+                    if (comboQtyBox) comboQtyBox.classList.remove('hidden');
+                    if (dniInput) dniInput.required = false;
+
+                    const state = StateModule.get();
+                    const evtId = document.getElementById('vdsComboDirectSelect')?.value;
+                    const evt = state.events.find(e => e.id === evtId);
+                    const note = document.getElementById('vdsComboDirectDetailNote');
+                    if (evt?.combo && note) {
+                        note.innerText = `Incluye ${evt.combo.ticketsCount} entradas oficiales para "${evt.title}". Se emitirán ${evt.combo.ticketsCount} QRs individuales.`;
+                    }
                 } else {
                     if (eventBox) eventBox.classList.remove('hidden');
+                    if (comboDirectBox) comboDirectBox.classList.add('hidden');
                     if (modeBox) modeBox.classList.remove('hidden');
                     if (busBox) busBox.classList.add('hidden');
                     if (dniInput) dniInput.required = false;
@@ -3967,6 +4010,38 @@ service cloud.firestore {
                     document.getElementById('vdsTotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(total);
 
                     return { item: bus, qty, actualTicketsCount: 1, subtotal, totalFee, total, isZero, isBus: true, isCombo: false };
+                }
+
+                if (saleType === 'COMBO_DIRECT') {
+                    const eventId = document.getElementById('vdsComboDirectSelect')?.value;
+                    const evt = state.events.find(e => e.id === eventId && e.combo && e.combo.enabled) || state.events.find(e => e.combo && e.combo.enabled);
+                    if (!evt) {
+                        document.getElementById('vdsSubtotalText').innerText = '$ 0';
+                        document.getElementById('vdsFeeText').innerText = '+$ 0';
+                        document.getElementById('vdsTotalText').innerText = '$ 0';
+                        return { item: null, qty: 1, actualTicketsCount: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: false, isCombo: false };
+                    }
+
+                    const qty = parseInt(document.getElementById('vdsComboQty')?.value) || 1;
+                    const comboUnitPrice = evt.combo.price || 0;
+                    const ticketsPerCombo = parseInt(evt.combo.ticketsCount) || 2;
+                    const actualTicketsCount = ticketsPerCombo * qty;
+                    const subtotal = comboUnitPrice * qty;
+                    const isZero = (comboUnitPrice === 0);
+                    const singleFee = isZero ? 0 : ServiceFeeModule.calculateFee(comboUnitPrice, evt.id, false);
+                    const totalFee = singleFee * qty;
+                    const total = subtotal + totalFee;
+
+                    const note = document.getElementById('vdsComboDirectDetailNote');
+                    if (note) {
+                        note.innerText = `Incluye ${evt.combo.ticketsCount} entradas oficiales para "${evt.title}". Total a emitir: ${actualTicketsCount} QRs.`;
+                    }
+
+                    document.getElementById('vdsSubtotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(subtotal);
+                    document.getElementById('vdsFeeText').innerText = isZero ? '$ 0' : `+${StateModule.formatARS(totalFee)}`;
+                    document.getElementById('vdsTotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(total);
+
+                    return { item: evt, qty, actualTicketsCount, subtotal, totalFee, total, isZero, isBus: false, isCombo: true };
                 }
 
                 const eventId = document.getElementById('vdsEventSelect')?.value;
