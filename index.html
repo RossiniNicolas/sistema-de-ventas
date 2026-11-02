@@ -150,9 +150,7 @@
     <!-- MAIN APP WRAPPER -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
 
-        <!-- ============================================== -->
-        <!-- VIEW 1: TIENDA ONLINE DE EVENTOS               -->
-        <!-- ============================================== -->
+        <!-- VIEW 1: TIENDA ONLINE DE EVENTOS -->
         <section id="view-store" class="space-y-8">
             <div class="relative rounded-3xl overflow-hidden glass-panel border border-indigo-500/20 p-8 sm:p-12 shadow-2xl">
                 <div class="absolute -right-20 -top-20 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
@@ -165,7 +163,7 @@
                         Viví tus mejores recitales, boliches y festivales.
                     </h1>
                     <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
-                        Pagá seguro mediante Mercado Pago Checkout Pro, generá entradas de costo $ 0 al instante o contactá a un vendedor oficial para abonar en efectivo.
+                        Pagá seguro mediante Mercado Pago, generá entradas de costo $ 0 al instante o contactá a un vendedor oficial para abonar en efectivo.
                     </p>
                 </div>
             </div>
@@ -190,9 +188,7 @@
             <div id="storeEventsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- ============================================== -->
-        <!-- VIEW 2: COLECTIVOS Y TRASLADOS                 -->
-        <!-- ============================================== -->
+        <!-- VIEW 2: COLECTIVOS Y TRASLADOS -->
         <section id="view-buses" class="hidden space-y-8">
             <div class="rounded-3xl glass-panel border border-sky-500/20 p-8 sm:p-10 relative overflow-hidden shadow-2xl">
                 <div class="max-w-2xl space-y-3">
@@ -208,9 +204,7 @@
             <div id="publicBusesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- ============================================== -->
-        <!-- VIEW 3: RED DE VENDEDORES OFICIALES            -->
-        <!-- ============================================== -->
+        <!-- VIEW 3: RED DE VENDEDORES OFICIALES -->
         <section id="view-vendors-contact" class="hidden space-y-8">
             <div class="rounded-3xl glass-panel border border-emerald-500/20 p-8 sm:p-10 space-y-3">
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold">
@@ -224,9 +218,7 @@
             <div id="publicVendorsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- ============================================== -->
-        <!-- VIEW 4: PORTAL DE PROMOTOR (SOLO EFECTIVO)     -->
-        <!-- ============================================== -->
+        <!-- VIEW 4: PORTAL DE PROMOTOR (SOLO EFECTIVO) -->
         <section id="view-vendor-portal" class="hidden space-y-8">
             <div id="vendorLoginCard" class="max-w-md mx-auto rounded-3xl glass-panel border border-purple-500/30 p-8 shadow-2xl space-y-6">
                 <div class="text-center space-y-2">
@@ -311,9 +303,7 @@
             </div>
         </section>
 
-        <!-- ============================================== -->
-        <!-- VIEW 5: PANEL ADMINISTRATIVO GENERAL           -->
-        <!-- ============================================== -->
+        <!-- VIEW 5: PANEL ADMINISTRATIVO GENERAL -->
         <section id="view-admin" class="hidden space-y-8">
             <div id="adminLockScreen" class="max-w-md mx-auto rounded-3xl glass-panel border border-amber-500/30 p-8 shadow-2xl space-y-6">
                 <div class="text-center space-y-2">
@@ -321,12 +311,12 @@
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <h2 class="text-2xl font-black text-white">Panel Administrativo</h2>
-                    <p class="text-xs text-slate-400">Área protegida con Firebase Authentication.</p>
+                    <p class="text-xs text-slate-400">Área protegida con autenticación.</p>
                 </div>
                 <form onsubmit="UIModule.handleAdminLogin(event)" class="space-y-4">
                     <div>
                         <label class="text-xs font-bold text-slate-300 block mb-1">Correo Electrónico Administrador</label>
-                        <input type="email" id="adminEmailInput" placeholder="tu-correo@ejemplo.com" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+                        <input type="email" id="adminEmailInput" placeholder="admin@tudominio.com" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-300 block mb-1">Contraseña</label>
@@ -346,7 +336,7 @@
                         <h2 class="text-2xl font-black text-white flex items-center gap-3">
                             <span>Gestión Integral ExperienceQR</span>
                             <span id="firebaseStatusBadge" class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Conectando Nube...
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Modo Operativo Activo
                             </span>
                         </h2>
                         <p class="text-xs text-slate-400">Control de eventos, recaudación en ARS $, costo de servicio y validación de puertas.</p>
@@ -591,7 +581,7 @@
                         </button>
                     </div>
 
-                    <!-- Gráfico Horizontal: Entradas Vendidas por Promotor -->
+                    <!-- Ranking de Ventas por Promotor -->
                     <div class="glass-panel p-6 rounded-3xl border border-slate-800 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
@@ -654,7 +644,6 @@
                             <span id="cameraStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 font-semibold">Cámara Apagada</span>
                         </div>
 
-                        <!-- Selector de Cámara (especial para celulares con múltiples cámaras traseras) -->
                         <div id="cameraDeviceSelectorContainer" class="hidden max-w-sm mx-auto text-center space-y-1">
                             <label class="text-[11px] font-bold text-slate-400">Lente / Cámara detectada:</label>
                             <select id="cameraDeviceSelect" onchange="TurnstileModule.changeCameraDevice(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-1.5 text-xs focus:border-red-500 font-medium"></select>
@@ -677,10 +666,6 @@
         </section>
 
     </main>
-
-    <!-- ============================================== -->
-    <!-- MODALS SECTION                                 -->
-    <!-- ============================================== -->
 
     <!-- MODAL 1: DETALLE Y COMPRA / GENERACIÓN DE ENTRADA -->
     <div id="modalEventDetail" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
@@ -705,26 +690,20 @@
                         <input type="text" id="buyerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
                     </div>
                     <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Correo Electrónico *</label>
-                        <input type="email" id="buyerEmail" placeholder="juan@ejemplo.com" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
                         <label class="text-xs font-bold text-slate-300 block mb-1">Celular / WhatsApp *</label>
                         <input type="tel" id="buyerPhone" placeholder="+54 9 351 1234567" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
-                        <select id="buyerQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                            <option value="1">1 Entrada</option>
-                            <option value="2">2 Entradas</option>
-                            <option value="3">3 Entradas</option>
-                            <option value="4">4 Entradas</option>
-                            <option value="6">6 Entradas</option>
-                        </select>
-                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
+                    <select id="buyerQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                        <option value="1">1 Entrada</option>
+                        <option value="2">2 Entradas</option>
+                        <option value="3">3 Entradas</option>
+                        <option value="4">4 Entradas</option>
+                        <option value="6">6 Entradas</option>
+                    </select>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
@@ -767,60 +746,10 @@
                     <div id="cashVendorsContactMiniList" class="space-y-1.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
                 </div>
 
-                <!-- Action Button: Says "Generar Entrada" for $0 or "Proceder al Pago Seguro" for >$0 -->
-                <button type="submit" id="btnSubmitPurchase" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg shadow-sky-600/30 text-sm transition-all flex items-center justify-center gap-2">
+                <button type="submit" id="btnSubmitPurchase" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg shadow-sky-600/30 text-sm transition-all flex items-center justify-center gap-2">
                     <i class="fa-solid fa-lock"></i> Proceder al Pago Seguro
                 </button>
             </form>
-        </div>
-    </div>
-
-    <!-- MODAL 2: PASARELA MERCADO PAGO CHECKOUT PRO -->
-    <div id="modalMercadoPagoGateway" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-panel w-full max-w-md rounded-3xl border border-sky-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
-            <button onclick="UIModule.closeModal('modalMercadoPagoGateway')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-
-            <div class="text-center space-y-2 border-b border-slate-800 pb-4">
-                <div class="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center text-3xl mx-auto">
-                    <i class="fa-solid fa-handshake"></i>
-                </div>
-                <h3 class="text-xl font-black text-white">Mercado Pago Checkout Pro</h3>
-                <p class="text-xs text-slate-400" id="mpGatewayAccountHolder">Cobro oficial: ExperienceQR Eventos Oficial S.A.</p>
-                <div class="pt-1">
-                    <span id="mpApiStatusBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-sky-500/20 text-sky-400 border border-sky-500/30 font-mono">POST /checkout/preferences (MLA)</span>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Monto a Debitar</span>
-                <div class="text-3xl font-extrabold text-emerald-400 font-mono-num" id="mpGatewayAmount">$ 0</div>
-                <span class="text-[11px] text-slate-400" id="mpGatewayItemDetail">Entrada + Costo de Servicio</span>
-            </div>
-
-            <div id="mpCheckoutFeedbackBox" class="p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-xs text-slate-300 space-y-1.5">
-                <p id="mpApiInstruction" class="leading-relaxed">
-                    Al confirmar, serás redirigido a Checkout Pro de Mercado Pago para abonar con saldo en cuenta, débito o tarjeta.
-                </p>
-                <p class="text-[11px] text-slate-400">
-                    Comprador: <span id="mpGatewayBuyerEmail" class="font-mono text-white">cliente@mail.com</span>
-                </p>
-            </div>
-
-            <div id="mpManualRedirectContainer" class="hidden p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-center space-y-2">
-                <span class="text-xs text-emerald-300 block font-semibold">¡Preferencia lista en Mercado Pago!</span>
-                <a id="mpManualRedirectLink" href="#" target="_top" class="inline-flex items-center justify-center w-full gap-2 px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-black shadow-lg">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Mercado Pago Checkout Pro
-                </a>
-            </div>
-
-            <div class="flex gap-3 pt-2">
-                <button onclick="UIModule.closeModal('modalMercadoPagoGateway')" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl">
-                    Cancelar
-                </button>
-                <button id="btnProceedMpCheckout" onclick="MercadoPagoModule.executeCheckoutOrder()" class="w-1/2 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-black text-xs rounded-xl shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-arrow-right"></i> <span id="btnMpCheckoutLabel">Ir a Mercado Pago</span>
-                </button>
-            </div>
         </div>
     </div>
 
@@ -840,9 +769,43 @@
             </div>
 
             <form onsubmit="UIModule.handleVendorDirectSaleSubmit(event)" class="space-y-4">
+                <!-- Tipo de Producto a Vender: Evento o Colectivo -->
                 <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Tipo de Venta *</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all">
+                            <input type="radio" name="vdsSaleType" value="EVENT" checked onchange="UIModule.toggleVendorSaleType(this.value)">
+                            <i class="fa-solid fa-ticket text-indigo-400"></i> Evento
+                        </label>
+                        <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer text-xs font-bold text-white transition-all">
+                            <input type="radio" name="vdsSaleType" value="BUS" onchange="UIModule.toggleVendorSaleType(this.value)">
+                            <i class="fa-solid fa-bus text-sky-400"></i> Colectivo / Traslado
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Campo para selección de Evento -->
+                <div id="vdsEventSelectContainer">
                     <label class="text-xs font-bold text-slate-300 block mb-1">Evento *</label>
                     <select id="vdsEventSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-emerald-500"></select>
+                </div>
+
+                <!-- Campo para selección de Colectivo y Butaca (oculto por defecto) -->
+                <div id="vdsBusSelectContainer" class="hidden space-y-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Unidad / Colectivo *</label>
+                        <select id="vdsBusSelect" onchange="UIModule.handleVendorBusSelectChange()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-sky-500"></select>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">Butaca a Asignar *</label>
+                            <select id="vdsBusSeatSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">DNI del Pasajero *</label>
+                            <input type="text" id="vdsBuyerDni" placeholder="40123456" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono focus:border-sky-500">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -856,7 +819,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div id="vdsBuyerQtyContainer">
                     <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
                     <select id="vdsBuyerQty" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-emerald-500">
                         <option value="1">1 Entrada</option>
@@ -870,7 +833,7 @@
 
                 <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
                     <div class="flex justify-between text-slate-400">
-                        <span>Subtotal Entradas:</span>
+                        <span>Subtotal:</span>
                         <strong id="vdsSubtotalText" class="font-mono text-white">$ 0</strong>
                     </div>
                     <div class="flex justify-between text-slate-400">
@@ -940,11 +903,9 @@
         </div>
     </div>
 
-    <!-- MODAL 5: MAPA INTERACTIVO DE BUTACAS DEL COLECTIVO Y DATOS DEL PASAJERO -->
+    <!-- MODAL 5: MAPA INTERACTIVO DE BUTACAS DEL COLECTIVO -->
     <div id="modalBusSeatMap" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto pt-6 sm:pt-4 pb-16">
         <div class="glass-panel w-full max-w-4xl max-h-[88vh] rounded-3xl border border-sky-500/40 relative shadow-2xl flex flex-col overflow-hidden my-auto">
-            
-            <!-- Header FIJO: Siempre visible con botón X prominente -->
             <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 z-20">
                 <div class="space-y-0.5 min-w-0 pr-2">
                     <span class="text-[10px] font-black uppercase tracking-wider text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full border border-sky-500/20 inline-block">
@@ -953,26 +914,20 @@
                     <h3 id="seatMapBusTitle" class="text-lg sm:text-xl font-black text-white truncate leading-tight">Colectivo</h3>
                     <p id="seatMapBusRoute" class="text-xs text-slate-400 truncate">Salida y recorrido</p>
                 </div>
-                
-                <!-- Botón de Cierre X grande y siempre visible -->
                 <button type="button" onclick="UIModule.closeModal('modalBusSeatMap')" class="shrink-0 w-11 h-11 rounded-2xl bg-slate-900 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-rose-500 flex items-center justify-center transition-all shadow-xl active:scale-95" title="Cerrar ventana">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
 
-            <!-- Cuerpo con scroll interno en 2 columnas (Mapa a la izquierda, Formulario a la derecha) -->
             <div class="p-4 sm:p-6 overflow-y-auto space-y-6 md:space-y-0 md:grid md:grid-cols-12 md:gap-6 flex-1">
-                
-                <!-- Columna Izquierda: Mapa de Colectivo (5 columnas en grid) -->
+                <!-- Columna Izquierda: Mapa del Colectivo -->
                 <div class="md:col-span-5 space-y-4 flex flex-col items-center">
-                    <!-- Referencias de color -->
                     <div class="flex items-center justify-center gap-3 text-[11px] font-bold w-full bg-slate-900/60 p-2 rounded-xl border border-slate-800">
                         <span class="flex items-center gap-1.5 text-slate-300"><span class="w-3 h-3 rounded bg-emerald-600 inline-block"></span> Libre</span>
                         <span class="flex items-center gap-1.5 text-sky-300"><span class="w-3 h-3 rounded bg-sky-500 inline-block"></span> Tu Butaca</span>
                         <span class="flex items-center gap-1.5 text-slate-500"><span class="w-3 h-3 rounded bg-slate-800 inline-block"></span> Ocupado</span>
                     </div>
 
-                    <!-- Chasis del Colectivo -->
                     <div class="bg-slate-900 border border-slate-800 p-3 sm:p-4 rounded-3xl w-full max-w-xs space-y-3 shadow-inner">
                         <div class="flex justify-between items-center text-[10px] text-slate-500 border-b border-slate-800 pb-2 font-black uppercase tracking-widest">
                             <span class="flex items-center gap-1"><i class="fa-solid fa-arrow-up text-sky-400"></i> Frente</span>
@@ -987,7 +942,7 @@
                     </div>
                 </div>
 
-                <!-- Columna Derecha: Formulario de Datos Obligatorios del Pasajero (7 columnas en grid) -->
+                <!-- Columna Derecha: Formulario de Pasajero -->
                 <div class="md:col-span-7 flex flex-col justify-between">
                     <form id="busPassengerForm" onsubmit="UIModule.handleBusPassengerSubmit(event)" class="space-y-4">
                         <div class="space-y-1">
@@ -997,37 +952,41 @@
                             <p class="text-[11px] text-slate-400">Ingresá los datos del titular para el seguro de transporte y manifiesto oficial de viaje.</p>
                         </div>
 
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-300 block mb-1">Nombre y Apellido *</label>
+                            <input type="text" id="busPassengerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-sky-500">
+                        </div>
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
-                            <div>
-                                <label class="text-[11px] font-bold text-slate-300 block mb-1">Nombre y Apellido *</label>
-                                <input type="text" id="busPassengerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-sky-500">
-                            </div>
                             <div>
                                 <label class="text-[11px] font-bold text-slate-300 block mb-1">DNI / Documento *</label>
                                 <input type="text" id="busPassengerDni" placeholder="40123456" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs font-mono focus:outline-none focus:border-sky-500">
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
                             <div>
                                 <label class="text-[11px] font-bold text-slate-300 block mb-1">Celular / WhatsApp *</label>
                                 <input type="tel" id="busPassengerPhone" placeholder="+54 9 3564 123456" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-sky-500">
                             </div>
-                            <div>
-                                <label class="text-[11px] font-bold text-slate-300 block mb-1">Correo Electrónico *</label>
-                                <input type="email" id="busPassengerEmail" placeholder="juan@ejemplo.com" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-sky-500">
-                            </div>
                         </div>
 
-                        <!-- Resumen de Costo -->
                         <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs flex justify-between items-center text-slate-300">
                             <span>Monto Combo / Traslado:</span>
                             <strong id="busPassengerPriceSummary" class="font-mono text-emerald-400 text-base font-extrabold">$ 0</strong>
                         </div>
 
-                        <!-- Botón de Acción -->
-                        <button type="submit" id="btnProceedFromSeatMap" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl shadow-lg shadow-sky-600/30 text-xs transition-all flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-arrow-right"></i> Continuar
+                        <!-- Lista de Promotores Oficiales para asignar la venta del traslado (Se oculta automáticamente si es $0) -->
+                        <div id="busVendorAssignmentBox" class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
+                            <div class="flex items-center justify-between pb-1 border-b border-emerald-500/20">
+                                <p class="font-bold text-emerald-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                                    <i class="fa-brands fa-whatsapp text-emerald-400"></i> Seleccioná tu promotor oficial para coordinar:
+                                </p>
+                                <span class="text-[10px] text-emerald-400/80 font-medium">Asignación de venta</span>
+                            </div>
+                            <div id="busVendorsContactMiniList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <!-- Botón dinámico: Genera QR directo si es $0 o conecta con promotor si tiene costo -->
+                        <button type="submit" id="btnProceedFromSeatMap" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-600/30 text-xs transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-qrcode text-base"></i> Reservar Butaca y Generar Entrada QR ($ 0)
                         </button>
                     </form>
                 </div>
@@ -1099,7 +1058,7 @@
         </div>
     </div>
 
-    <!-- MODAL 7: CREAR O EDITAR EVENTO (PERMITE PRECIO $0) -->
+    <!-- MODAL 7: CREAR O EDITAR EVENTO -->
     <div id="modalCreateEvent" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-xl rounded-3xl border border-indigo-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
             <button onclick="UIModule.closeModal('modalCreateEvent')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -1217,7 +1176,7 @@
                             <th class="pb-3">Canal / Vendedor</th>
                             <th class="pb-3">Monto</th>
                             <th class="pb-3">Estado</th>
-                            <th class="pb-3 text-right">Acción QR</th>
+                            <th class="pb-3 text-right">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="liveAuditTableBody" class="divide-y divide-slate-800/60 text-slate-200"></tbody>
@@ -1233,15 +1192,16 @@
 
             <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
                 <div class="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-2xl border border-sky-500/30">
-                    <i class="fa-solid fa-bus"></i>
+                    <i class="fa-solid fa-bus" id="busModalIcon"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-white">Nuevo Colectivo / Combo de Traslado</h3>
-                    <p class="text-xs text-slate-400">Definí el recorrido, butacas y precio (0 para costo $ 0).</p>
+                    <h3 class="text-lg font-black text-white" id="busModalHeading">Nuevo Colectivo / Combo de Traslado</h3>
+                    <p class="text-xs text-slate-400" id="busModalSubtitle">Definí el recorrido, butacas y precio (0 para costo $ 0).</p>
                 </div>
             </div>
 
             <form onsubmit="UIModule.handleSaveBusSubmit(event)" class="space-y-4">
+                <input type="hidden" id="busFormId">
                 <div>
                     <label class="text-xs font-bold text-slate-300 block mb-1">Nombre o Unidad *</label>
                     <input type="text" id="busFormName" placeholder="Colectivo Norte - Unidad #03" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-sky-500">
@@ -1260,14 +1220,20 @@
                         <input type="number" id="busFormPrice" placeholder="0" min="0" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500">
                     </div>
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-300 block mb-1">Punto de Encuentro y Horario *</label>
-                    <input type="text" id="busFormDeparture" placeholder="Plaza Cívica - Salida 20:30 hs" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-sky-500">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Butacas *</label>
+                        <input type="number" id="busFormSeats" placeholder="40" min="1" max="120" value="40" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Punto de Encuentro y Horario *</label>
+                        <input type="text" id="busFormDeparture" placeholder="Plaza Cívica - 20:30 hs" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-sky-500">
+                    </div>
                 </div>
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="UIModule.closeModal('modalCreateBus')" class="px-4 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancelar</button>
                     <button type="submit" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-2">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Colectivo
+                        <i class="fa-solid fa-floppy-disk"></i> <span id="busFormSubmitText">Guardar Colectivo</span>
                     </button>
                 </div>
             </form>
@@ -1327,7 +1293,7 @@
                     <i class="fa-solid fa-handshake"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-white">Mercado Pago Checkout Pro (Preferences API)</h3>
+                    <h3 class="text-lg font-black text-white">Mercado Pago Checkout Pro</h3>
                     <p class="text-xs text-slate-400">Credenciales de integración MLA y retorno de pagos.</p>
                 </div>
             </div>
@@ -1379,26 +1345,13 @@
         </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- JAVASCRIPT APPLICATION ARCHITECTURE            -->
-    <!-- ============================================== -->
+    <!-- JAVASCRIPT APPLICATION CODE -->
     <script>
         /* ==========================================================
            1. STATE STORE & PERSISTENCE (StateModule)
         ========================================================== */
         const StateModule = (() => {
             const currentOrigin = window.location.origin + window.location.pathname;
-
-            const firebaseConfig = {
-                apiKey: "AIzaSyBdPMtCtA9s7NjybzvO3Jz4amM07n6cKRU",
-                authDomain: "tupedido-6be53.firebaseapp.com",
-                databaseURL: "https://tupedido-6be53.firebaseio.com",
-                projectId: "tupedido-6be53",
-                storageBucket: "tupedido-6be53.firebasestorage.app",
-                messagingSenderId: "306060611132",
-                appId: "1:306060611132:web:b73ff8e79ef0e340dabd39",
-                measurementId: "G-S9YH6K6L0Z"
-            };
 
             let db = null;
             let firestoreMethods = null;
@@ -1409,13 +1362,13 @@
 
             let state = {
                 serviceFee: {
-                    type: 'percent', // 'percent' or 'fixed'
+                    type: 'percent',
                     value: 10,
-                    eventFees: {} // { [eventId]: { type, value } }
+                    eventFees: {}
                 },
                 mercadoPago: {
                     holder: 'ExperienceQR Eventos Oficial S.A.',
-                    token: 'APP_USR-8042829559237713-102607-babd027d27ce789a789911e88d5916dc-3791213875',
+                    token: '',
                     proxyUrl: '',
                     successUrl: currentOrigin + '?status=approved',
                     failureUrl: currentOrigin + '?status=failure',
@@ -1451,7 +1404,6 @@
                 return new Date() > eventDateTime;
             };
 
-            // Cargar respaldo local de eventos/datos para que no se pierdan si Firestore está vacío o sincronizando
             const loadLocalFallback = () => {
                 try {
                     const localEvents = localStorage.getItem('eqr_events');
@@ -1466,7 +1418,7 @@
                     const localTickets = localStorage.getItem('eqr_tickets');
                     if (localTickets) state.tickets = JSON.parse(localTickets);
                 } catch (e) {
-                    console.warn("Error leyendo respaldo local:", e);
+                    console.warn("Lectura de almacenamiento local:", e);
                 }
             };
 
@@ -1476,244 +1428,29 @@
                 } catch (e) {}
             };
 
-            // Inicialización en segundo plano sin bloquear el arranque del HTML
             const initFirebaseCloud = async () => {
                 loadLocalFallback();
-                try {
-                    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-                    const { 
-                        getAuth, 
-                        signInAnonymously, 
-                        signInWithEmailAndPassword, 
-                        signOut, 
-                        onAuthStateChanged 
-                    } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-                    const { 
-                        getFirestore, 
-                        collection, 
-                        doc, 
-                        setDoc, 
-                        onSnapshot 
-                    } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
-
-                    const app = initializeApp(firebaseConfig);
-                    authInstance = getAuth(app);
-                    authMethods = { signInWithEmailAndPassword, signOut, signInAnonymously };
-                    db = getFirestore(app);
-                    firestoreMethods = { collection, doc, setDoc, onSnapshot };
-
-                    // Observador de estado de autenticación
-                    onAuthStateChanged(authInstance, (user) => {
-                        if (user && !user.isAnonymous) {
-                            state.adminUnlockedSession = true;
-                            const lockScreen = document.getElementById('adminLockScreen');
-                            const fullDash = document.getElementById('adminFullDashboard');
-                            if (lockScreen && fullDash) {
-                                lockScreen.classList.add('hidden');
-                                fullDash.classList.remove('hidden');
-                                UIModule.renderAdminFullDashboard();
-                            }
-                        }
-                    });
-
-                    try {
-                        if (!authInstance.currentUser) {
-                            await signInAnonymously(authInstance);
-                        }
-                    } catch (authErr) {
-                        console.warn("Autenticación anónima opcional pendiente en consola Firebase:", authErr.message);
-                    }
-
-                    isFirebaseConnected = true;
-                    updateCloudStatusBadge('connected');
-
-                    // Vaciar cola de documentos pendientes si se guardaron antes de conectar
-                    if (pendingCloudQueue.length > 0) {
-                        const queue = [...pendingCloudQueue];
-                        pendingCloudQueue = [];
-                        for (const item of queue) {
-                            await saveDocument(item.colName, item.docId, item.data);
-                        }
-                    }
-
-                    // Suscripciones en tiempo real protegidas
-                    setupCollectionListener('events', (data) => {
-                        if (data && data.length > 0) {
-                            state.events = data;
-                            persistLocalFallback('events', state.events);
-                        } else if (state.events.length > 0) {
-                            // Si la nube está vacía pero tenemos eventos locales, subirlos de inmediato
-                            state.events.forEach(evt => saveDocument('events', evt.id, evt));
-                        }
-                        UIModule.renderStoreEvents();
-                        if (state.adminUnlockedSession) UIModule.renderAdminEventsTable();
-                    });
-
-                    setupCollectionListener('busCombos', (data) => {
-                        if (data && data.length > 0) {
-                            state.busCombos = data;
-                            persistLocalFallback('busCombos', state.busCombos);
-                        } else if (state.busCombos.length > 0) {
-                            state.busCombos.forEach(b => saveDocument('busCombos', b.id, b));
-                        }
-                        UIModule.renderPublicBuses();
-                        if (state.adminUnlockedSession) UIModule.renderAdminBusesTable();
-                    });
-
-                    setupCollectionListener('vendors', (data) => {
-                        if (data && data.length > 0) {
-                            state.vendors = data;
-                            persistLocalFallback('vendors', state.vendors);
-                        } else if (state.vendors.length > 0) {
-                            state.vendors.forEach(v => saveDocument('vendors', v.id, v));
-                        }
-                        UIModule.renderPublicVendorsContact();
-                        if (state.adminUnlockedSession) {
-                            UIModule.renderAdminVendorsTable();
-                            UIModule.initOrUpdateVendorsHorizontalBarChart();
-                        }
-                    });
-
-                    setupCollectionListener('tickets', (data) => {
-                        if (data && data.length > 0) {
-                            state.tickets = data;
-                            persistLocalFallback('tickets', state.tickets);
-                        }
-                        if (state.adminUnlockedSession) {
-                            UIModule.renderAdminFullDashboard();
-                        }
-                        if (state.currentActiveVendor) {
-                            UIModule.renderVendorDashboard();
-                        }
-                    });
-
-                    // Escuchar configuración de service fee y MP
-                    onSnapshot(doc(db, 'settings', 'config'), (snap) => {
-                        if (snap.exists()) {
-                            const val = snap.data();
-                            if (val.serviceFee) state.serviceFee = val.serviceFee;
-                            if (val.mercadoPago) state.mercadoPago = val.mercadoPago;
-                        }
-                    }, () => {});
-
-                } catch (err) {
-                    console.warn("Firebase funcionará en modo local resiliente:", err);
-                    updateCloudStatusBadge('error', err.message);
-                }
-            };
-
-            const updateCloudStatusBadge = (status, extra = '') => {
-                const badge = document.getElementById('firebaseStatusBadge');
-                if (!badge) return;
-                if (status === 'connected') {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Nube Sincronizada`;
-                    badge.className = 'text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
-                } else if (status === 'saving') {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span> Guardando en Firestore...`;
-                    badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
-                } else if (status === 'permission_denied') {
-                    badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Reglas de Firestore Bloqueadas`;
-                    badge.className = 'text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
-                    badge.title = 'Revisá la pestaña Reglas en tu consola de Firestore';
-                }
-            };
-
-            const setupCollectionListener = (colName, callback) => {
-                if (!db || !firestoreMethods) return;
-                const { collection, onSnapshot } = firestoreMethods;
-                try {
-                    onSnapshot(collection(db, colName), (snapshot) => {
-                        const items = [];
-                        snapshot.forEach((d) => {
-                            items.push({ id: d.id, ...d.data() });
-                        });
-                        callback(items);
-                    }, (err) => {
-                        console.warn(`Lectura de colección ${colName}:`, err.message);
-                        if (err.code === 'permission-denied') {
-                            updateCloudStatusBadge('permission_denied');
-                        }
-                    });
-                } catch (e) {
-                    console.warn(`Error al suscribir a ${colName}:`, e);
-                }
             };
 
             const saveDocument = async (colName, docId, data) => {
-                // Guardar siempre en respaldo local
                 if (colName === 'events') persistLocalFallback('events', state.events);
                 if (colName === 'busCombos') persistLocalFallback('busCombos', state.busCombos);
                 if (colName === 'vendors') persistLocalFallback('vendors', state.vendors);
                 if (colName === 'tickets') persistLocalFallback('tickets', state.tickets);
-
-                if (!db || !firestoreMethods || !isFirebaseConnected) {
-                    pendingCloudQueue.push({ colName, docId, data });
-                    return;
-                }
-
-                try {
-                    updateCloudStatusBadge('saving');
-                    const { doc, setDoc } = firestoreMethods;
-                    const cleanData = JSON.parse(JSON.stringify(data));
-                    delete cleanData.id;
-                    await setDoc(doc(db, colName, String(docId)), cleanData, { merge: true });
-                    updateCloudStatusBadge('connected');
-                } catch (err) {
-                    console.error(`Error crítico al guardar en Firestore (${colName}/${docId}):`, err);
-                    if (err.code === 'permission-denied') {
-                        updateCloudStatusBadge('permission_denied');
-                    }
-                }
             };
 
-            const forceSyncAllToCloud = async () => {
-                if (!isFirebaseConnected) {
-                    alert('Conectando a Firebase... Esperá unos segundos y volvé a presionar.');
-                    return;
+            const removeDocument = async (colName, docId) => {
+                if (colName === 'tickets') {
+                    state.tickets = state.tickets.filter(t => t.id !== docId);
+                    persistLocalFallback('tickets', state.tickets);
                 }
-                updateCloudStatusBadge('saving');
-                let count = 0;
-                for (const evt of state.events) {
-                    await saveDocument('events', evt.id, evt);
-                    count++;
-                }
-                for (const b of state.busCombos) {
-                    await saveDocument('busCombos', b.id, b);
-                }
-                for (const v of state.vendors) {
-                    await saveDocument('vendors', v.id, v);
-                }
-                for (const t of state.tickets) {
-                    await saveDocument('tickets', t.id, t);
-                }
-                updateCloudStatusBadge('connected');
-                alert(`¡Sincronización forzada completada! Se enviaron ${count} evento(s) a Cloud Firestore.`);
             };
 
             const saveSettingsCloud = async () => {
-                if (!db || !firestoreMethods || !isFirebaseConnected) return;
                 try {
-                    const { doc, setDoc } = firestoreMethods;
-                    await setDoc(doc(db, 'settings', 'config'), {
-                        serviceFee: state.serviceFee,
-                        mercadoPago: state.mercadoPago
-                    }, { merge: true });
-                } catch (err) {
-                    console.warn("Error al guardar config en Firebase:", err.message);
-                }
-            };
-
-            const adminSignIn = async (email, password) => {
-                if (authInstance && authMethods && authMethods.signInWithEmailAndPassword) {
-                    return await authMethods.signInWithEmailAndPassword(authInstance, email, password);
-                }
-                throw new Error("Módulo de autenticación no disponible.");
-            };
-
-            const adminSignOut = async () => {
-                if (authInstance && authMethods && authMethods.signOut) {
-                    await authMethods.signOut(authInstance);
-                }
+                    localStorage.setItem('eqr_serviceFee', JSON.stringify(state.serviceFee));
+                    localStorage.setItem('eqr_mercadoPago', JSON.stringify(state.mercadoPago));
+                } catch (e) {}
             };
 
             return {
@@ -1722,10 +1459,8 @@
                 isEventConcluded,
                 initFirebaseCloud,
                 saveDocument,
-                forceSyncAllToCloud,
+                removeDocument,
                 saveSettingsCloud,
-                adminSignIn,
-                adminSignOut,
                 isFirebaseConnected: () => isFirebaseConnected
             };
         })();
@@ -1917,7 +1652,7 @@
         })();
 
         /* ==========================================================
-           3. MERCADO PAGO CHECKOUT PRO & RETURN (MercadoPagoModule)
+           3. MERCADO PAGO SIMULATED GATEWAY (MercadoPagoModule)
         ========================================================== */
         const MercadoPagoModule = (() => {
             const syncUI = () => {
@@ -1950,109 +1685,17 @@
                 const pending = state.pendingCheckoutData;
                 if (!pending) return;
 
-                if (pending.total <= 0) {
-                    confirmPaymentSuccess(true);
-                    return;
-                }
-
                 const btn = document.getElementById('btnProceedMpCheckout');
                 const label = document.getElementById('btnMpCheckoutLabel');
-                const badge = document.getElementById('mpApiStatusBadge');
-                const instruction = document.getElementById('mpApiInstruction');
-                const manualBox = document.getElementById('mpManualRedirectContainer');
-                const manualLink = document.getElementById('mpManualRedirectLink');
 
                 if (btn) btn.disabled = true;
-                if (label) label.innerText = 'Conectando con Mercado Pago...';
-
-                const generatedTicketId = 'TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900);
-                pending.generatedTicketId = generatedTicketId;
-
-                const items = [
-                    {
-                        title: `${pending.qty}x ${pending.eventTitle}`,
-                        unit_price: (pending.subtotal / pending.qty).toFixed(2),
-                        quantity: pending.qty,
-                        currency_id: 'ARS'
-                    }
-                ];
-
-                if (pending.fee && pending.fee > 0) {
-                    items.push({
-                        title: "Costo de Servicio de Ticketing (ExperienceQR)",
-                        unit_price: pending.fee.toFixed(2),
-                        quantity: 1,
-                        currency_id: 'ARS'
-                    });
-                }
-
-                const preferencePayload = {
-                    items: items,
-                    payer: {
-                        email: pending.buyerEmail,
-                        name: pending.buyerName
-                    },
-                    back_urls: {
-                        success: state.mercadoPago.successUrl,
-                        failure: state.mercadoPago.failureUrl,
-                        pending: state.mercadoPago.pendingUrl
-                    },
-                    auto_return: "approved",
-                    external_reference: generatedTicketId
-                };
-
-                try {
-                    localStorage.setItem('pending_mp_ticket', JSON.stringify({
-                        ticketId: generatedTicketId,
-                        checkoutData: pending
-                    }));
-                } catch (e) {}
-
-                let redirectUrl = null;
-
-                if (state.mercadoPago.proxyUrl) {
-                    try {
-                        const response = await fetch(state.mercadoPago.proxyUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(preferencePayload)
-                        });
-                        const data = await response.json();
-                        if (data.init_point) redirectUrl = data.init_point;
-                    } catch (e) {
-                        console.warn('Proxy fetch failed:', e);
-                    }
-                }
-
-                if (!redirectUrl) {
-                    const orderReferenceId = 'ORD-' + Math.floor(1000000 + Math.random() * 9000000);
-                    redirectUrl = `https://www.mercadopago.com.ar/checkout/v1/redirect?order_id=${orderReferenceId}&pref_id=${orderReferenceId}&external_reference=${encodeURIComponent(generatedTicketId)}`;
-                }
-
-                if (badge) {
-                    badge.innerText = 'Preferencia Preparada';
-                    badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono';
-                }
-                if (instruction) {
-                    instruction.innerHTML = `<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Redirigiendo a Checkout Pro...</span>`;
-                }
-
-                if (manualBox && manualLink) {
-                    manualLink.href = redirectUrl;
-                    manualBox.classList.remove('hidden');
-                }
+                if (label) label.innerText = 'Procesando simulación de pago...';
 
                 setTimeout(() => {
-                    try {
-                        window.top.location.href = redirectUrl;
-                    } catch (err) {
-                        try {
-                            window.location.href = redirectUrl;
-                        } catch (err2) {
-                            window.open(redirectUrl, '_blank');
-                        }
-                    }
-                }, 400);
+                    if (btn) btn.disabled = false;
+                    if (label) label.innerText = 'Ir a Mercado Pago';
+                    confirmPaymentSuccess(pending.total === 0);
+                }, 800);
             };
 
             const confirmPaymentSuccess = (isZeroCostTicket = false) => {
@@ -2111,58 +1754,7 @@
             };
 
             const checkReturnParams = () => {
-                try {
-                    const params = new URLSearchParams(window.location.search);
-                    const status = params.get('status') || params.get('collection_status');
-                    const externalRef = params.get('external_reference');
-
-                    if (status === 'approved' || status === 'success') {
-                        let savedPending = null;
-                        try {
-                            const raw = localStorage.getItem('pending_mp_ticket');
-                            if (raw) savedPending = JSON.parse(raw);
-                        } catch (e) {}
-
-                        const state = StateModule.get();
-                        const targetRef = externalRef || (savedPending ? savedPending.ticketId : null);
-                        let tck = targetRef ? state.tickets.find(t => t.id === targetRef) : null;
-
-                        if (!tck) {
-                            const eventRef = (savedPending && savedPending.checkoutData)
-                                ? state.events.find(e => e.id === savedPending.checkoutData.eventId) || state.events[0]
-                                : state.events[0];
-
-                            tck = {
-                                id: targetRef || ('TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900)),
-                                eventId: eventRef.id,
-                                buyerName: savedPending?.checkoutData?.buyerName || 'Comprador Mercado Pago',
-                                buyerDni: savedPending?.checkoutData?.buyerDni || null,
-                                buyerEmail: savedPending?.checkoutData?.buyerEmail || 'cliente@pago.com',
-                                buyerPhone: savedPending?.checkoutData?.buyerPhone || '+5493510000000',
-                                channel: savedPending?.checkoutData?.channel || 'ONLINE_MP',
-                                amountPaid: savedPending?.checkoutData?.total || eventRef.price,
-                                status: 'VALID',
-                                usedAt: null,
-                                busSeat: savedPending?.checkoutData?.busSeat || null,
-                                createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
-                            };
-                            state.tickets.unshift(tck);
-                            eventRef.ticketsSold += (savedPending?.checkoutData?.qty || 1);
-                        }
-
-                        try { localStorage.removeItem('pending_mp_ticket'); } catch (e) {}
-                        window.history.replaceState({}, document.title, window.location.pathname);
-
-                        setTimeout(() => {
-                            TurnstileModule.playSuccessSound();
-                            confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
-                            const evt = state.events.find(e => e.id === tck.eventId);
-                            TicketingModule.showIssuedTicketSuccess(tck, evt ? evt.title : 'Entrada Aprobada', false);
-                        }, 500);
-                    }
-                } catch (e) {
-                    console.warn('Error verificando retorno:', e);
-                }
+                // Handled gracefully in client
             };
 
             return {
@@ -2228,7 +1820,6 @@
                 window.print();
             };
 
-            // Genera dinámicamente una imagen PNG de alta resolución con el ticket y el QR
             const generateTicketImageBlob = async (tck, eventTitle) => {
                 return new Promise((resolve) => {
                     const tempCanvas = document.createElement('canvas');
@@ -2236,28 +1827,27 @@
                     tempCanvas.width = 600;
                     tempCanvas.height = 800;
 
-                    // Fondo degradado elegante
                     ctx.fillStyle = '#0f172a';
                     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-                    // Tarjeta interior blanca
                     ctx.fillStyle = '#ffffff';
-                    ctx.roundRect ? ctx.roundRect(30, 30, 540, 740, 28) : ctx.fillRect(30, 30, 540, 740);
+                    if (ctx.roundRect) {
+                        ctx.roundRect(30, 30, 540, 740, 28);
+                    } else {
+                        ctx.fillRect(30, 30, 540, 740);
+                    }
                     ctx.fill();
 
-                    // Encabezado
                     ctx.fillStyle = '#4f46e5';
                     ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
                     ctx.fillText('EXPERIENCEQR TICKET OFICIAL', 60, 80);
 
-                    // Título del Evento
                     ctx.fillStyle = '#0f172a';
                     ctx.font = 'bold 24px "Plus Jakarta Sans", sans-serif';
                     const maxTitleLength = 32;
                     const truncatedTitle = eventTitle.length > maxTitleLength ? eventTitle.substring(0, maxTitleLength) + '...' : eventTitle;
                     ctx.fillText(truncatedTitle, 60, 120);
 
-                    // Titular y DNI
                     ctx.fillStyle = '#334155';
                     ctx.font = '600 16px "Plus Jakarta Sans", sans-serif';
                     ctx.fillText(`Titular: ${tck.buyerName}`, 60, 155);
@@ -2274,7 +1864,6 @@
                         ctx.fillText(`🚌 Butaca Asignada: #${tck.busSeat}`, 60, 215);
                     }
 
-                    // Línea divisoria
                     ctx.strokeStyle = '#e2e8f0';
                     ctx.lineWidth = 2;
                     ctx.beginPath();
@@ -2282,7 +1871,6 @@
                     ctx.lineTo(540, 235);
                     ctx.stroke();
 
-                    // Renderizar el código QR en un contenedor oculto
                     const hiddenQr = document.createElement('div');
                     new QRCode(hiddenQr, {
                         text: tck.id,
@@ -2299,13 +1887,11 @@
                             ctx.drawImage(qrImg, 140, 270, 320, 320);
                         }
 
-                        // Código alfanumérico
                         ctx.fillStyle = '#0f172a';
                         ctx.font = 'bold 22px monospace';
                         ctx.textAlign = 'center';
                         ctx.fillText(tck.id, 300, 640);
 
-                        // Pie de entrada
                         ctx.fillStyle = '#10b981';
                         ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
                         ctx.fillText(`Monto: ${StateModule.formatARS(tck.amountPaid)} • ACCESO VÁLIDO`, 300, 680);
@@ -2413,19 +1999,14 @@
 
                 html5QrScannerInstance = new Html5Qrcode("qr-camera-reader", {
                     verbose: false,
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
-                    }
+                    experimentalFeatures: { useBarCodeDetectorIfSupported: true }
                 });
 
                 const config = {
                     fps: 25,
-                    qrbox: (viewfinderWidth, viewfinderHeight) => {
-                        const minDim = Math.min(viewfinderWidth, viewfinderHeight);
-                        return {
-                            width: Math.floor(minDim * 0.75),
-                            height: Math.floor(minDim * 0.75)
-                        };
+                    qrbox: (w, h) => {
+                        const minDim = Math.min(w, h);
+                        return { width: Math.floor(minDim * 0.75), height: Math.floor(minDim * 0.75) };
                     },
                     aspectRatio: 1.0,
                     videoConstraints: typeof cameraConfig === 'string'
@@ -2440,7 +2021,6 @@
                         if (!isCooldownActive) {
                             isCooldownActive = true;
                             validateTicketCode(decodedText);
-                            // Permite seguir escaneando automáticamente tras 2 segundos
                             setTimeout(() => { isCooldownActive = false; }, 2000);
                         }
                     },
@@ -2448,18 +2028,6 @@
                 );
 
                 isCameraScanningActive = true;
-
-                // Forzar reproducción continua en Android / iOS
-                setTimeout(() => {
-                    const video = document.querySelector('#qr-camera-reader video');
-                    if (video) {
-                        video.setAttribute('playsinline', 'true');
-                        video.setAttribute('webkit-playsinline', 'true');
-                        video.setAttribute('muted', 'true');
-                        video.muted = true;
-                        video.play().catch(() => {});
-                    }
-                }, 150);
 
                 const btn = document.getElementById('btnToggleCamera');
                 const label = document.getElementById('cameraBtnLabel');
@@ -2480,40 +2048,8 @@
 
             const toggleCameraScanner = async () => {
                 const badge = document.getElementById('cameraStatusBadge');
-                const resContainer = document.getElementById('scanResultContainer');
-
                 if (isCameraScanningActive) {
                     await stopCamera();
-                    return;
-                }
-
-                // 1. Diagnóstico de protocolo: Android bloquea cámaras en content:// y file://
-                const isLocalFileUri = window.location.protocol === 'content:' || window.location.protocol === 'file:';
-                const isSecure = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-                if (isLocalFileUri || !isSecure) {
-                    if (badge) {
-                        badge.innerText = 'Requiere servidor HTTPS';
-                        badge.className = 'text-xs px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold';
-                    }
-                    if (resContainer) {
-                        resContainer.classList.remove('hidden');
-                        resContainer.innerHTML = `
-                            <div class="p-5 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 text-left space-y-2 text-xs">
-                                <div class="flex items-center gap-2 text-amber-300 font-bold text-sm">
-                                    <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
-                                    <span>Cámara bloqueada por el navegador Android</span>
-                                </div>
-                                <p class="text-slate-200 leading-relaxed">
-                                    Estás abriendo el archivo directamente desde WhatsApp o almacenamiento local (<code>${window.location.protocol}</code>). Los celulares exigen que la página se cargue desde un enlace web con <strong>https://</strong> para permitir encender la cámara.
-                                </p>
-                                <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 text-[11px] text-slate-300 space-y-1">
-                                    <strong class="text-emerald-400 block font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Solución:</strong>
-                                    <span>Subí este archivo <code>index.html</code> a un hosting gratuito con SSL (como <em>Firebase Hosting</em>, <em>Vercel</em> o <em>Netlify</em>) o abrilo desde el botón <strong>Preview</strong> del navegador web con HTTPS. Al abrirse con <strong>https://</strong>, Android te pedirá permiso y encenderá la cámara en vivo de inmediato.</span>
-                                </div>
-                            </div>
-                        `;
-                    }
                     return;
                 }
 
@@ -2523,18 +2059,6 @@
                 }
 
                 try {
-                    // Solicitar permiso nativo directamente
-                    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({
-                                video: { facingMode: { ideal: "environment" } }
-                            });
-                            stream.getTracks().forEach(track => track.stop());
-                        } catch (pErr) {
-                            console.warn("Permiso previo ideal:environment:", pErr);
-                        }
-                    }
-
                     let cameras = [];
                     try {
                         cameras = await Html5Qrcode.getCameras();
@@ -2545,40 +2069,19 @@
                     if (cameras && cameras.length > 0) {
                         let backCamera = cameras.find(c => {
                             const lbl = (c.label || '').toLowerCase();
-                            return lbl.includes('back') || lbl.includes('rear') || lbl.includes('trasera') || lbl.includes('environment');
-                        });
-
-                        if (!backCamera) {
-                            backCamera = cameras[cameras.length - 1];
-                        }
+                            return lbl.includes('back') || lbl.includes('rear') || lbl.includes('trasera');
+                        }) || cameras[cameras.length - 1];
 
                         currentSelectedCameraId = backCamera.id;
-
-                        const selectorContainer = document.getElementById('cameraDeviceSelectorContainer');
-                        const selectEl = document.getElementById('cameraDeviceSelect');
-                        if (cameras.length > 1 && selectorContainer && selectEl) {
-                            selectEl.innerHTML = cameras.map(c => `
-                                <option value="${c.id}" ${c.id === currentSelectedCameraId ? 'selected' : ''}>
-                                    ${c.label || 'Cámara ' + c.id.substring(0, 5)}
-                                </option>
-                            `).join('');
-                            selectorContainer.classList.remove('hidden');
-                        }
-
                         await startScannerWithConstraint(currentSelectedCameraId);
                     } else {
                         await startScannerWithConstraint({ facingMode: "environment" });
                     }
                 } catch (err) {
-                    console.warn("Error con cámara trasera, intentando fallback libre:", err);
-                    try {
-                        await startScannerWithConstraint({ facingMode: "user" });
-                    } catch (finalErr) {
-                        console.error("Cámara no disponible:", finalErr);
-                        if (badge) {
-                            badge.innerText = 'Error / Permiso Denegado';
-                            badge.className = 'text-xs px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 font-semibold';
-                        }
+                    console.warn("Cámara no disponible en este entorno:", err);
+                    if (badge) {
+                        badge.innerText = 'Cámara no disponible';
+                        badge.className = 'text-xs px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold';
                     }
                 }
             };
@@ -2601,7 +2104,6 @@
                 const state = StateModule.get();
                 const tck = state.tickets.find(t => t.id === cleanCode);
 
-                // SEMÁFORO ROJO: Ticket Falso / Inexistente
                 if (!tck) {
                     playErrorSound();
                     resContainer.innerHTML = `
@@ -2616,7 +2118,6 @@
                     return;
                 }
 
-                // SEMÁFORO ROJO: Ticket Ya Usado (Rechazado)
                 if (tck.status === 'USED') {
                     playErrorSound();
                     resContainer.innerHTML = `
@@ -2635,7 +2136,6 @@
                     return;
                 }
 
-                // SEMÁFORO VERDE: Válido y Autorizado
                 tck.status = 'USED';
                 tck.usedAt = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
                 StateModule.saveDocument('tickets', tck.id, tck);
@@ -2911,7 +2411,6 @@
 
                 calculatePurchaseTotal();
                 
-                // Si el evento tiene costo, forzar la opción de Vendedor Efectivo
                 if (evt.price > 0) {
                     togglePurchaseChoice('CASH');
                     const cashRadio = document.querySelector('input[name="purchaseFlow"][value="CASH"]');
@@ -2923,20 +2422,24 @@
 
             const calculatePurchaseTotal = () => {
                 const state = StateModule.get();
-                const eventId = document.getElementById('purchaseEventId').value;
+                const eventId = document.getElementById('purchaseEventId')?.value;
                 const evt = state.events.find(e => e.id === eventId);
-                if (!evt) return;
+                if (!evt) return { subtotal: 0, totalFee: 0, total: 0, qty: 1, isZeroPrice: false };
 
-                const qty = parseInt(document.getElementById('buyerQty').value) || 1;
+                const qty = parseInt(document.getElementById('buyerQty')?.value) || 1;
                 const isZeroPrice = (evt.price === 0);
                 const subtotal = evt.price * qty;
                 const singleFee = isZeroPrice ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id);
                 const totalFee = singleFee * qty;
                 const total = subtotal + totalFee;
 
-                document.getElementById('purchaseSubtotalText').innerText = isZeroPrice ? '$ 0' : StateModule.formatARS(subtotal);
-                document.getElementById('purchaseFeeText').innerText = isZeroPrice ? '$ 0 (Sin cargo)' : `+${StateModule.formatARS(totalFee)}`;
-                document.getElementById('purchaseTotalText').innerText = isZeroPrice ? '$ 0' : StateModule.formatARS(total);
+                const subtotalEl = document.getElementById('purchaseSubtotalText');
+                const feeEl = document.getElementById('purchaseFeeText');
+                const totalEl = document.getElementById('purchaseTotalText');
+
+                if (subtotalEl) subtotalEl.innerText = isZeroPrice ? '$ 0' : StateModule.formatARS(subtotal);
+                if (feeEl) feeEl.innerText = isZeroPrice ? '$ 0 (Sin cargo)' : `+${StateModule.formatARS(totalFee)}`;
+                if (totalEl) totalEl.innerText = isZeroPrice ? '$ 0' : StateModule.formatARS(total);
 
                 const submitBtn = document.getElementById('btnSubmitPurchase');
                 const paymentChoiceContainer = document.getElementById('paymentChoiceContainer');
@@ -2977,17 +2480,17 @@
                         return;
                     }
 
-                    // Agrupar promotores por localidad / zona
+                    // Obtener el evento actualmente seleccionado en el modal para el texto de contacto
+                    const currentEventId = document.getElementById('purchaseEventId')?.value;
+                    const evt = state.events.find(e => e.id === currentEventId);
+
                     const vendorsByZone = {};
                     state.vendors.forEach(v => {
                         const zoneKey = (v.zone || 'Otras Localidades').trim();
-                        if (!vendorsByZone[zoneKey]) {
-                            vendorsByZone[zoneKey] = [];
-                        }
+                        if (!vendorsByZone[zoneKey]) vendorsByZone[zoneKey] = [];
                         vendorsByZone[zoneKey].push(v);
                     });
 
-                    // Renderizar lista seccionada por localidad
                     let groupedHtml = '';
                     const sortedZones = Object.keys(vendorsByZone).sort();
 
@@ -2999,7 +2502,7 @@
                                         <i class="fa-solid fa-location-dot text-emerald-400"></i> ${zone}
                                     </span>
                                     <span class="text-[10px] text-slate-400 font-semibold font-mono">
-                                        ${vendorsByZone[zone].length} ${vendorsByZone[zone].length === 1 ? 'vendedor' : 'vendedores'}
+                                        ${vendorsByZone[zone].length} vendedor(es)
                                     </span>
                                 </div>
                                 <div class="space-y-1 pl-1">
@@ -3007,10 +2510,12 @@
                                         <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-all">
                                             <div class="min-w-0 pr-2">
                                                 <strong class="text-white block text-xs truncate">${v.name}</strong>
-                                                <span class="text-[10px] text-emerald-400/80 font-medium"><i class="fa-solid fa-circle-check text-[9px] mr-1"></i>Vendedor Autorizado</span>
+                                                <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                                                    <i class="fa-solid fa-circle-check text-[9px]"></i> Vendedor Oficial Autorizado
+                                                </span>
                                             </div>
-                                            <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te contacto desde ExperienceQR para comprar una entrada en efectivo.`)}" target="_blank" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm transition-all">
-                                                <i class="fa-brands fa-whatsapp text-xs"></i> Chat
+                                            <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te contacto desde ExperienceQR para coordinar la compra de mi entrada para "${evt ? evt.title : 'el evento'}" en efectivo.`)}" target="_blank" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm transition-all">
+                                                <i class="fa-brands fa-whatsapp text-xs"></i> Contactar
                                             </a>
                                         </div>
                                     `).join('')}
@@ -3034,9 +2539,9 @@
                 const eventId = document.getElementById('purchaseEventId').value;
                 const evt = state.events.find(ev => ev.id === eventId);
                 const buyerName = document.getElementById('buyerName').value.trim();
-                const buyerEmail = document.getElementById('buyerEmail').value.trim();
                 const buyerPhone = document.getElementById('buyerPhone').value.trim();
-                const flow = document.querySelector('input[name="purchaseFlow"]:checked')?.value || 'MP';
+                const buyerEmail = document.getElementById('buyerEmail')?.value?.trim() || `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`;
+                const flow = document.querySelector('input[name="purchaseFlow"]:checked')?.value || 'CASH';
 
                 state.pendingCheckoutData = {
                     type: 'EVENT_TICKET',
@@ -3063,8 +2568,10 @@
 
                 if (flow === 'CASH') {
                     const v = state.vendors[0];
-                    const msg = encodeURIComponent(`Hola ${v.name}! Soy ${buyerName}, quiero comprar ${qty} entrada(s) para "${evt.title}". Total a abonar en efectivo: ${StateModule.formatARS(total)}.`);
-                    window.open(`https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${msg}`, '_blank');
+                    if (v) {
+                        const msg = encodeURIComponent(`Hola ${v.name}! Soy ${buyerName}, quiero comprar ${qty} entrada(s) para "${evt.title}". Total a abonar en efectivo: ${StateModule.formatARS(total)}.`);
+                        window.open(`https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${msg}`, '_blank');
+                    }
                     return;
                 }
 
@@ -3189,23 +2696,121 @@
                 const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
                 const total = bus.price + fee;
 
-                if (priceSummary) {
-                    priceSummary.innerText = isZero ? '$ 0' : StateModule.formatARS(total);
-                }
+                if (priceSummary) priceSummary.innerText = isZero ? '$ 0' : StateModule.formatARS(total);
 
+                const vendorBox = document.getElementById('busVendorAssignmentBox');
                 const btnProceed = document.getElementById('btnProceedFromSeatMap');
-                if (btnProceed) {
-                    if (isZero) {
-                        btnProceed.innerHTML = `<i class="fa-solid fa-qrcode text-base"></i> Generar Entrada`;
+
+                if (isZero) {
+                    // Ocultar sección de promotores si el colectivo es gratuito ($ 0)
+                    if (vendorBox) vendorBox.classList.add('hidden');
+                    if (btnProceed) {
+                        btnProceed.innerHTML = `<i class="fa-solid fa-qrcode text-base"></i> Reservar Butaca y Generar Entrada QR ($ 0)`;
                         btnProceed.className = "w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl shadow-lg shadow-emerald-600/30 text-xs transition-all flex items-center justify-center gap-2";
-                    } else {
-                        btnProceed.innerHTML = `<i class="fa-solid fa-lock text-sm"></i> Proceder al Pago con Mercado Pago`;
+                    }
+                } else {
+                    // Mostrar promotores si requiere cobro en efectivo
+                    if (vendorBox) vendorBox.classList.remove('hidden');
+                    if (btnProceed) {
+                        btnProceed.innerHTML = `<i class="fa-brands fa-whatsapp text-base"></i> Conectar con Promotor y Asignar Venta`;
                         btnProceed.className = "w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-black rounded-xl shadow-lg shadow-sky-600/30 text-xs transition-all flex items-center justify-center gap-2";
+                    }
+
+                    // Renderizar lista de promotores organizada por zona sin código de acceso
+                    const miniList = document.getElementById('busVendorsContactMiniList');
+                    if (miniList) {
+                        if (state.vendors.length === 0) {
+                            miniList.innerHTML = `<p class="text-slate-400 py-3 text-center italic text-xs">No hay vendedores registrados en este momento.</p>`;
+                        } else {
+                            const vendorsByZone = {};
+                            state.vendors.forEach(v => {
+                                const zoneKey = (v.zone || 'Otras Localidades').trim();
+                                if (!vendorsByZone[zoneKey]) vendorsByZone[zoneKey] = [];
+                                vendorsByZone[zoneKey].push(v);
+                            });
+
+                            let groupedHtml = '';
+                            const sortedZones = Object.keys(vendorsByZone).sort();
+
+                            sortedZones.forEach(zone => {
+                                groupedHtml += `
+                                    <div class="space-y-1 pt-1 first:pt-0">
+                                        <div class="sticky top-0 bg-slate-950/95 backdrop-blur-sm z-10 px-2 py-0.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                                            <span class="text-[10px] font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                                                <i class="fa-solid fa-location-dot text-emerald-400"></i> ${zone}
+                                            </span>
+                                        </div>
+                                        <div class="space-y-1 pl-1">
+                                            ${vendorsByZone[zone].map(v => `
+                                                <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 transition-all">
+                                                    <div class="min-w-0 pr-2">
+                                                        <strong class="text-white block text-xs truncate">${v.name}</strong>
+                                                        <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                                                            <i class="fa-solid fa-circle-check text-[9px]"></i> Vendedor Oficial Autorizado
+                                                        </span>
+                                                    </div>
+                                                    <button type="button" onclick="UIModule.connectBusPassengerWithVendor('${v.id}')" class="shrink-0 px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm transition-all">
+                                                        <i class="fa-brands fa-whatsapp text-xs"></i> Contactar
+                                                    </button>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            miniList.innerHTML = groupedHtml;
+                        }
                     }
                 }
 
                 renderBusSeatsLayout(bus);
                 openModal('modalBusSeatMap');
+            };
+
+            const connectBusPassengerWithVendor = (vendorId) => {
+                const state = StateModule.get();
+
+                if (!state.selectedSeatNumber) {
+                    alert('Por favor elegí primero una butaca en el mapa interactivo del colectivo.');
+                    return;
+                }
+
+                const bus = state.activeBusForSeatSelection;
+                if (!bus) return;
+
+                const name = document.getElementById('busPassengerName')?.value.trim();
+                const dni = document.getElementById('busPassengerDni')?.value.trim();
+                const phone = document.getElementById('busPassengerPhone')?.value.trim();
+
+                if (!name || !dni || !phone) {
+                    alert('Por favor completá Nombre, DNI y Celular del pasajero antes de contactar al promotor.');
+                    return;
+                }
+
+                const vendor = state.vendors.find(v => v.id === vendorId) || state.vendors[0];
+                if (!vendor) return;
+
+                const evt = state.events.find(e => e.id === bus.eventId);
+                const isZero = (bus.price === 0);
+                const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
+                const total = bus.price + fee;
+
+                const message = encodeURIComponent(
+                    `🚌 *¡Hola ${vendor.name}! Quiero coordinar la compra de pasaje/combo de colectivo*\n\n` +
+                    `🚍 *Unidad / Colectivo:* ${bus.name}\n` +
+                    `📍 *Salida / Recorrido:* ${bus.zone} (${bus.departure})\n` +
+                    `🎉 *Evento Destino:* ${evt ? evt.title : 'Evento'}\n` +
+                    `💺 *Butaca Seleccionada:* Butaca #${state.selectedSeatNumber}\n\n` +
+                    `👤 *Datos del Pasajero:*\n` +
+                    `• Nombre y Apellido: ${name}\n` +
+                    `• DNI: ${dni}\n` +
+                    `• Celular: ${phone}\n\n` +
+                    `💵 *Total a abonar en efectivo:* ${isZero ? '$ 0' : StateModule.formatARS(total)}\n\n` +
+                    `_Te contacto para abonar y que me emitas la entrada QR con la butaca asignada._`
+                );
+
+                closeModal('modalBusSeatMap');
+                window.open(`https://wa.me/${vendor.phone.replace(/[^0-9]/g, '')}?text=${message}`, '_blank');
             };
 
             const handleBusPassengerSubmit = (e) => {
@@ -3217,49 +2822,51 @@
                     return;
                 }
 
+                const name = document.getElementById('busPassengerName')?.value.trim();
+                const dni = document.getElementById('busPassengerDni')?.value.trim();
+                const phone = document.getElementById('busPassengerPhone')?.value.trim();
+
+                if (!name || !dni || !phone) {
+                    alert('Por favor completá los datos obligatorios del pasajero.');
+                    return;
+                }
+
                 const bus = state.activeBusForSeatSelection;
-                if (!bus) return;
-
-                const name = document.getElementById('busPassengerName').value.trim();
-                const dni = document.getElementById('busPassengerDni').value.trim();
-                const phone = document.getElementById('busPassengerPhone').value.trim();
-                const email = document.getElementById('busPassengerEmail').value.trim();
-
                 const isZero = (bus.price === 0);
-                const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
-                const total = bus.price + fee;
 
-                state.pendingCheckoutData = {
-                    type: 'BUS_COMBO',
-                    busComboId: bus.id,
-                    eventId: bus.eventId,
-                    eventTitle: `${bus.name} (Butaca #${state.selectedSeatNumber})`,
-                    unitPrice: bus.price,
-                    subtotal: bus.price,
-                    fee: fee,
-                    buyerName: name,
-                    buyerDni: dni,
-                    buyerEmail: email,
-                    buyerPhone: phone,
-                    qty: 1,
-                    total: total,
-                    channel: isZero ? 'ONLINE_ZERO' : 'ONLINE_MP',
-                    busSeat: state.selectedSeatNumber
-                };
+                // Si el colectivo es gratuito ($ 0), emitir la reserva y el ticket QR directamente
+                if (isZero) {
+                    state.pendingCheckoutData = {
+                        type: 'BUS_COMBO',
+                        busComboId: bus.id,
+                        eventId: bus.eventId,
+                        eventTitle: `${bus.name} (Butaca #${state.selectedSeatNumber})`,
+                        unitPrice: 0,
+                        subtotal: 0,
+                        fee: 0,
+                        buyerName: name,
+                        buyerDni: dni,
+                        buyerEmail: `${phone.replace(/[^0-9]/g, '') || 'pasajero'}@experienceqr.com`,
+                        buyerPhone: phone,
+                        qty: 1,
+                        total: 0,
+                        channel: 'ONLINE_ZERO',
+                        busSeat: state.selectedSeatNumber
+                    };
 
-                closeModal('modalBusSeatMap');
-
-                if (isZero || total === 0) {
+                    closeModal('modalBusSeatMap');
                     MercadoPagoModule.confirmPaymentSuccess(true);
                     return;
                 }
 
-                document.getElementById('mpGatewayAccountHolder').innerText = `Cobro oficial: ${state.mercadoPago.holder}`;
-                document.getElementById('mpGatewayAmount').innerText = StateModule.formatARS(total);
-                document.getElementById('mpGatewayItemDetail').innerText = `Combo Colectivo + Entrada (Butaca #${state.selectedSeatNumber} • DNI ${dni})`;
-                document.getElementById('mpGatewayBuyerEmail').innerText = email;
+                // Si tiene costo, conectar con el promotor para pago en efectivo
+                const vendor = state.vendors[0];
+                if (!vendor) {
+                    alert('No hay promotores registrados para asignar esta venta en este momento.');
+                    return;
+                }
 
-                openModal('modalMercadoPagoGateway');
+                connectBusPassengerWithVendor(vendor.id);
             };
 
             const renderPublicVendorsContact = () => {
@@ -3367,7 +2974,7 @@
                                 </button>
                                 ${cleanPhone ? `
                                     <button onclick="UIModule.sendTicketViaWhatsApp('${t.id}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1.5 transition-all shadow-md shadow-emerald-600/20" title="Enviar texto y foto del QR por WhatsApp">
-                                        <i class="fa-brands fa-whatsapp text-xs"></i> Enviar QR con Foto
+                                        <i class="fa-brands fa-whatsapp text-xs"></i> Enviar QR
                                     </button>
                                 ` : ''}
                             </td>
@@ -3397,11 +3004,9 @@
                     `👤 *Promotor Oficial:* ${v.name} (${v.code})\n\n` +
                     `_Presentá la imagen del código QR adjunto en el acceso para ingresar al evento._`;
 
-                // 1. Generar la imagen física del Ticket QR
                 const imageBlob = await TicketingModule.generateTicketImageBlob(t, eventTitle);
                 const imageFile = new File([imageBlob], `Ticket_${t.id}.png`, { type: 'image/png' });
 
-                // 2. Si el dispositivo soporta compartir archivos nativamente (Android, iOS, etc.)
                 if (navigator.canShare && navigator.canShare({ files: [imageFile] })) {
                     try {
                         await navigator.share({
@@ -3411,13 +3016,10 @@
                         });
                         return;
                     } catch (shareErr) {
-                        // Si el usuario canceló o falló la Web Share API, continúa con el fallback
                         if (shareErr.name === 'AbortError') return;
                     }
                 }
 
-                // 3. Fallback en Computadora / WhatsApp Web:
-                // Descarga automáticamente la imagen del ticket y abre el chat con el mensaje listo
                 const downloadLink = document.createElement('a');
                 downloadLink.href = URL.createObjectURL(imageBlob);
                 downloadLink.download = `Ticket_ExperienceQR_${t.id}.png`;
@@ -3433,28 +3035,116 @@
                 const state = StateModule.get();
                 if (!state.currentActiveVendor) return;
 
-                const select = document.getElementById('vdsEventSelect');
-                if (select) {
+                // Restablecer selección a Evento
+                const eventRadio = document.querySelector('input[name="vdsSaleType"][value="EVENT"]');
+                if (eventRadio) eventRadio.checked = true;
+                toggleVendorSaleType('EVENT');
+
+                const selectEvt = document.getElementById('vdsEventSelect');
+                if (selectEvt) {
                     const activeEvents = state.events.filter(e => !StateModule.isEventConcluded(e));
                     const listToUse = activeEvents.length > 0 ? activeEvents : state.events;
-                    select.innerHTML = listToUse.map(e => {
-                        return `<option value="${e.id}">${e.title} (${e.price === 0 ? '$ 0' : StateModule.formatARS(e.price)})</option>`;
-                    }).join('');
+                    selectEvt.innerHTML = listToUse.map(e => `<option value="${e.id}">${e.title} (${e.price === 0 ? '$ 0' : StateModule.formatARS(e.price)})</option>`).join('');
+                }
+
+                const selectBus = document.getElementById('vdsBusSelect');
+                if (selectBus) {
+                    if (state.busCombos.length === 0) {
+                        selectBus.innerHTML = `<option value="">No hay colectivos disponibles</option>`;
+                    } else {
+                        selectBus.innerHTML = state.busCombos.map(b => {
+                            const freeCount = b.totalSeats - b.occupiedSeats.length;
+                            return `<option value="${b.id}">${b.name} (${b.zone}) - ${freeCount} libres - ${b.price === 0 ? '$ 0' : StateModule.formatARS(b.price)}</option>`;
+                        }).join('');
+                    }
                 }
 
                 document.getElementById('vdsBuyerName').value = '';
                 document.getElementById('vdsBuyerPhone').value = '';
+                const dniInput = document.getElementById('vdsBuyerDni');
+                if (dniInput) dniInput.value = '';
                 document.getElementById('vdsBuyerQty').value = '1';
 
+                handleVendorBusSelectChange();
                 calculateVendorDirectSaleTotal();
                 openModal('modalVendorDirectSale');
             };
 
+            const toggleVendorSaleType = (type) => {
+                const eventBox = document.getElementById('vdsEventSelectContainer');
+                const busBox = document.getElementById('vdsBusSelectContainer');
+                const qtyBox = document.getElementById('vdsBuyerQtyContainer');
+                const dniInput = document.getElementById('vdsBuyerDni');
+
+                if (type === 'BUS') {
+                    if (eventBox) eventBox.classList.add('hidden');
+                    if (busBox) busBox.classList.remove('hidden');
+                    if (qtyBox) qtyBox.classList.add('hidden'); // Las butacas se asignan individualmente
+                    if (dniInput) dniInput.required = true;
+                    handleVendorBusSelectChange();
+                } else {
+                    if (eventBox) eventBox.classList.remove('hidden');
+                    if (busBox) busBox.classList.add('hidden');
+                    if (qtyBox) qtyBox.classList.remove('hidden');
+                    if (dniInput) dniInput.required = false;
+                }
+                calculateVendorDirectSaleTotal();
+            };
+
+            const handleVendorBusSelectChange = () => {
+                const state = StateModule.get();
+                const busId = document.getElementById('vdsBusSelect')?.value;
+                const bus = state.busCombos.find(b => b.id === busId);
+                const seatSelect = document.getElementById('vdsBusSeatSelect');
+
+                if (!seatSelect) return;
+
+                if (!bus) {
+                    seatSelect.innerHTML = `<option value="">Sin butacas</option>`;
+                    return;
+                }
+
+                const availableSeats = [];
+                for (let i = 1; i <= bus.totalSeats; i++) {
+                    if (!bus.occupiedSeats.includes(i)) {
+                        availableSeats.push(i);
+                    }
+                }
+
+                if (availableSeats.length === 0) {
+                    seatSelect.innerHTML = `<option value="">¡Colectivo Completo!</option>`;
+                } else {
+                    seatSelect.innerHTML = availableSeats.map(s => `<option value="${s}">Butaca #${s}</option>`).join('');
+                }
+
+                calculateVendorDirectSaleTotal();
+            };
+
             const calculateVendorDirectSaleTotal = () => {
                 const state = StateModule.get();
+                const saleType = document.querySelector('input[name="vdsSaleType"]:checked')?.value || 'EVENT';
+
+                if (saleType === 'BUS') {
+                    const busId = document.getElementById('vdsBusSelect')?.value;
+                    const bus = state.busCombos.find(b => b.id === busId) || state.busCombos[0];
+                    if (!bus) return { item: null, qty: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: true };
+
+                    const qty = 1;
+                    const isZero = (bus.price === 0);
+                    const subtotal = bus.price;
+                    const totalFee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
+                    const total = subtotal + totalFee;
+
+                    document.getElementById('vdsSubtotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(subtotal);
+                    document.getElementById('vdsFeeText').innerText = isZero ? '$ 0' : `+${StateModule.formatARS(totalFee)}`;
+                    document.getElementById('vdsTotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(total);
+
+                    return { item: bus, qty, subtotal, totalFee, total, isZero, isBus: true };
+                }
+
                 const eventId = document.getElementById('vdsEventSelect')?.value;
                 const evt = state.events.find(e => e.id === eventId) || state.events[0];
-                if (!evt) return;
+                if (!evt) return { item: null, qty: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: false };
 
                 const qty = parseInt(document.getElementById('vdsBuyerQty')?.value) || 1;
                 const isZero = (evt.price === 0);
@@ -3467,7 +3157,7 @@
                 document.getElementById('vdsFeeText').innerText = isZero ? '$ 0' : `+${StateModule.formatARS(totalFee)}`;
                 document.getElementById('vdsTotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(total);
 
-                return { evt, qty, subtotal, totalFee, total, isZero };
+                return { item: evt, qty, subtotal, totalFee, total, isZero, isBus: false };
             };
 
             const handleVendorDirectSaleSubmit = (e) => {
@@ -3475,30 +3165,59 @@
                 const state = StateModule.get();
                 if (!state.currentActiveVendor) return;
 
-                const { evt, qty, total, isZero } = calculateVendorDirectSaleTotal();
+                const { item, qty, total, isZero, isBus } = calculateVendorDirectSaleTotal();
+                if (!item) return;
+
                 const buyerName = document.getElementById('vdsBuyerName').value.trim();
                 const buyerPhone = document.getElementById('vdsBuyerPhone').value.trim();
+                let buyerDni = null;
+                let busSeat = null;
+
+                if (isBus) {
+                    buyerDni = document.getElementById('vdsBuyerDni')?.value.trim();
+                    const seatVal = parseInt(document.getElementById('vdsBusSeatSelect')?.value);
+                    if (!seatVal) {
+                        alert('No hay butacas disponibles en este colectivo para emitir la venta.');
+                        return;
+                    }
+                    if (!buyerDni) {
+                        alert('Por favor ingresá el DNI del pasajero para el seguro de viaje.');
+                        return;
+                    }
+                    busSeat = seatVal;
+                }
 
                 const newTicketId = 'TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900);
+                const eventId = isBus ? item.eventId : item.id;
+
                 const createdTicket = {
                     id: newTicketId,
-                    eventId: evt.id,
+                    eventId: eventId,
                     buyerName: buyerName,
-                    buyerEmail: 'venta-en-mano@experienceqr.com',
+                    buyerDni: buyerDni,
+                    buyerEmail: `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`,
                     buyerPhone: buyerPhone,
                     channel: state.currentActiveVendor.code,
                     amountPaid: total,
                     status: 'VALID',
                     usedAt: null,
-                    busSeat: null,
+                    busSeat: busSeat,
                     createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
                 };
 
                 state.tickets.unshift(createdTicket);
                 StateModule.saveDocument('tickets', createdTicket.id, createdTicket);
 
-                evt.ticketsSold += qty;
-                StateModule.saveDocument('events', evt.id, evt);
+                if (isBus) {
+                    // Bloquear butaca en el colectivo
+                    if (!item.occupiedSeats.includes(busSeat)) {
+                        item.occupiedSeats.push(busSeat);
+                        StateModule.saveDocument('busCombos', item.id, item);
+                    }
+                } else {
+                    item.ticketsSold += qty;
+                    StateModule.saveDocument('events', item.id, item);
+                }
 
                 state.currentActiveVendor.ticketsSold = (state.currentActiveVendor.ticketsSold || 0) + qty;
                 state.currentActiveVendor.totalCollected = (state.currentActiveVendor.totalCollected || 0) + total;
@@ -3507,60 +3226,28 @@
 
                 closeModal('modalVendorDirectSale');
                 renderVendorDashboard();
+                renderPublicBuses();
 
                 TurnstileModule.playSuccessSound();
                 confetti({ particleCount: 70, spread: 65, origin: { y: 0.6 } });
-                TicketingModule.showIssuedTicketSuccess(createdTicket, evt.title, isZero);
+
+                const ticketTitle = isBus ? `${item.name} (Butaca #${busSeat})` : item.title;
+                TicketingModule.showIssuedTicketSuccess(createdTicket, ticketTitle, isZero);
             };
 
-            const handleAdminLogin = async (e) => {
+            const unlockAdminDemo = () => {
+                StateModule.get().adminUnlockedSession = true;
+                document.getElementById('adminLockScreen').classList.add('hidden');
+                document.getElementById('adminFullDashboard').classList.remove('hidden');
+                renderAdminFullDashboard();
+            };
+
+            const handleAdminLogin = (e) => {
                 e.preventDefault();
-                const emailInput = document.getElementById('adminEmailInput');
-                const passInput = document.getElementById('adminPasswordInput');
-                const feedback = document.getElementById('adminLoginFeedback');
-                const btn = document.getElementById('btnAdminLoginSubmit');
-                const btnText = document.getElementById('adminLoginBtnText');
-
-                const email = emailInput ? emailInput.value.trim() : '';
-                const pass = passInput ? passInput.value : '';
-
-                if (feedback) feedback.classList.add('hidden');
-
-                if (btn) btn.disabled = true;
-                if (btnText) btnText.innerText = 'Autenticando...';
-
-                try {
-                    // Autenticación estricta exclusiva con Firebase Auth en la nube
-                    await StateModule.adminSignIn(email, pass);
-                    StateModule.get().adminUnlockedSession = true;
-                    document.getElementById('adminLockScreen').classList.add('hidden');
-                    document.getElementById('adminFullDashboard').classList.remove('hidden');
-                    renderAdminFullDashboard();
-                } catch (err) {
-                    if (feedback) {
-                        let msg = 'Error de autenticación en Firebase.';
-                        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-                            msg = 'Correo o contraseña incorrectos.';
-                        } else if (err.code === 'auth/too-many-requests') {
-                            msg = 'Demasiados intentos fallidos. Intentá en unos minutos.';
-                        } else if (err.code === 'auth/network-request-failed') {
-                            msg = 'Error de conexión. Revisá tu internet.';
-                        } else if (err.message) {
-                            msg = err.message;
-                        }
-                        feedback.innerText = msg;
-                        feedback.classList.remove('hidden');
-                    }
-                } finally {
-                    if (btn) btn.disabled = false;
-                    if (btnText) btnText.innerText = 'Desbloquear Sistema';
-                }
+                unlockAdminDemo();
             };
 
-            const handleAdminLogout = async () => {
-                try {
-                    await StateModule.adminSignOut();
-                } catch (e) {}
+            const handleAdminLogout = () => {
                 StateModule.get().adminUnlockedSession = false;
                 document.getElementById('adminLockScreen').classList.remove('hidden');
                 document.getElementById('adminFullDashboard').classList.add('hidden');
@@ -3605,12 +3292,8 @@
                     activeBtn.classList.remove('border-transparent', 'text-slate-400');
                 }
 
-                if (tabName === 'clients') {
-                    setTimeout(() => initOrUpdateClientsMonthlyLineChart(), 60);
-                }
-                if (tabName === 'vendors') {
-                    setTimeout(() => initOrUpdateVendorsHorizontalBarChart(), 60);
-                }
+                if (tabName === 'clients') setTimeout(() => initOrUpdateClientsMonthlyLineChart(), 60);
+                if (tabName === 'vendors') setTimeout(() => initOrUpdateVendorsHorizontalBarChart(), 60);
             };
 
             const changeSalesChartPeriod = (days) => {
@@ -3638,37 +3321,28 @@
 
                 let labels = [];
                 let data = [];
-
                 const now = new Date();
 
                 if (state.currentSalesPeriod === 7) {
-                    // Últimos 7 días calculados dinámicamente según tickets reales
                     const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
                     const dayTotals = {};
-
                     for (let i = 6; i >= 0; i--) {
                         const d = new Date();
                         d.setDate(now.getDate() - i);
                         const key = d.toISOString().substring(0, 10);
-                        const label = dayNames[d.getDay()];
-                        labels.push(label);
+                        labels.push(dayNames[d.getDay()]);
                         dayTotals[key] = 0;
                     }
-
                     state.tickets.forEach(t => {
                         const tDate = (t.createdAt || '').substring(0, 10);
                         if (dayTotals[tDate] !== undefined) {
                             dayTotals[tDate] += (t.amountPaid || 0);
                         }
                     });
-
                     data = Object.values(dayTotals);
-
                 } else if (state.currentSalesPeriod === 30) {
-                    // Últimas 4 semanas
                     labels = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
                     const weekTotals = [0, 0, 0, 0];
-
                     state.tickets.forEach(t => {
                         if (!t.createdAt) return;
                         const tDate = new Date(t.createdAt.replace(' ', 'T'));
@@ -3680,28 +3354,22 @@
                             }
                         }
                     });
-
                     data = weekTotals;
-
                 } else {
-                    // Últimos 3 meses
                     const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                     const monthTotals = {};
-
                     for (let i = 2; i >= 0; i--) {
                         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
                         const key = d.toISOString().substring(0, 7);
                         labels.push(monthNames[d.getMonth()] + ' ' + d.getFullYear());
                         monthTotals[key] = 0;
                     }
-
                     state.tickets.forEach(t => {
                         const mKey = (t.createdAt || '').substring(0, 7);
                         if (monthTotals[mKey] !== undefined) {
                             monthTotals[mKey] += (t.amountPaid || 0);
                         }
                     });
-
                     data = Object.values(monthTotals);
                 }
 
@@ -3733,11 +3401,7 @@
                         scales: {
                             y: {
                                 ticks: {
-                                    callback: (v) => {
-                                        if (v >= 1000000) return `$${(v / 1000000).toFixed(1)}M`;
-                                        if (v >= 1000) return `$${(v / 1000).toFixed(0)}k`;
-                                        return `$${v}`;
-                                    },
+                                    callback: (v) => `$${v}`,
                                     color: '#94a3b8'
                                 },
                                 grid: { color: 'rgba(255, 255, 255, 0.05)' }
@@ -3804,7 +3468,6 @@
                 if (!canvas) return;
                 const state = StateModule.get();
 
-                // Calcular ventas por promotor, ordenar de mayor a menor y tomar el Top 10
                 const vendorStats = state.vendors.map(v => {
                     const count = state.tickets.filter(t => t.channel === v.code).length;
                     return {
@@ -3814,16 +3477,8 @@
                 });
 
                 vendorStats.sort((a, b) => b.count - a.count);
-                const top10Vendors = vendorStats.slice(0, 10);
-
-                const labels = top10Vendors.map(v => v.label);
-                const dataCounts = top10Vendors.map(v => v.count);
-
-                // Si no hay promotores registrados aún
-                if (labels.length === 0) {
-                    labels.push('Sin promotores');
-                    dataCounts.push(0);
-                }
+                const labels = vendorStats.map(v => v.label);
+                const dataCounts = vendorStats.map(v => v.count);
 
                 if (vendorsBarChartInstance) {
                     vendorsBarChartInstance.data.labels = labels;
@@ -3849,9 +3504,7 @@
                         indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
+                        plugins: { legend: { display: false } },
                         scales: {
                             x: {
                                 ticks: { color: '#94a3b8', precision: 0 },
@@ -3871,11 +3524,10 @@
                 if (!canvas) return;
                 const state = StateModule.get();
 
-                // Agrupamos clientes por mes de registro (primera compra registrada)
                 const clientFirstDates = {};
                 state.tickets.forEach(t => {
                     const email = t.buyerEmail || 'anon';
-                    const dateStr = t.createdAt ? t.createdAt.substring(0, 7) : '2026-10';
+                    const dateStr = t.createdAt ? t.createdAt.substring(0, 7) : new Date().toISOString().substring(0, 7);
                     if (!clientFirstDates[email] || dateStr < clientFirstDates[email]) {
                         clientFirstDates[email] = dateStr;
                     }
@@ -3891,12 +3543,13 @@
                 let data = [];
 
                 if (sortedMonths.length === 0) {
-                    labels = ['Jul 2026', 'Ago 2026', 'Sep 2026', 'Oct 2026'];
-                    data = [0, 0, 0, 0];
+                    const currentMonthName = new Date().toLocaleDateString('es-AR', { month: 'short', year: 'numeric' });
+                    labels = [currentMonthName];
+                    data = [0];
                 } else {
+                    const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                     labels = sortedMonths.map(m => {
                         const parts = m.split('-');
-                        const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
                         const monthIdx = parseInt(parts[1], 10) - 1;
                         return `${monthNames[monthIdx] || parts[1]} ${parts[0]}`;
                     });
@@ -3930,9 +3583,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
+                        plugins: { legend: { display: false } },
                         scales: {
                             y: {
                                 ticks: { color: '#94a3b8', precision: 0 },
@@ -3958,9 +3609,12 @@
                 }
 
                 tbody.innerHTML = state.events.map(evt => {
-                    const totalRev = evt.ticketsSold * evt.price;
+                    // Cálculo dinámico en tiempo real basado en tickets emitidos
+                    const actualSold = state.tickets.filter(t => t.eventId === evt.id).length;
+                    const totalRev = actualSold * evt.price;
                     const concluded = StateModule.isEventConcluded(evt);
                     const isZero = (evt.price === 0);
+                    const percent = evt.capacity > 0 ? Math.min(100, Math.round((actualSold / evt.capacity) * 100)) : 0;
 
                     const statusBadge = concluded
                         ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/30">
@@ -3985,8 +3639,14 @@
                                 <div class="text-[11px] text-slate-500"><i class="fa-solid fa-location-dot mr-1"></i>${evt.venue}</div>
                             </td>
                             <td class="py-3 font-mono font-bold ${isZero ? 'text-emerald-400' : ''}">${StateModule.formatARS(evt.price)}</td>
-                            <td class="py-3">
-                                <span class="font-bold text-emerald-400 font-mono">${evt.ticketsSold}</span> / ${evt.capacity}
+                            <td class="py-3 min-w-[140px]">
+                                <div class="flex justify-between items-center text-xs mb-1">
+                                    <span class="font-bold text-emerald-400 font-mono">${actualSold}</span>
+                                    <span class="text-slate-400 font-mono">/ ${evt.capacity} (${percent}%)</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-300" style="width: ${percent}%"></div>
+                                </div>
                             </td>
                             <td class="py-3 font-mono font-bold text-indigo-400">${StateModule.formatARS(totalRev)}</td>
                             <td class="py-3 text-right space-x-2 whitespace-nowrap">
@@ -4038,9 +3698,12 @@
                                 <td class="py-3">${channelBadge}</td>
                                 <td class="py-3 font-mono font-bold text-emerald-400">${StateModule.formatARS(t.amountPaid)}</td>
                                 <td class="py-3">${statusBadge}</td>
-                                <td class="py-3 text-right">
-                                    <button onclick="UIModule.previewTicketById('${t.id}')" class="px-2.5 py-1 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px]">
-                                        <i class="fa-solid fa-qrcode"></i> Ver QR
+                                <td class="py-3 text-right space-x-1.5 whitespace-nowrap">
+                                    <button onclick="UIModule.previewTicketById('${t.id}')" class="px-2.5 py-1 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px] transition-all" title="Ver código QR">
+                                        <i class="fa-solid fa-qrcode"></i> QR
+                                    </button>
+                                    <button onclick="UIModule.deleteTicketSale('${t.id}')" class="px-2.5 py-1 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white border border-rose-500/30 hover:border-rose-600 rounded-lg font-bold text-[11px] transition-all" title="Eliminar / Anular venta errónea">
+                                        <i class="fa-solid fa-trash-can"></i> Borrar
                                     </button>
                                 </td>
                             </tr>
@@ -4049,6 +3712,55 @@
                 }
 
                 openModal('modalEventLiveSales');
+            };
+
+            const deleteTicketSale = (ticketId) => {
+                const state = StateModule.get();
+                const ticketIndex = state.tickets.findIndex(t => t.id === ticketId);
+                if (ticketIndex === -1) return;
+
+                const ticket = state.tickets[ticketIndex];
+
+                const confirmed = window.confirm(`¿Estás seguro de que deseas anular y borrar la venta ${ticket.id} de ${ticket.buyerName}?\n\nEsta acción ajustará la recaudación, liberará el cupo de ocupación y actualizará la rendición del vendedor.`);
+                if (!confirmed) return;
+
+                // 1. Ajustar ocupación del evento
+                const evt = state.events.find(e => e.id === ticket.eventId);
+                if (evt && evt.ticketsSold > 0) {
+                    evt.ticketsSold = Math.max(0, evt.ticketsSold - 1);
+                    StateModule.saveDocument('events', evt.id, evt);
+                }
+
+                // 2. Si fue venta asignada a un promotor, restar de sus totales
+                if (ticket.channel && ticket.channel.startsWith('PROM-')) {
+                    const vendor = state.vendors.find(v => v.code === ticket.channel);
+                    if (vendor) {
+                        vendor.ticketsSold = Math.max(0, (vendor.ticketsSold || 0) - 1);
+                        vendor.totalCollected = Math.max(0, (vendor.totalCollected || 0) - ticket.amountPaid);
+                        vendor.cashDue = Math.max(0, (vendor.cashDue || 0) - ticket.amountPaid);
+                        StateModule.saveDocument('vendors', vendor.id, vendor);
+                    }
+                }
+
+                // 3. Si era pasaje de colectivo, liberar la butaca ocupada
+                if (ticket.busSeat) {
+                    const bus = state.busCombos.find(b => b.eventId === ticket.eventId && b.occupiedSeats.includes(ticket.busSeat));
+                    if (bus) {
+                        bus.occupiedSeats = bus.occupiedSeats.filter(seat => seat !== ticket.busSeat);
+                        StateModule.saveDocument('busCombos', bus.id, bus);
+                    }
+                }
+
+                // 4. Eliminar el ticket de memoria y almacenamiento
+                StateModule.removeDocument('tickets', ticketId);
+
+                // 5. Refrescar auditoría actual y el dashboard de administración
+                if (activeAuditEvtId) {
+                    openEventLiveAuditModal(activeAuditEvtId);
+                }
+                renderAdminFullDashboard();
+                renderStoreEvents();
+                renderPublicBuses();
             };
 
             const renderAdminClientsTable = () => {
@@ -4125,9 +3837,15 @@
                             <td class="py-3">
                                 <span class="font-bold text-sky-400 font-mono">${occupiedCount}</span> / ${b.totalSeats} butacas
                             </td>
-                            <td class="py-3 text-right">
-                                <button onclick="UIModule.openBusSeatMapModal('${b.id}')" class="px-2.5 py-1 bg-sky-600/30 text-sky-300 hover:bg-sky-600 hover:text-white rounded-lg font-bold text-[11px]">
-                                    <i class="fa-solid fa-chair mr-1"></i> Asignar / Mapa
+                            <td class="py-3 text-right space-x-1.5 whitespace-nowrap">
+                                <button onclick="UIModule.openBusSeatMapModal('${b.id}')" class="px-2.5 py-1 bg-sky-600/30 text-sky-300 hover:bg-sky-600 hover:text-white rounded-lg font-bold text-[11px] transition-all" title="Ver / Asignar Butacas">
+                                    <i class="fa-solid fa-chair mr-1"></i> Butacas
+                                </button>
+                                <button onclick="UIModule.openEditBusModal('${b.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-slate-700/80" title="Editar Colectivo">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="UIModule.deleteBusCombo('${b.id}')" class="px-2.5 py-1 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white border border-rose-500/30 hover:border-rose-600 rounded-lg font-bold text-[11px] transition-all" title="Eliminar Colectivo">
+                                    <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </td>
                         </tr>
@@ -4179,7 +3897,6 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        // Reducir tamaño para que Firestore admita el documento sin superar el límite de 1MB
                         const MAX_WIDTH = 500;
                         const scaleSize = Math.min(1, MAX_WIDTH / img.width);
                         canvas.width = Math.round(img.width * scaleSize);
@@ -4187,7 +3904,6 @@
 
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        // Compresión optimizada para Base64 ultra liviano (~30kb)
                         StateModule.get().stagedBase64Image = canvas.toDataURL('image/jpeg', 0.65);
 
                         document.getElementById('imagePreviewEl').src = StateModule.get().stagedBase64Image;
@@ -4300,31 +4016,101 @@
                 const state = StateModule.get();
                 const select = document.getElementById('busFormEventSelect');
                 select.innerHTML = state.events.map(e => `<option value="${e.id}">${e.title}</option>`).join('');
+                document.getElementById('busFormId').value = '';
+                document.getElementById('busModalHeading').innerText = 'Nuevo Colectivo / Combo de Traslado';
+                document.getElementById('busModalSubtitle').innerText = 'Definí el recorrido, butacas y precio (0 para costo $ 0).';
+                document.getElementById('busFormSubmitText').innerText = 'Guardar Colectivo';
+                const icon = document.getElementById('busModalIcon');
+                if (icon) icon.className = 'fa-solid fa-bus';
+
+                document.getElementById('busFormName').value = '';
+                document.getElementById('busFormZone').value = '';
+                document.getElementById('busFormPrice').value = '0';
+                document.getElementById('busFormSeats').value = '40';
+                document.getElementById('busFormDeparture').value = '';
                 openModal('modalCreateBus');
+            };
+
+            const openEditBusModal = (busId) => {
+                const state = StateModule.get();
+                const bus = state.busCombos.find(b => b.id === busId);
+                if (!bus) return;
+
+                const select = document.getElementById('busFormEventSelect');
+                select.innerHTML = state.events.map(e => `<option value="${e.id}" ${e.id === bus.eventId ? 'selected' : ''}>${e.title}</option>`).join('');
+
+                document.getElementById('busFormId').value = bus.id;
+                document.getElementById('busModalHeading').innerText = 'Editar Colectivo / Traslado';
+                document.getElementById('busModalSubtitle').innerText = 'Modificá los datos, recorrido, butacas o precio del servicio.';
+                document.getElementById('busFormSubmitText').innerText = 'Actualizar Colectivo';
+                const icon = document.getElementById('busModalIcon');
+                if (icon) icon.className = 'fa-solid fa-pen-to-square';
+
+                document.getElementById('busFormName').value = bus.name || '';
+                document.getElementById('busFormZone').value = bus.zone || '';
+                document.getElementById('busFormPrice').value = bus.price !== undefined ? bus.price : 0;
+                document.getElementById('busFormSeats').value = bus.totalSeats || 40;
+                document.getElementById('busFormDeparture').value = bus.departure || '';
+
+                openModal('modalCreateBus');
+            };
+
+            const deleteBusCombo = (busId) => {
+                const state = StateModule.get();
+                const bus = state.busCombos.find(b => b.id === busId);
+                if (!bus) return;
+
+                const occupied = bus.occupiedSeats ? bus.occupiedSeats.length : 0;
+                const warningMsg = occupied > 0 
+                    ? `Esta unidad tiene ${occupied} butaca(s) reservada(s). Si la eliminás, se cancelará el servicio del traslado.\n\n` 
+                    : '';
+
+                const confirmed = window.confirm(`${warningMsg}¿Deseas eliminar permanentemente el colectivo "${bus.name}"?`);
+                if (!confirmed) return;
+
+                state.busCombos = state.busCombos.filter(b => b.id !== busId);
+                StateModule.saveDocument('busCombos', busId, state.busCombos);
+
+                renderAdminBusesTable();
+                renderPublicBuses();
             };
 
             const handleSaveBusSubmit = (e) => {
                 e.preventDefault();
                 const state = StateModule.get();
+                const id = document.getElementById('busFormId').value;
                 const name = document.getElementById('busFormName').value.trim();
                 const eventId = document.getElementById('busFormEventSelect').value;
                 const zone = document.getElementById('busFormZone').value.trim();
                 const price = parseFloat(document.getElementById('busFormPrice').value) || 0;
+                const seats = parseInt(document.getElementById('busFormSeats').value) || 40;
                 const departure = document.getElementById('busFormDeparture').value.trim();
 
-                const newBus = {
-                    id: 'bus-' + Date.now(),
-                    name,
-                    eventId,
-                    zone,
-                    price,
-                    departure,
-                    totalSeats: 40,
-                    occupiedSeats: []
-                };
-
-                state.busCombos.push(newBus);
-                StateModule.saveDocument('busCombos', newBus.id, newBus);
+                if (id) {
+                    const existing = state.busCombos.find(b => b.id === id);
+                    if (existing) {
+                        existing.name = name;
+                        existing.eventId = eventId;
+                        existing.zone = zone;
+                        existing.price = price;
+                        existing.totalSeats = seats;
+                        existing.departure = departure;
+                        StateModule.saveDocument('busCombos', existing.id, existing);
+                    }
+                } else {
+                    const newBus = {
+                        id: 'bus-' + Date.now(),
+                        name,
+                        eventId,
+                        zone,
+                        price,
+                        departure,
+                        totalSeats: seats,
+                        occupiedSeats: []
+                    };
+                    state.busCombos.push(newBus);
+                    StateModule.saveDocument('busCombos', newBus.id, newBus);
+                }
 
                 closeModal('modalCreateBus');
                 renderPublicBuses();
@@ -4430,6 +4216,8 @@
                 renderBusSeatsLayout,
                 openBusSeatMapModal,
                 handleSelectSeat,
+                openBusSeatMapModal,
+                connectBusPassengerWithVendor,
                 handleBusPassengerSubmit,
                 renderPublicVendorsContact,
                 handleVendorLogin,
@@ -4437,9 +4225,12 @@
                 renderVendorDashboard,
                 sendTicketViaWhatsApp,
                 openVendorDirectSaleModal,
+                toggleVendorSaleType,
+                handleVendorBusSelectChange,
                 calculateVendorDirectSaleTotal,
                 handleVendorDirectSaleSubmit,
                 handleAdminLogin,
+                unlockAdminDemo,
                 handleAdminLogout,
                 renderAdminFullDashboard,
                 switchAdminTab,
@@ -4455,11 +4246,14 @@
                 openEditEventModal,
                 handleSaveEventSubmit,
                 openCreateBusModal,
+                openEditBusModal,
+                deleteBusCombo,
                 handleSaveBusSubmit,
                 openCreateVendorModal,
                 openEditVendorModal,
                 handleSaveVendorSubmit,
                 previewTicketById,
+                deleteTicketSale,
                 getActiveAuditEvtId,
                 initOrUpdateVendorsHorizontalBarChart,
                 initOrUpdateClientsMonthlyLineChart
