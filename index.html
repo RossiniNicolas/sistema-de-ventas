@@ -405,6 +405,9 @@
                     <button onclick="UIModule.switchAdminTab('events')" id="admtab-btn-events" class="px-5 py-3 text-xs sm:text-sm font-bold border-b-2 border-indigo-500 text-white flex items-center gap-2">
                         <i class="fa-solid fa-calendar-days text-indigo-400"></i> Mis Eventos
                     </button>
+                    <button onclick="UIModule.switchAdminTab('combos')" id="admtab-btn-combos" class="px-5 py-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-tags text-purple-400"></i> Combos / Promociones
+                    </button>
                     <button onclick="UIModule.switchAdminTab('clients')" id="admtab-btn-clients" class="px-5 py-3 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2">
                         <i class="fa-solid fa-users text-pink-400"></i> Mis Clientes (CRM)
                     </button>
@@ -475,6 +478,40 @@
                                     </tr>
                                 </thead>
                                 <tbody id="adminEventsTableBody" class="divide-y divide-slate-800/60 text-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NUEVA TAB: GESTIÓN DE COMBOS Y PROMOCIONES -->
+                <div id="admtab-combos" class="hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-3xl border border-slate-800">
+                        <div>
+                            <h3 class="text-xl font-black text-white flex items-center gap-2">
+                                <i class="fa-solid fa-tags text-purple-400"></i> Gestión de Combos y Promociones
+                            </h3>
+                            <p class="text-xs text-slate-400">Creá promociones grupales (ej: 3x2, 2x1, Pack Previa) que generan múltiples QR individuales con un solo cobro.</p>
+                        </div>
+                        <button onclick="UIModule.openCreateComboModal()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Crear Nuevo Combo
+                        </button>
+                    </div>
+
+                    <div class="glass-panel rounded-3xl border border-slate-800 p-6 space-y-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="text-slate-400 border-b border-slate-800 uppercase font-semibold">
+                                    <tr>
+                                        <th class="pb-3">Nombre Combo / Promo</th>
+                                        <th class="pb-3">Evento Asociado</th>
+                                        <th class="pb-3">QRs que Genera</th>
+                                        <th class="pb-3">Precio Total Combo</th>
+                                        <th class="pb-3">Precio Regular Individual</th>
+                                        <th class="pb-3">Ahorro Promocional</th>
+                                        <th class="pb-3 text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminCombosTableBody" class="divide-y divide-slate-800/60 text-slate-200"></tbody>
                             </table>
                         </div>
                     </div>
@@ -668,88 +705,123 @@
     </main>
 
     <!-- MODAL 1: DETALLE Y COMPRA / GENERACIÓN DE ENTRADA -->
-    <div id="modalEventDetail" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-panel w-full max-w-xl rounded-3xl border border-indigo-500/30 p-6 sm:p-8 relative shadow-2xl space-y-6 my-8">
-            <button onclick="UIModule.closeModal('modalEventDetail')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-
-            <div class="flex gap-4 items-center">
-                <img id="detailEvtImg" src="" alt="Flyer" class="w-20 h-20 rounded-2xl object-cover border border-slate-700 shadow-md">
-                <div>
-                    <span id="detailEvtBadge" class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">Fiesta</span>
-                    <h3 id="detailEvtTitle" class="text-xl font-extrabold text-white mt-1">Nombre Evento</h3>
-                    <p id="detailEvtVenue" class="text-xs text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i> Lugar</p>
+    <div id="modalEventDetail" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto pt-6 sm:pt-4 pb-16">
+        <div class="glass-panel w-full max-w-xl max-h-[88vh] rounded-3xl border border-indigo-500/40 relative shadow-2xl flex flex-col overflow-hidden my-auto">
+            
+            <!-- Header FIJO: Siempre visible con botón X prominente idéntico a Colectivos -->
+            <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 z-20">
+                <div class="flex items-center gap-3 min-w-0 pr-2">
+                    <img id="detailEvtImg" src="" alt="Flyer" class="w-12 h-12 rounded-xl object-cover border border-slate-700 shadow-md shrink-0">
+                    <div class="space-y-0.5 min-w-0">
+                        <span id="detailEvtBadge" class="text-[10px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 inline-block">Fiesta</span>
+                        <h3 id="detailEvtTitle" class="text-base sm:text-lg font-black text-white truncate leading-tight">Nombre Evento</h3>
+                        <p id="detailEvtVenue" class="text-xs text-slate-400 truncate"><i class="fa-solid fa-location-dot mr-1"></i> Lugar</p>
+                    </div>
                 </div>
+
+                <!-- Botón de Cierre X grande y siempre visible -->
+                <button type="button" onclick="UIModule.closeModal('modalEventDetail')" class="shrink-0 w-11 h-11 rounded-2xl bg-slate-900 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-rose-500 flex items-center justify-center transition-all shadow-xl active:scale-95" title="Cerrar ventana">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
             </div>
 
-            <form onsubmit="UIModule.handlePurchaseSubmit(event)" class="space-y-4">
-                <input type="hidden" id="purchaseEventId">
+            <!-- Cuerpo con scroll interno independiente -->
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
+                <form onsubmit="UIModule.handlePurchaseSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="purchaseEventId">
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Nombre y Apellido *</label>
-                        <input type="text" id="buyerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Celular / WhatsApp *</label>
-                        <input type="tel" id="buyerPhone" placeholder="+54 9 351 1234567" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
-                    <select id="buyerQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                        <option value="1">1 Entrada</option>
-                        <option value="2">2 Entradas</option>
-                        <option value="3">3 Entradas</option>
-                        <option value="4">4 Entradas</option>
-                        <option value="6">6 Entradas</option>
-                    </select>
-                </div>
-
-                <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
-                    <div class="flex justify-between text-slate-400">
-                        <span>Subtotal Entradas:</span>
-                        <strong id="purchaseSubtotalText" class="font-mono text-white">$ 0</strong>
-                    </div>
-                    <div class="flex justify-between text-slate-400">
-                        <span id="purchaseFeeLabel">Costo por Servicio:</span>
-                        <strong id="purchaseFeeText" class="font-mono text-amber-400">+$ 0</strong>
-                    </div>
-                    <div class="flex justify-between text-sm font-bold border-t border-slate-800 pt-2 text-white">
-                        <span id="purchaseTotalHeading">Total Final a Pagar:</span>
-                        <strong id="purchaseTotalText" class="font-mono text-emerald-400 text-base">$ 0</strong>
-                    </div>
-                </div>
-
-                <!-- Payment Choice Container (Auto hidden if $0) -->
-                <div id="paymentChoiceContainer" class="grid grid-cols-2 gap-3">
-                    <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-800 bg-slate-900/50 cursor-not-allowed opacity-50 relative overflow-hidden" title="Temporalmente deshabilitado">
-                        <input type="radio" name="purchaseFlow" value="MP" disabled onchange="UIModule.togglePurchaseChoice('MP')">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-credit-card mr-1"></i> Mercado Pago</span>
-                            <span class="text-[9px] text-amber-400 font-semibold">(Temporalmente deshabilitado)</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">Nombre y Apellido *</label>
+                            <input type="text" id="buyerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
                         </div>
-                    </label>
-                    <label class="flex items-center gap-2 p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer">
-                        <input type="radio" name="purchaseFlow" value="CASH" checked onchange="UIModule.togglePurchaseChoice('CASH')">
-                        <span class="text-xs font-bold text-emerald-300"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Vendedor Efectivo</span>
-                    </label>
-                </div>
-
-                <div id="cashVendorSelectionBox" class="hidden p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
-                    <div class="flex items-center justify-between pb-1 border-b border-emerald-500/20">
-                        <p class="font-bold text-emerald-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
-                            <i class="fa-brands fa-whatsapp text-emerald-400"></i> Seleccioná tu promotor oficial:
-                        </p>
-                        <span class="text-[10px] text-emerald-400/80 font-medium">Pago en efectivo</span>
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">Celular / WhatsApp *</label>
+                            <input type="tel" id="buyerPhone" placeholder="+54 9 351 1234567" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                        </div>
                     </div>
-                    <div id="cashVendorsContactMiniList" class="space-y-1.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
-                </div>
 
-                <button type="submit" id="btnSubmitPurchase" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg shadow-sky-600/30 text-sm transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-lock"></i> Proceder al Pago Seguro
-                </button>
-            </form>
+                    <!-- Selector de Modalidad: Entrada Individual o Combo Promocional -->
+                    <div id="buyerPackageTypeContainer" class="space-y-2">
+                        <label class="text-xs font-bold text-slate-300 block">Tipo de Pase *</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all">
+                                <input type="radio" name="buyerTicketMode" value="SINGLE" checked onchange="UIModule.handleTicketModeChange(this.value)">
+                                <span>Entrada Individual</span>
+                            </label>
+                            <label id="buyerComboOptionLabel" class="hidden flex items-center justify-center gap-2 p-2.5 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-purple-300 transition-all">
+                                <input type="radio" name="buyerTicketMode" value="COMBO" onchange="UIModule.handleTicketModeChange(this.value)">
+                                <span id="buyerComboOptionTitle">Combo Promocional</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="buyerQtyContainer">
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
+                        <select id="buyerQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                            <option value="1">1 Entrada</option>
+                            <option value="2">2 Entradas</option>
+                            <option value="3">3 Entradas</option>
+                            <option value="4">4 Entradas</option>
+                            <option value="6">6 Entradas</option>
+                        </select>
+                    </div>
+
+                    <div id="buyerComboQtyContainer" class="hidden">
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Combos</label>
+                        <select id="buyerComboQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                            <option value="1">1 Combo</option>
+                            <option value="2">2 Combos</option>
+                            <option value="3">3 Combos</option>
+                        </select>
+                        <p id="buyerComboDetailNote" class="text-[11px] text-purple-300 mt-1 font-semibold"></p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
+                        <div class="flex justify-between text-slate-400">
+                            <span>Subtotal Entradas:</span>
+                            <strong id="purchaseSubtotalText" class="font-mono text-white">$ 0</strong>
+                        </div>
+                        <div class="flex justify-between text-slate-400">
+                            <span id="purchaseFeeLabel">Costo por Servicio:</span>
+                            <strong id="purchaseFeeText" class="font-mono text-amber-400">+$ 0</strong>
+                        </div>
+                        <div class="flex justify-between text-sm font-bold border-t border-slate-800 pt-2 text-white">
+                            <span id="purchaseTotalHeading">Total Final a Pagar:</span>
+                            <strong id="purchaseTotalText" class="font-mono text-emerald-400 text-base">$ 0</strong>
+                        </div>
+                    </div>
+
+                    <!-- Payment Choice Container (Auto hidden if $0) -->
+                    <div id="paymentChoiceContainer" class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-800 bg-slate-900/50 cursor-not-allowed opacity-50 relative overflow-hidden" title="Temporalmente deshabilitado">
+                            <input type="radio" name="purchaseFlow" value="MP" disabled onchange="UIModule.togglePurchaseChoice('MP')">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-credit-card mr-1"></i> Mercado Pago</span>
+                                <span class="text-[9px] text-amber-400 font-semibold">(Temporalmente deshabilitado)</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer">
+                            <input type="radio" name="purchaseFlow" value="CASH" checked onchange="UIModule.togglePurchaseChoice('CASH')">
+                            <span class="text-xs font-bold text-emerald-300"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Vendedor Efectivo</span>
+                        </label>
+                    </div>
+
+                    <div id="cashVendorSelectionBox" class="hidden p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
+                        <div class="flex items-center justify-between pb-1 border-b border-emerald-500/20">
+                            <p class="font-bold text-emerald-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                                <i class="fa-brands fa-whatsapp text-emerald-400"></i> Seleccioná tu promotor oficial:
+                            </p>
+                            <span class="text-[10px] text-emerald-400/80 font-medium">Pago en efectivo</span>
+                        </div>
+                        <div id="cashVendorsContactMiniList" class="space-y-1.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <button type="submit" id="btnSubmitPurchase" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg shadow-sky-600/30 text-sm transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock"></i> Proceder al Pago Seguro
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -819,6 +891,21 @@
                     </div>
                 </div>
 
+                <!-- Modalidad para Venta Directa: Entrada Individual o Combo -->
+                <div id="vdsTicketModeContainer" class="space-y-2">
+                    <label class="text-xs font-bold text-slate-300 block">Modalidad de Entrada *</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center justify-center gap-2 p-2 rounded-xl border border-slate-700 bg-slate-900 cursor-pointer text-xs font-bold text-white">
+                            <input type="radio" name="vdsTicketMode" value="SINGLE" checked onchange="UIModule.handleVdsTicketModeChange(this.value)">
+                            <span>Individual</span>
+                        </label>
+                        <label id="vdsComboOptionLabel" class="hidden flex items-center justify-center gap-2 p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-purple-300">
+                            <input type="radio" name="vdsTicketMode" value="COMBO" onchange="UIModule.handleVdsTicketModeChange(this.value)">
+                            <span id="vdsComboOptionTitle">Combo</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div id="vdsBuyerQtyContainer">
                     <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
                     <select id="vdsBuyerQty" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-emerald-500">
@@ -829,6 +916,16 @@
                         <option value="5">5 Entradas</option>
                         <option value="6">6 Entradas</option>
                     </select>
+                </div>
+
+                <div id="vdsComboQtyContainer" class="hidden">
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Combos</label>
+                    <select id="vdsComboQty" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-emerald-500">
+                        <option value="1">1 Combo</option>
+                        <option value="2">2 Combos</option>
+                        <option value="3">3 Combos</option>
+                    </select>
+                    <p id="vdsComboDetailNote" class="text-[11px] text-purple-300 mt-1 font-semibold"></p>
                 </div>
 
                 <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
@@ -877,14 +974,28 @@
                 <i class="fa-solid fa-circle-check"></i>
             </div>
             <div>
-                <h3 class="text-xl font-extrabold text-white" id="ticketSuccessHeading">¡Entrada Confirmada!</h3>
-                <p class="text-xs text-slate-400">Presentá este código QR en el acceso del evento.</p>
+                <h3 class="text-xl font-extrabold text-white" id="ticketSuccessHeading">¡Entradas Confirmadas!</h3>
+                <p class="text-xs text-slate-400" id="ticketSuccessSubtitle">Presentá cada código QR individual en el acceso.</p>
+            </div>
+
+            <!-- Navegador de tickets emitidos cuando qty > 1 -->
+            <div id="multiTicketSelectorContainer" class="hidden flex items-center justify-between bg-slate-900 border border-slate-800 p-2 rounded-xl text-xs">
+                <button type="button" onclick="TicketingModule.navigateTicket(-1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span id="multiTicketCounterLabel" class="font-bold text-emerald-400">Entrada 1 de 1</span>
+                <button type="button" onclick="TicketingModule.navigateTicket(1)" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded-lg font-bold">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
 
             <div id="issuedTicketPrintableArea" class="bg-white p-5 rounded-2xl shadow-xl space-y-3 text-slate-950">
                 <div class="text-left border-b border-slate-200 pb-2">
-                    <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600">ExperienceQR Ticket Oficial</span>
-                    <h4 id="ticketModalEvtTitle" class="text-base font-black text-slate-900 leading-tight">Nombre Evento</h4>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600">ExperienceQR Ticket Oficial</span>
+                        <span id="ticketModalIndexBadge" class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-200">1 / 1</span>
+                    </div>
+                    <h4 id="ticketModalEvtTitle" class="text-base font-black text-slate-900 leading-tight mt-1">Nombre Evento</h4>
                     <p id="ticketModalBuyerName" class="text-xs text-slate-600 font-bold">Comprador: Juan Pérez</p>
                     <p id="ticketModalBuyerDni" class="text-[11px] text-slate-500 font-semibold"></p>
                     <p id="ticketModalSeatBadge" class="text-xs text-indigo-600 font-bold hidden"></p>
@@ -895,9 +1006,9 @@
                 </div>
             </div>
 
-            <div class="flex gap-2">
+            <div class="flex flex-col gap-2">
                 <button onclick="TicketingModule.downloadTicket()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-download"></i> Guardar Ticket Digital
+                    <i class="fa-solid fa-download"></i> Guardar Ticket Actual
                 </button>
             </div>
         </div>
@@ -1120,6 +1231,36 @@
                     </div>
                 </div>
 
+                <!-- SECCIÓN DE COMBOS PROMOCIONALES (Ej: 3x2, 2x1, Pack Amigos) -->
+                <div class="p-4 rounded-2xl bg-purple-950/20 border border-purple-500/30 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-black text-purple-300 flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="formHasCombo" onchange="UIModule.toggleComboFormFields(this.checked)" class="rounded text-purple-600 focus:ring-purple-500">
+                            <i class="fa-solid fa-tags text-purple-400"></i> Habilitar Combo Promocional (ej. 3x2, Pack Amigos)
+                        </label>
+                    </div>
+
+                    <div id="comboFormFieldsContainer" class="hidden space-y-3 pt-2 border-t border-purple-500/20">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-300 block mb-1">Nombre de la Promoción *</label>
+                            <input type="text" id="formComboName" placeholder="Promo 3x2 Amigos" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs focus:border-purple-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-300 block mb-1">Entradas que Integra el Combo *</label>
+                                <input type="number" id="formComboTicketsCount" placeholder="3" min="2" max="50" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs font-mono font-bold focus:border-purple-500">
+                                <span class="text-[10px] text-slate-400">Cantidad de QR a generar</span>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-300 block mb-1">Precio Total del Combo (ARS $) *</label>
+                                <input type="number" id="formComboPrice" placeholder="0" min="0" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3.5 py-2 text-xs font-mono font-bold focus:border-purple-500">
+                                <span class="text-[10px] text-slate-400">Total a abonar por el pack</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flyer / Imagen del Evento -->
                 <div class="space-y-2 border-t border-slate-800 pt-3">
                     <label class="text-xs font-bold text-slate-300 block">Flyer / Imagen del Evento</label>
                     <div class="flex items-center gap-3">
@@ -1151,6 +1292,73 @@
         </div>
     </div>
 
+    <!-- MODAL DEDICADO: CREAR O EDITAR COMBO PROMOCIONAL -->
+    <div id="modalCreateCombo" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-purple-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
+            <button onclick="UIModule.closeModal('modalCreateCombo')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl border border-purple-500/30">
+                    <i class="fa-solid fa-tags" id="comboModalIcon"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white" id="comboModalHeading">Crear Combo Promocional</h3>
+                    <p class="text-xs text-slate-400" id="comboModalSubtitle">Configurá promociones tipo 3x2, packs grupales o descuentos en cantidad.</p>
+                </div>
+            </div>
+
+            <form onsubmit="UIModule.handleSaveComboSubmit(event)" class="space-y-4">
+                <input type="hidden" id="comboFormEventId">
+
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Evento Destino *</label>
+                    <select id="comboFormEventSelect" onchange="UIModule.handleComboEventSelectChange()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-purple-500"></select>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Nombre Comercial de la Promoción *</label>
+                    <input type="text" id="comboFormName" placeholder="Promo 3x2 Amigos / Pack Previa" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-purple-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Entradas Físicas (QR) *</label>
+                        <input type="number" id="comboFormTicketsCount" placeholder="3" min="2" max="50" oninput="UIModule.updateComboSimulation()" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-purple-500">
+                        <span class="text-[10px] text-slate-400">Total de personas que ingresan</span>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Precio Total del Combo (ARS $) *</label>
+                        <input type="number" id="comboFormPrice" placeholder="0" min="0" oninput="UIModule.updateComboSimulation()" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-purple-500">
+                        <span class="text-[10px] text-slate-400">Importe total que abonará el cliente</span>
+                    </div>
+                </div>
+
+                <!-- Simulación Dinámica de Descuento -->
+                <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-1.5 text-xs">
+                    <div class="flex justify-between text-slate-400">
+                        <span>Valor sin promo (compradas individuales):</span>
+                        <strong id="comboSimRegularTotal" class="font-mono text-slate-300">$ 0</strong>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Precio total promocional:</span>
+                        <strong id="comboSimPromoTotal" class="font-mono text-purple-400 font-bold">$ 0</strong>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800 pt-1 font-bold">
+                        <span class="text-emerald-400">Ahorro para el comprador:</span>
+                        <strong id="comboSimSavings" class="font-mono text-emerald-400 text-sm">$ 0</strong>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="UIModule.closeModal('modalCreateCombo')" class="px-4 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-purple-600/30 flex items-center gap-2">
+                        <i class="fa-solid fa-floppy-disk"></i> Guardar Combo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL 8: AUDITORÍA EN VIVO DE VENTAS POR EVENTO -->
     <div id="modalEventLiveSales" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-4xl rounded-3xl border border-indigo-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
@@ -1176,7 +1384,7 @@
                             <th class="pb-3">Canal / Vendedor</th>
                             <th class="pb-3">Monto</th>
                             <th class="pb-3">Estado</th>
-                            <th class="pb-3 text-right">Acciones</th>
+                            <th class="pb-3 text-right">Acción</th>
                         </tr>
                     </thead>
                     <tbody id="liveAuditTableBody" class="divide-y divide-slate-800/60 text-slate-200"></tbody>
@@ -1185,7 +1393,7 @@
         </div>
     </div>
 
-    <!-- MODAL 9: CREAR COLECTIVO / TRASLADO -->
+    <!-- MODAL 9: CREAR O EDITAR COLECTIVO / TRASLADO -->
     <div id="modalCreateBus" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-lg rounded-3xl border border-sky-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
             <button onclick="UIModule.closeModal('modalCreateBus')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -1220,15 +1428,13 @@
                         <input type="number" id="busFormPrice" placeholder="0" min="0" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500">
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Butacas *</label>
-                        <input type="number" id="busFormSeats" placeholder="40" min="1" max="120" value="40" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Punto de Encuentro y Horario *</label>
-                        <input type="text" id="busFormDeparture" placeholder="Plaza Cívica - 20:30 hs" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-sky-500">
-                    </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Butacas *</label>
+                    <input type="number" id="busFormSeats" placeholder="40" min="4" max="100" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Punto de Encuentro y Horario *</label>
+                    <input type="text" id="busFormDeparture" placeholder="Plaza Cívica - Salida 20:30 hs" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-sky-500">
                 </div>
                 <div class="flex justify-end gap-3 pt-2">
                     <button type="button" onclick="UIModule.closeModal('modalCreateBus')" class="px-4 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancelar</button>
@@ -1240,7 +1446,7 @@
         </div>
     </div>
 
-    <!-- MODAL 10: REGISTRAR PROMOTOR -->
+    <!-- MODAL 10: REGISTRAR O EDITAR PROMOTOR -->
     <div id="modalCreateVendor" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-md rounded-3xl border border-emerald-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
             <button onclick="UIModule.closeModal('modalCreateVendor')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -1283,7 +1489,7 @@
         </div>
     </div>
 
-    <!-- MODAL 11: CONFIGURACIÓN MERCADO PAGO CHECKOUT PRO -->
+    <!-- MODAL 11: CONFIGURACIÓN MERCADO PAGO -->
     <div id="modalMpSettings" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-lg rounded-3xl border border-sky-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
             <button onclick="UIModule.closeModal('modalMpSettings')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -1293,8 +1499,8 @@
                     <i class="fa-solid fa-handshake"></i>
                 </div>
                 <div>
-                    <h3 class="text-lg font-black text-white">Mercado Pago Checkout Pro</h3>
-                    <p class="text-xs text-slate-400">Credenciales de integración MLA y retorno de pagos.</p>
+                    <h3 class="text-lg font-black text-white">Mercado Pago Checkout</h3>
+                    <p class="text-xs text-slate-400">Credenciales de integración y retorno de pagos.</p>
                 </div>
             </div>
 
@@ -1345,13 +1551,13 @@
         </div>
     </div>
 
-    <!-- MODAL 12: AYUDA Y SOLUCIÓN REGLAS DE FIRESTORE -->
+    <!-- MODAL 12: AYUDA DE REGLAS DE FIRESTORE (OCULTO POR DEFECTO) -->
     <div id="modalFirebaseRulesHelp" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-panel w-full max-w-lg rounded-3xl border border-rose-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
+        <div class="glass-panel w-full max-w-xl rounded-3xl border border-amber-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
             <button onclick="UIModule.closeModal('modalFirebaseRulesHelp')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
 
             <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
-                <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl border border-rose-500/30">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl border border-amber-500/30">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <div>
@@ -1646,6 +1852,7 @@ service cloud.firestore {
                         UIModule.renderStoreEvents();
                         if (state.adminUnlockedSession) {
                             UIModule.renderAdminEventsTable();
+                            UIModule.renderAdminCombosTable();
                             UIModule.renderAdminFullDashboard();
                         }
                     });
@@ -2144,28 +2351,39 @@ service cloud.firestore {
                 const pending = state.pendingCheckoutData;
                 if (!pending) return;
 
-                const newTicketId = pending.generatedTicketId || ('TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900));
-                const createdTicket = {
-                    id: newTicketId,
-                    eventId: pending.eventId,
-                    buyerName: pending.buyerName,
-                    buyerDni: pending.buyerDni || null,
-                    buyerEmail: pending.buyerEmail,
-                    buyerPhone: pending.buyerPhone,
-                    channel: isZeroCostTicket ? 'ONLINE_ZERO' : pending.channel,
-                    amountPaid: pending.total,
-                    status: 'VALID',
-                    usedAt: null,
-                    busSeat: pending.busSeat,
-                    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
-                };
+                const qty = pending.qty || 1;
+                const baseTicketId = pending.generatedTicketId || ('TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900));
+                const unitPrice = pending.total / qty;
+                const createdTickets = [];
 
-                state.tickets.unshift(createdTicket);
-                StateModule.saveDocument('tickets', createdTicket.id, createdTicket);
+                for (let i = 1; i <= qty; i++) {
+                    const ticketId = qty > 1 ? `${baseTicketId}-${i}` : baseTicketId;
+                    const createdTicket = {
+                        id: ticketId,
+                        orderId: baseTicketId,
+                        ticketIndex: i,
+                        ticketTotalCount: qty,
+                        eventId: pending.eventId,
+                        buyerName: pending.buyerName,
+                        buyerDni: pending.buyerDni || null,
+                        buyerEmail: pending.buyerEmail,
+                        buyerPhone: pending.buyerPhone,
+                        channel: isZeroCostTicket ? 'ONLINE_ZERO' : pending.channel,
+                        amountPaid: unitPrice,
+                        status: 'VALID',
+                        usedAt: null,
+                        busSeat: pending.busSeat,
+                        createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                    };
+
+                    state.tickets.unshift(createdTicket);
+                    StateModule.saveDocument('tickets', createdTicket.id, createdTicket);
+                    createdTickets.push(createdTicket);
+                }
 
                 const evt = state.events.find(e => e.id === pending.eventId);
                 if (evt) {
-                    evt.ticketsSold += (pending.qty || 1);
+                    evt.ticketsSold += qty;
                     StateModule.saveDocument('events', evt.id, evt);
                 }
 
@@ -2186,7 +2404,7 @@ service cloud.firestore {
                     origin: { y: 0.6 }
                 });
 
-                TicketingModule.showIssuedTicketSuccess(createdTicket, pending.eventTitle, isZeroCostTicket);
+                TicketingModule.showIssuedTicketsBatch(createdTickets, pending.eventTitle, isZeroCostTicket);
                 state.pendingCheckoutData = null;
 
                 UIModule.renderStoreEvents();
@@ -2211,10 +2429,41 @@ service cloud.firestore {
            4. TICKETING & QR VISOR (TicketingModule)
         ========================================================== */
         const TicketingModule = (() => {
-            const showIssuedTicketSuccess = (tck, eventTitle, isZeroCostTicket = false) => {
+            let activeBatchTickets = [];
+            let activeBatchIndex = 0;
+            let activeBatchEventTitle = '';
+            let activeBatchIsZero = false;
+
+            const renderCurrentBatchTicket = () => {
+                if (!activeBatchTickets || activeBatchTickets.length === 0) return;
+                const tck = activeBatchTickets[activeBatchIndex];
+                const eventTitle = activeBatchEventTitle;
+
                 const heading = document.getElementById('ticketSuccessHeading');
+                const subtitle = document.getElementById('ticketSuccessSubtitle');
+                const isZero = activeBatchIsZero || tck.amountPaid === 0;
+
                 if (heading) {
-                    heading.innerText = (isZeroCostTicket || tck.amountPaid === 0) ? '¡Entrada Generada ($ 0)!' : '¡Entrada Confirmada!';
+                    if (activeBatchTickets.length > 1) {
+                        heading.innerText = isZero ? '¡Entradas Generadas ($ 0)!' : '¡Entradas Confirmadas!';
+                        if (subtitle) subtitle.innerText = `Se generaron ${activeBatchTickets.length} códigos QR únicos. Navegá entre ellos:`;
+                    } else {
+                        heading.innerText = isZero ? '¡Entrada Generada ($ 0)!' : '¡Entrada Confirmada!';
+                        if (subtitle) subtitle.innerText = 'Presentá este código QR en el acceso del evento.';
+                    }
+                }
+
+                const selectorBox = document.getElementById('multiTicketSelectorContainer');
+                const counterLabel = document.getElementById('multiTicketCounterLabel');
+                const indexBadge = document.getElementById('ticketModalIndexBadge');
+
+                if (activeBatchTickets.length > 1) {
+                    if (selectorBox) selectorBox.classList.remove('hidden');
+                    if (counterLabel) counterLabel.innerText = `Entrada ${activeBatchIndex + 1} de ${activeBatchTickets.length}`;
+                    if (indexBadge) indexBadge.innerText = `${activeBatchIndex + 1} / ${activeBatchTickets.length}`;
+                } else {
+                    if (selectorBox) selectorBox.classList.add('hidden');
+                    if (indexBadge) indexBadge.innerText = `1 / 1`;
                 }
 
                 document.getElementById('ticketModalEvtTitle').innerText = eventTitle;
@@ -2253,8 +2502,28 @@ service cloud.firestore {
                     colorLight: '#ffffff',
                     correctLevel: QRCode.CorrectLevel.H
                 });
+            };
 
+            const showIssuedTicketsBatch = (ticketsList, eventTitle, isZeroCostTicket = false) => {
+                activeBatchTickets = Array.isArray(ticketsList) ? ticketsList : [ticketsList];
+                activeBatchIndex = 0;
+                activeBatchEventTitle = eventTitle;
+                activeBatchIsZero = isZeroCostTicket;
+
+                renderCurrentBatchTicket();
                 UIModule.openModal('modalTicketSuccess');
+            };
+
+            const showIssuedTicketSuccess = (tck, eventTitle, isZeroCostTicket = false) => {
+                showIssuedTicketsBatch([tck], eventTitle, isZeroCostTicket);
+            };
+
+            const navigateTicket = (direction) => {
+                if (!activeBatchTickets || activeBatchTickets.length <= 1) return;
+                activeBatchIndex += direction;
+                if (activeBatchIndex < 0) activeBatchIndex = activeBatchTickets.length - 1;
+                if (activeBatchIndex >= activeBatchTickets.length) activeBatchIndex = 0;
+                renderCurrentBatchTicket();
             };
 
             const downloadTicket = () => {
@@ -2281,7 +2550,8 @@ service cloud.firestore {
 
                     ctx.fillStyle = '#4f46e5';
                     ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
-                    ctx.fillText('EXPERIENCEQR TICKET OFICIAL', 60, 80);
+                    const indexStr = (tck.ticketIndex && tck.ticketTotalCount) ? ` (${tck.ticketIndex}/${tck.ticketTotalCount})` : '';
+                    ctx.fillText(`EXPERIENCEQR TICKET OFICIAL${indexStr}`, 60, 80);
 
                     ctx.fillStyle = '#0f172a';
                     ctx.font = 'bold 24px "Plus Jakarta Sans", sans-serif';
@@ -2350,6 +2620,8 @@ service cloud.firestore {
 
             return {
                 showIssuedTicketSuccess,
+                showIssuedTicketsBatch,
+                navigateTicket,
                 downloadTicket,
                 generateTicketImageBlob
             };
@@ -2771,15 +3043,22 @@ service cloud.firestore {
                     const actionButtonLabel = isZero ? `<i class="fa-solid fa-qrcode mr-1"></i> Generar Entrada` : `<i class="fa-solid fa-ticket mr-1"></i> Comprar`;
                     const actionBtnClass = isZero ? `bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30` : `bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/30`;
 
+                    const comboBadge = evt.combo && evt.combo.enabled ? `
+                        <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 backdrop-blur-md flex items-center gap-1">
+                            <i class="fa-solid fa-tags"></i> ${evt.combo.name || 'Promo ' + evt.combo.ticketsCount + 'x'}
+                        </span>
+                    ` : '';
+
                     return `
                         <div class="glass-panel rounded-3xl border ${concluded ? 'border-slate-800/60 opacity-80' : 'border-slate-800 group hover:border-indigo-500/50'} overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10">
                             <div class="relative h-48 overflow-hidden">
                                 <img src="${evt.image}" alt="${evt.title}" class="w-full h-full object-cover ${concluded ? 'grayscale-[60%]' : 'group-hover:scale-105'} transition-all duration-500">
                                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-                                <div class="absolute top-3 left-3 flex items-center gap-2">
+                                <div class="absolute top-3 left-3 flex flex-wrap items-center gap-2">
                                     <span class="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-slate-950/80 border border-slate-700 text-indigo-400 backdrop-blur-md">
                                         ${evt.category}
                                     </span>
+                                    ${comboBadge}
                                     ${isZero ? `
                                         <span class="text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 backdrop-blur-md">
                                             Costo $ 0
@@ -2850,6 +3129,21 @@ service cloud.firestore {
                 document.getElementById('detailEvtBadge').innerText = evt.category;
                 document.getElementById('detailEvtVenue').innerHTML = `<i class="fa-solid fa-location-dot mr-1"></i> ${evt.venue} • ${evt.date}`;
 
+                // Configurar opción de Combo en el modal si el evento lo tiene habilitado
+                const comboOptionLabel = document.getElementById('buyerComboOptionLabel');
+                const comboOptionTitle = document.getElementById('buyerComboOptionTitle');
+                const singleRadio = document.querySelector('input[name="buyerTicketMode"][value="SINGLE"]');
+
+                if (singleRadio) singleRadio.checked = true;
+
+                if (evt.combo && evt.combo.enabled) {
+                    if (comboOptionLabel) comboOptionLabel.classList.remove('hidden');
+                    if (comboOptionTitle) comboOptionTitle.innerHTML = `<i class="fa-solid fa-tags text-purple-400"></i> ${evt.combo.name || 'Combo Promocional'}`;
+                } else {
+                    if (comboOptionLabel) comboOptionLabel.classList.add('hidden');
+                }
+
+                handleTicketModeChange('SINGLE');
                 calculatePurchaseTotal();
                 
                 if (evt.price > 0) {
@@ -2861,18 +3155,61 @@ service cloud.firestore {
                 openModal('modalEventDetail');
             };
 
+            const handleTicketModeChange = (mode) => {
+                const singleQtyBox = document.getElementById('buyerQtyContainer');
+                const comboQtyBox = document.getElementById('buyerComboQtyContainer');
+                const state = StateModule.get();
+                const eventId = document.getElementById('purchaseEventId')?.value;
+                const evt = state.events.find(e => e.id === eventId);
+
+                if (mode === 'COMBO' && evt?.combo?.enabled) {
+                    if (singleQtyBox) singleQtyBox.classList.add('hidden');
+                    if (comboQtyBox) comboQtyBox.classList.remove('hidden');
+                    const note = document.getElementById('buyerComboDetailNote');
+                    if (note) note.innerText = `Este combo incluye ${evt.combo.ticketsCount} entradas oficiales (se generarán ${evt.combo.ticketsCount} códigos QR individuales).`;
+                } else {
+                    if (singleQtyBox) singleQtyBox.classList.remove('hidden');
+                    if (comboQtyBox) comboQtyBox.classList.add('hidden');
+                }
+                calculatePurchaseTotal();
+            };
+
             const calculatePurchaseTotal = () => {
                 const state = StateModule.get();
                 const eventId = document.getElementById('purchaseEventId')?.value;
                 const evt = state.events.find(e => e.id === eventId);
-                if (!evt) return { subtotal: 0, totalFee: 0, total: 0, qty: 1, isZeroPrice: false };
+                if (!evt) return { subtotal: 0, totalFee: 0, total: 0, qty: 1, isZeroPrice: false, actualTicketsCount: 1, isCombo: false };
 
-                const qty = parseInt(document.getElementById('buyerQty')?.value) || 1;
-                const isZeroPrice = (evt.price === 0);
-                const subtotal = evt.price * qty;
-                const singleFee = isZeroPrice ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id);
-                const totalFee = singleFee * qty;
-                const total = subtotal + totalFee;
+                const ticketMode = document.querySelector('input[name="buyerTicketMode"]:checked')?.value || 'SINGLE';
+                const isCombo = (ticketMode === 'COMBO' && evt.combo && evt.combo.enabled);
+
+                let subtotal = 0;
+                let singleFee = 0;
+                let totalFee = 0;
+                let total = 0;
+                let qty = 1;
+                let actualTicketsCount = 1;
+                let isZeroPrice = false;
+
+                if (isCombo) {
+                    qty = parseInt(document.getElementById('buyerComboQty')?.value) || 1;
+                    const comboUnitPrice = evt.combo.price || 0;
+                    const ticketsPerCombo = parseInt(evt.combo.ticketsCount) || 2;
+                    actualTicketsCount = ticketsPerCombo * qty;
+                    subtotal = comboUnitPrice * qty;
+                    isZeroPrice = (comboUnitPrice === 0);
+                    singleFee = isZeroPrice ? 0 : ServiceFeeModule.calculateFee(comboUnitPrice, evt.id);
+                    totalFee = singleFee * qty;
+                    total = subtotal + totalFee;
+                } else {
+                    qty = parseInt(document.getElementById('buyerQty')?.value) || 1;
+                    actualTicketsCount = qty;
+                    isZeroPrice = (evt.price === 0);
+                    subtotal = evt.price * qty;
+                    singleFee = isZeroPrice ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id);
+                    totalFee = singleFee * qty;
+                    total = subtotal + totalFee;
+                }
 
                 const subtotalEl = document.getElementById('purchaseSubtotalText');
                 const feeEl = document.getElementById('purchaseFeeText');
@@ -2902,7 +3239,7 @@ service cloud.firestore {
                     }
                 }
 
-                return { subtotal, totalFee, total, qty, isZeroPrice };
+                return { subtotal, totalFee, total, qty, isZeroPrice, actualTicketsCount, isCombo };
             };
 
             const togglePurchaseChoice = (choice) => {
@@ -2975,26 +3312,28 @@ service cloud.firestore {
 
             const handlePurchaseSubmit = (e) => {
                 e.preventDefault();
-                const { subtotal, totalFee, total, qty, isZeroPrice } = calculatePurchaseTotal();
+                const { subtotal, totalFee, total, qty, isZeroPrice, actualTicketsCount, isCombo } = calculatePurchaseTotal();
                 const state = StateModule.get();
                 const eventId = document.getElementById('purchaseEventId').value;
                 const evt = state.events.find(ev => ev.id === eventId);
                 const buyerName = document.getElementById('buyerName').value.trim();
                 const buyerPhone = document.getElementById('buyerPhone').value.trim();
-                const buyerEmail = document.getElementById('buyerEmail')?.value?.trim() || `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`;
+                const buyerEmail = `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`;
                 const flow = document.querySelector('input[name="purchaseFlow"]:checked')?.value || 'CASH';
+
+                const displayTitle = isCombo ? `${evt.title} (${evt.combo.name || 'Combo Promocional'})` : evt.title;
 
                 state.pendingCheckoutData = {
                     type: 'EVENT_TICKET',
                     eventId: evt.id,
-                    eventTitle: evt.title,
-                    unitPrice: evt.price,
+                    eventTitle: displayTitle,
+                    unitPrice: isCombo ? (evt.combo.price / evt.combo.ticketsCount) : evt.price,
                     subtotal: subtotal,
                     fee: totalFee,
                     buyerName,
                     buyerEmail,
                     buyerPhone,
-                    qty,
+                    qty: actualTicketsCount, // Genera exactamente la cantidad total de QR que integran el combo
                     total,
                     channel: isZeroPrice ? 'ONLINE_ZERO' : 'ONLINE_MP',
                     busSeat: null
@@ -3010,7 +3349,8 @@ service cloud.firestore {
                 if (flow === 'CASH') {
                     const v = state.vendors[0];
                     if (v) {
-                        const msg = encodeURIComponent(`Hola ${v.name}! Soy ${buyerName}, quiero comprar ${qty} entrada(s) para "${evt.title}". Total a abonar en efectivo: ${StateModule.formatARS(total)}.`);
+                        const packInfo = isCombo ? `1 combo "${evt.combo.name}" (${actualTicketsCount} entradas en total)` : `${qty} entrada(s)`;
+                        const msg = encodeURIComponent(`Hola ${v.name}! Soy ${buyerName}, quiero comprar ${packInfo} para "${evt.title}". Total a abonar en efectivo: ${StateModule.formatARS(total)}.`);
                         window.open(`https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${msg}`, '_blank');
                     }
                     return;
@@ -3018,7 +3358,7 @@ service cloud.firestore {
 
                 document.getElementById('mpGatewayAccountHolder').innerText = `Cobro oficial: ${state.mercadoPago.holder}`;
                 document.getElementById('mpGatewayAmount').innerText = StateModule.formatARS(total);
-                document.getElementById('mpGatewayItemDetail').innerText = `${qty}x Entrada(s) "${evt.title}" + Costo de Servicio`;
+                document.getElementById('mpGatewayItemDetail').innerText = `${displayTitle} + Costo de Servicio`;
                 document.getElementById('mpGatewayBuyerEmail').innerText = buyerEmail;
 
                 openModal('modalMercadoPagoGateway');
@@ -3507,28 +3847,73 @@ service cloud.firestore {
                 if (dniInput) dniInput.value = '';
                 document.getElementById('vdsBuyerQty').value = '1';
 
+                handleVendorEventSelectChange();
                 handleVendorBusSelectChange();
                 calculateVendorDirectSaleTotal();
                 openModal('modalVendorDirectSale');
             };
 
+            const handleVendorEventSelectChange = () => {
+                const state = StateModule.get();
+                const eventId = document.getElementById('vdsEventSelect')?.value;
+                const evt = state.events.find(e => e.id === eventId);
+                const comboOptionLabel = document.getElementById('vdsComboOptionLabel');
+                const comboOptionTitle = document.getElementById('vdsComboOptionTitle');
+                const singleRadio = document.querySelector('input[name="vdsTicketMode"][value="SINGLE"]');
+
+                if (singleRadio) singleRadio.checked = true;
+
+                if (evt && evt.combo && evt.combo.enabled) {
+                    if (comboOptionLabel) comboOptionLabel.classList.remove('hidden');
+                    if (comboOptionTitle) comboOptionTitle.innerHTML = `<i class="fa-solid fa-tags text-purple-400"></i> ${evt.combo.name || 'Combo'}`;
+                } else {
+                    if (comboOptionLabel) comboOptionLabel.classList.add('hidden');
+                }
+
+                handleVdsTicketModeChange('SINGLE');
+            };
+
+            const handleVdsTicketModeChange = (mode) => {
+                const singleQtyBox = document.getElementById('vdsBuyerQtyContainer');
+                const comboQtyBox = document.getElementById('vdsComboQtyContainer');
+                const state = StateModule.get();
+                const eventId = document.getElementById('vdsEventSelect')?.value;
+                const evt = state.events.find(e => e.id === eventId);
+
+                if (mode === 'COMBO' && evt?.combo?.enabled) {
+                    if (singleQtyBox) singleQtyBox.classList.add('hidden');
+                    if (comboQtyBox) comboQtyBox.classList.remove('hidden');
+                    const note = document.getElementById('vdsComboDetailNote');
+                    if (note) note.innerText = `Este combo incluye ${evt.combo.ticketsCount} entradas (se emitirán ${evt.combo.ticketsCount} códigos QR en mano).`;
+                } else {
+                    if (singleQtyBox) singleQtyBox.classList.remove('hidden');
+                    if (comboQtyBox) comboQtyBox.classList.add('hidden');
+                }
+                calculateVendorDirectSaleTotal();
+            };
+
             const toggleVendorSaleType = (type) => {
                 const eventBox = document.getElementById('vdsEventSelectContainer');
                 const busBox = document.getElementById('vdsBusSelectContainer');
+                const modeBox = document.getElementById('vdsTicketModeContainer');
                 const qtyBox = document.getElementById('vdsBuyerQtyContainer');
+                const comboQtyBox = document.getElementById('vdsComboQtyContainer');
                 const dniInput = document.getElementById('vdsBuyerDni');
 
                 if (type === 'BUS') {
                     if (eventBox) eventBox.classList.add('hidden');
+                    if (modeBox) modeBox.classList.add('hidden');
                     if (busBox) busBox.classList.remove('hidden');
-                    if (qtyBox) qtyBox.classList.add('hidden'); // Las butacas se asignan individualmente
+                    if (qtyBox) qtyBox.classList.add('hidden');
+                    if (comboQtyBox) comboQtyBox.classList.add('hidden');
                     if (dniInput) dniInput.required = true;
                     handleVendorBusSelectChange();
                 } else {
                     if (eventBox) eventBox.classList.remove('hidden');
+                    if (modeBox) modeBox.classList.remove('hidden');
                     if (busBox) busBox.classList.add('hidden');
-                    if (qtyBox) qtyBox.classList.remove('hidden');
                     if (dniInput) dniInput.required = false;
+                    handleVendorEventSelectChange();
                 }
                 calculateVendorDirectSaleTotal();
             };
@@ -3569,7 +3954,7 @@ service cloud.firestore {
                 if (saleType === 'BUS') {
                     const busId = document.getElementById('vdsBusSelect')?.value;
                     const bus = state.busCombos.find(b => b.id === busId) || state.busCombos[0];
-                    if (!bus) return { item: null, qty: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: true };
+                    if (!bus) return { item: null, qty: 1, actualTicketsCount: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: true, isCombo: false };
 
                     const qty = 1;
                     const isZero = (bus.price === 0);
@@ -3581,25 +3966,49 @@ service cloud.firestore {
                     document.getElementById('vdsFeeText').innerText = isZero ? '$ 0' : `+${StateModule.formatARS(totalFee)}`;
                     document.getElementById('vdsTotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(total);
 
-                    return { item: bus, qty, subtotal, totalFee, total, isZero, isBus: true };
+                    return { item: bus, qty, actualTicketsCount: 1, subtotal, totalFee, total, isZero, isBus: true, isCombo: false };
                 }
 
                 const eventId = document.getElementById('vdsEventSelect')?.value;
                 const evt = state.events.find(e => e.id === eventId) || state.events[0];
-                if (!evt) return { item: null, qty: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: false };
+                if (!evt) return { item: null, qty: 1, actualTicketsCount: 1, subtotal: 0, totalFee: 0, total: 0, isZero: false, isBus: false, isCombo: false };
 
-                const qty = parseInt(document.getElementById('vdsBuyerQty')?.value) || 1;
-                const isZero = (evt.price === 0);
-                const subtotal = evt.price * qty;
-                const singleFee = isZero ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id, false);
-                const totalFee = singleFee * qty;
-                const total = subtotal + totalFee;
+                const ticketMode = document.querySelector('input[name="vdsTicketMode"]:checked')?.value || 'SINGLE';
+                const isCombo = (ticketMode === 'COMBO' && evt.combo && evt.combo.enabled);
+
+                let qty = 1;
+                let actualTicketsCount = 1;
+                let isZero = false;
+                let subtotal = 0;
+                let singleFee = 0;
+                let totalFee = 0;
+                let total = 0;
+
+                if (isCombo) {
+                    qty = parseInt(document.getElementById('vdsComboQty')?.value) || 1;
+                    const comboUnitPrice = evt.combo.price || 0;
+                    const ticketsPerCombo = parseInt(evt.combo.ticketsCount) || 2;
+                    actualTicketsCount = ticketsPerCombo * qty;
+                    subtotal = comboUnitPrice * qty;
+                    isZero = (comboUnitPrice === 0);
+                    singleFee = isZero ? 0 : ServiceFeeModule.calculateFee(comboUnitPrice, evt.id, false);
+                    totalFee = singleFee * qty;
+                    total = subtotal + totalFee;
+                } else {
+                    qty = parseInt(document.getElementById('vdsBuyerQty')?.value) || 1;
+                    actualTicketsCount = qty;
+                    isZero = (evt.price === 0);
+                    subtotal = evt.price * qty;
+                    singleFee = isZero ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id, false);
+                    totalFee = singleFee * qty;
+                    total = subtotal + totalFee;
+                }
 
                 document.getElementById('vdsSubtotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(subtotal);
                 document.getElementById('vdsFeeText').innerText = isZero ? '$ 0' : `+${StateModule.formatARS(totalFee)}`;
                 document.getElementById('vdsTotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(total);
 
-                return { item: evt, qty, subtotal, totalFee, total, isZero, isBus: false };
+                return { item: evt, qty, actualTicketsCount, subtotal, totalFee, total, isZero, isBus: false, isCombo };
             };
 
             const handleVendorDirectSaleSubmit = (e) => {
@@ -3607,7 +4016,7 @@ service cloud.firestore {
                 const state = StateModule.get();
                 if (!state.currentActiveVendor) return;
 
-                const { item, qty, total, isZero, isBus } = calculateVendorDirectSaleTotal();
+                const { item, qty, actualTicketsCount, total, isZero, isBus, isCombo } = calculateVendorDirectSaleTotal();
                 if (!item) return;
 
                 const buyerName = document.getElementById('vdsBuyerName').value.trim();
@@ -3629,39 +4038,48 @@ service cloud.firestore {
                     busSeat = seatVal;
                 }
 
-                const newTicketId = 'TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900);
+                const baseTicketId = 'TCK-' + Math.floor(100000 + Math.random() * 900000) + '-' + Math.floor(100 + Math.random() * 900);
                 const eventId = isBus ? item.eventId : item.id;
+                const totalTicketsToIssue = actualTicketsCount; // Genera la cantidad exacta de QR que integran el combo
+                const unitPrice = total / totalTicketsToIssue;
+                const createdTickets = [];
 
-                const createdTicket = {
-                    id: newTicketId,
-                    eventId: eventId,
-                    buyerName: buyerName,
-                    buyerDni: buyerDni,
-                    buyerEmail: `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`,
-                    buyerPhone: buyerPhone,
-                    channel: state.currentActiveVendor.code,
-                    amountPaid: total,
-                    status: 'VALID',
-                    usedAt: null,
-                    busSeat: busSeat,
-                    createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
-                };
+                for (let i = 1; i <= totalTicketsToIssue; i++) {
+                    const ticketId = totalTicketsToIssue > 1 ? `${baseTicketId}-${i}` : baseTicketId;
+                    const createdTicket = {
+                        id: ticketId,
+                        orderId: baseTicketId,
+                        ticketIndex: i,
+                        ticketTotalCount: totalTicketsToIssue,
+                        eventId: eventId,
+                        buyerName: buyerName,
+                        buyerDni: buyerDni,
+                        buyerEmail: `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`,
+                        buyerPhone: buyerPhone,
+                        channel: state.currentActiveVendor.code,
+                        amountPaid: unitPrice,
+                        status: 'VALID',
+                        usedAt: null,
+                        busSeat: busSeat,
+                        createdAt: new Date().toISOString().replace('T', ' ').substring(0, 16)
+                    };
 
-                state.tickets.unshift(createdTicket);
-                StateModule.saveDocument('tickets', createdTicket.id, createdTicket);
+                    state.tickets.unshift(createdTicket);
+                    StateModule.saveDocument('tickets', createdTicket.id, createdTicket);
+                    createdTickets.push(createdTicket);
+                }
 
                 if (isBus) {
-                    // Bloquear butaca en el colectivo
                     if (!item.occupiedSeats.includes(busSeat)) {
                         item.occupiedSeats.push(busSeat);
                         StateModule.saveDocument('busCombos', item.id, item);
                     }
                 } else {
-                    item.ticketsSold += qty;
+                    item.ticketsSold += totalTicketsToIssue;
                     StateModule.saveDocument('events', item.id, item);
                 }
 
-                state.currentActiveVendor.ticketsSold = (state.currentActiveVendor.ticketsSold || 0) + qty;
+                state.currentActiveVendor.ticketsSold = (state.currentActiveVendor.ticketsSold || 0) + totalTicketsToIssue;
                 state.currentActiveVendor.totalCollected = (state.currentActiveVendor.totalCollected || 0) + total;
                 state.currentActiveVendor.cashDue = (state.currentActiveVendor.cashDue || 0) + total;
                 StateModule.saveDocument('vendors', state.currentActiveVendor.id, state.currentActiveVendor);
@@ -3673,8 +4091,11 @@ service cloud.firestore {
                 TurnstileModule.playSuccessSound();
                 confetti({ particleCount: 70, spread: 65, origin: { y: 0.6 } });
 
-                const ticketTitle = isBus ? `${item.name} (Butaca #${busSeat})` : item.title;
-                TicketingModule.showIssuedTicketSuccess(createdTicket, ticketTitle, isZero);
+                const ticketTitle = isBus 
+                    ? `${item.name} (Butaca #${busSeat})` 
+                    : (isCombo ? `${item.title} (${item.combo.name || 'Combo Promocional'})` : item.title);
+
+                TicketingModule.showIssuedTicketsBatch(createdTickets, ticketTitle, isZero);
             };
 
             const unlockAdminDemo = () => {
@@ -3696,6 +4117,7 @@ service cloud.firestore {
                 document.getElementById('adminKpiCheckedIn').innerText = totalCheckedIn;
 
                 renderAdminEventsTable();
+                renderAdminCombosTable();
                 renderAdminClientsTable();
                 renderAdminBusesTable();
                 renderAdminVendorsTable();
@@ -3706,7 +4128,7 @@ service cloud.firestore {
             };
 
             const switchAdminTab = (tabName) => {
-                const tabs = ['events', 'clients', 'buses', 'vendors', 'scanner'];
+                const tabs = ['events', 'combos', 'clients', 'buses', 'vendors', 'scanner'];
                 tabs.forEach(t => {
                     document.getElementById(`admtab-${t}`)?.classList.add('hidden');
                     const btn = document.getElementById(`admtab-btn-${t}`);
@@ -3723,6 +4145,7 @@ service cloud.firestore {
                     activeBtn.classList.remove('border-transparent', 'text-slate-400');
                 }
 
+                if (tabName === 'combos') renderAdminCombosTable();
                 if (tabName === 'clients') setTimeout(() => initOrUpdateClientsMonthlyLineChart(), 60);
                 if (tabName === 'vendors') setTimeout(() => initOrUpdateVendorsHorizontalBarChart(), 60);
             };
@@ -4040,7 +4463,6 @@ service cloud.firestore {
                 }
 
                 tbody.innerHTML = state.events.map(evt => {
-                    // Cálculo dinámico en tiempo real basado en tickets emitidos
                     const actualSold = state.tickets.filter(t => t.eventId === evt.id).length;
                     const totalRev = actualSold * evt.price;
                     const concluded = StateModule.isEventConcluded(evt);
@@ -4091,6 +4513,196 @@ service cloud.firestore {
                         </tr>
                     `;
                 }).join('');
+            };
+
+            const renderAdminCombosTable = () => {
+                const tbody = document.getElementById('adminCombosTableBody');
+                if (!tbody) return;
+                const state = StateModule.get();
+
+                const eventsWithCombos = state.events.filter(e => e.combo && e.combo.enabled);
+
+                if (eventsWithCombos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500">No hay combos ni promociones activas. Hacé clic en "Crear Nuevo Combo" para agregar una promoción.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = eventsWithCombos.map(evt => {
+                    const c = evt.combo;
+                    const regularTotal = (evt.price || 0) * (c.ticketsCount || 1);
+                    const promoTotal = c.price || 0;
+                    const savings = Math.max(0, regularTotal - promoTotal);
+
+                    return `
+                        <tr class="hover:bg-slate-900/50">
+                            <td class="py-3 font-bold text-white flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm border border-purple-500/30">
+                                    <i class="fa-solid fa-tags"></i>
+                                </span>
+                                <div>
+                                    <span class="block leading-snug">${c.name || 'Combo Promocional'}</span>
+                                    <span class="text-[10px] text-purple-400 font-bold uppercase">Promo ${c.ticketsCount}x</span>
+                                </div>
+                            </td>
+                            <td class="py-3 text-slate-300 font-semibold">${evt.title}</td>
+                            <td class="py-3">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-mono font-bold text-xs border border-indigo-500/30">
+                                    ${c.ticketsCount} entradas (QR)
+                                </span>
+                            </td>
+                            <td class="py-3 font-mono font-bold text-purple-400 text-sm">${StateModule.formatARS(promoTotal)}</td>
+                            <td class="py-3 font-mono text-slate-400">${StateModule.formatARS(regularTotal)}</td>
+                            <td class="py-3 font-mono font-bold text-emerald-400">
+                                ${savings > 0 ? `Ahorrás ${StateModule.formatARS(savings)}` : 'Sin diferencia'}
+                            </td>
+                            <td class="py-3 text-right space-x-1.5 whitespace-nowrap">
+                                <button onclick="UIModule.openEditComboModal('${evt.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-slate-700/80" title="Editar Combo">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="UIModule.deleteCombo('${evt.id}')" class="px-2.5 py-1 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white border border-rose-500/30 hover:border-rose-600 rounded-lg font-bold text-[11px] transition-all" title="Eliminar / Desactivar Combo">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            };
+
+            const openCreateComboModal = () => {
+                const state = StateModule.get();
+                const select = document.getElementById('comboFormEventSelect');
+                if (!select) return;
+
+                if (state.events.length === 0) {
+                    alert('Primero debés tener creado al menos un evento para poder asignarle un combo.');
+                    return;
+                }
+
+                select.innerHTML = state.events.map(e => {
+                    const priceLabel = e.price === 0 ? '$ 0' : StateModule.formatARS(e.price);
+                    return `<option value="${e.id}">${e.title} (${priceLabel})</option>`;
+                }).join('');
+
+                document.getElementById('comboFormEventId').value = '';
+                document.getElementById('comboModalHeading').innerText = 'Crear Combo Promocional';
+                document.getElementById('comboModalSubtitle').innerText = 'Configurá promociones tipo 3x2, packs grupales o descuentos en cantidad.';
+                document.getElementById('comboFormName').value = '';
+                document.getElementById('comboFormTicketsCount').value = '3';
+                document.getElementById('comboFormPrice').value = '';
+
+                handleComboEventSelectChange();
+                openModal('modalCreateCombo');
+            };
+
+            const openEditComboModal = (eventId) => {
+                const state = StateModule.get();
+                const evt = state.events.find(e => e.id === eventId);
+                if (!evt || !evt.combo) return;
+
+                const select = document.getElementById('comboFormEventSelect');
+                if (select) {
+                    select.innerHTML = state.events.map(e => {
+                        const priceLabel = e.price === 0 ? '$ 0' : StateModule.formatARS(e.price);
+                        return `<option value="${e.id}" ${e.id === evt.id ? 'selected' : ''}>${e.title} (${priceLabel})</option>`;
+                    }).join('');
+                }
+
+                document.getElementById('comboFormEventId').value = evt.id;
+                document.getElementById('comboModalHeading').innerText = 'Editar Combo Promocional';
+                document.getElementById('comboModalSubtitle').innerText = `Modificá la promoción para "${evt.title}".`;
+                document.getElementById('comboFormName').value = evt.combo.name || '';
+                document.getElementById('comboFormTicketsCount').value = evt.combo.ticketsCount || 3;
+                document.getElementById('comboFormPrice').value = evt.combo.price !== undefined ? evt.combo.price : 0;
+
+                updateComboSimulation();
+                openModal('modalCreateCombo');
+            };
+
+            const handleComboEventSelectChange = () => {
+                const state = StateModule.get();
+                const eventId = document.getElementById('comboFormEventSelect')?.value;
+                const evt = state.events.find(e => e.id === eventId);
+                const priceInput = document.getElementById('comboFormPrice');
+
+                if (evt && priceInput && !priceInput.value) {
+                    // Sugerir un 3x2 por defecto: valor de 2 entradas si el combo es de 3
+                    const count = parseInt(document.getElementById('comboFormTicketsCount')?.value) || 3;
+                    const suggestedTicketsToPay = Math.max(1, count - 1);
+                    priceInput.value = (evt.price || 0) * suggestedTicketsToPay;
+                }
+                updateComboSimulation();
+            };
+
+            const updateComboSimulation = () => {
+                const state = StateModule.get();
+                const eventId = document.getElementById('comboFormEventSelect')?.value;
+                const evt = state.events.find(e => e.id === eventId);
+                const count = parseInt(document.getElementById('comboFormTicketsCount')?.value) || 0;
+                const promoPrice = parseFloat(document.getElementById('comboFormPrice')?.value) || 0;
+
+                const regularPrice = evt ? evt.price : 0;
+                const regularTotal = regularPrice * count;
+                const savings = Math.max(0, regularTotal - promoPrice);
+
+                const regEl = document.getElementById('comboSimRegularTotal');
+                const promoEl = document.getElementById('comboSimPromoTotal');
+                const savEl = document.getElementById('comboSimSavings');
+
+                if (regEl) regEl.innerText = StateModule.formatARS(regularTotal);
+                if (promoEl) promoEl.innerText = StateModule.formatARS(promoPrice);
+                if (savEl) savEl.innerText = savings > 0 ? StateModule.formatARS(savings) : '$ 0';
+            };
+
+            const handleSaveComboSubmit = (e) => {
+                e.preventDefault();
+                const state = StateModule.get();
+                const selectedEventId = document.getElementById('comboFormEventSelect')?.value;
+                const evt = state.events.find(ev => ev.id === selectedEventId);
+
+                if (!evt) {
+                    alert('Seleccioná un evento válido.');
+                    return;
+                }
+
+                const name = document.getElementById('comboFormName').value.trim();
+                const ticketsCount = parseInt(document.getElementById('comboFormTicketsCount').value) || 2;
+                const price = parseFloat(document.getElementById('comboFormPrice').value) || 0;
+
+                evt.combo = {
+                    enabled: true,
+                    name: name,
+                    ticketsCount: ticketsCount,
+                    price: price
+                };
+
+                StateModule.saveDocument('events', evt.id, evt);
+
+                closeModal('modalCreateCombo');
+                renderAdminCombosTable();
+                renderAdminEventsTable();
+                renderStoreEvents();
+            };
+
+            const deleteCombo = (eventId) => {
+                const state = StateModule.get();
+                const evt = state.events.find(e => e.id === eventId);
+                if (!evt || !evt.combo) return;
+
+                const confirmed = window.confirm(`¿Estás seguro de que deseas eliminar la promoción "${evt.combo.name}" del evento "${evt.title}"?\n\nLos tickets individuales emitidos previamente se mantendrán vigentes.`);
+                if (!confirmed) return;
+
+                evt.combo = {
+                    enabled: false,
+                    name: '',
+                    ticketsCount: 2,
+                    price: 0
+                };
+
+                StateModule.saveDocument('events', evt.id, evt);
+
+                renderAdminCombosTable();
+                renderAdminEventsTable();
+                renderStoreEvents();
             };
 
             const openEventLiveAuditModal = (eventId) => {
@@ -4352,17 +4964,51 @@ service cloud.firestore {
                 document.getElementById('imagePreviewContainer').classList.add('hidden');
             };
 
+            const toggleComboFormFields = (isChecked) => {
+                const container = document.getElementById('comboFormFieldsContainer');
+                if (container) {
+                    if (isChecked) {
+                        container.classList.remove('hidden');
+                    } else {
+                        container.classList.add('hidden');
+                    }
+                }
+            };
+
             const openCreateEventModal = () => {
-                document.getElementById('formEventId').value = '';
-                document.getElementById('eventModalTitle').innerText = 'Crear Nuevo Evento';
-                document.getElementById('formTitle').value = '';
-                document.getElementById('formCategory').value = 'FIESTA';
-                document.getElementById('formPrice').value = '0';
-                document.getElementById('formDate').value = '';
-                document.getElementById('formTime').value = '';
-                document.getElementById('formVenue').value = '';
-                document.getElementById('formCapacity').value = '';
-                document.getElementById('formImageUrl').value = '';
+                const elId = document.getElementById('formEventId');
+                const elTitle = document.getElementById('eventModalTitle');
+                const elFormTitle = document.getElementById('formTitle');
+                const elCat = document.getElementById('formCategory');
+                const elPrice = document.getElementById('formPrice');
+                const elDate = document.getElementById('formDate');
+                const elTime = document.getElementById('formTime');
+                const elVenue = document.getElementById('formVenue');
+                const elCap = document.getElementById('formCapacity');
+                const elImgUrl = document.getElementById('formImageUrl');
+
+                if (elId) elId.value = '';
+                if (elTitle) elTitle.innerText = 'Crear Nuevo Evento';
+                if (elFormTitle) elFormTitle.value = '';
+                if (elCat) elCat.value = 'FIESTA';
+                if (elPrice) elPrice.value = '0';
+                if (elDate) elDate.value = '';
+                if (elTime) elTime.value = '';
+                if (elVenue) elVenue.value = '';
+                if (elCap) elCap.value = '';
+                if (elImgUrl) elImgUrl.value = '';
+
+                // Resetear campos de combo
+                const hasComboCheck = document.getElementById('formHasCombo');
+                if (hasComboCheck) hasComboCheck.checked = false;
+                toggleComboFormFields(false);
+                const comboName = document.getElementById('formComboName');
+                const comboCount = document.getElementById('formComboTicketsCount');
+                const comboPrice = document.getElementById('formComboPrice');
+                if (comboName) comboName.value = '';
+                if (comboCount) comboCount.value = '3';
+                if (comboPrice) comboPrice.value = '';
+
                 clearEventImagePreview();
                 openModal('modalCreateEvent');
             };
@@ -4372,20 +5018,53 @@ service cloud.firestore {
                 const evt = state.events.find(e => e.id === id);
                 if (!evt) return;
 
-                document.getElementById('formEventId').value = evt.id;
-                document.getElementById('eventModalTitle').innerText = 'Editar Evento';
-                document.getElementById('formTitle').value = evt.title;
-                document.getElementById('formCategory').value = evt.category;
-                document.getElementById('formPrice').value = evt.price;
-                document.getElementById('formDate').value = evt.date;
-                document.getElementById('formTime').value = evt.time;
-                document.getElementById('formVenue').value = evt.venue;
-                document.getElementById('formCapacity').value = evt.capacity;
-                document.getElementById('formImageUrl').value = evt.image;
+                const elId = document.getElementById('formEventId');
+                const elTitle = document.getElementById('eventModalTitle');
+                const elFormTitle = document.getElementById('formTitle');
+                const elCat = document.getElementById('formCategory');
+                const elPrice = document.getElementById('formPrice');
+                const elDate = document.getElementById('formDate');
+                const elTime = document.getElementById('formTime');
+                const elVenue = document.getElementById('formVenue');
+                const elCap = document.getElementById('formCapacity');
+                const elImgUrl = document.getElementById('formImageUrl');
+
+                if (elId) elId.value = evt.id;
+                if (elTitle) elTitle.innerText = 'Editar Evento';
+                if (elFormTitle) elFormTitle.value = evt.title || '';
+                if (elCat) elCat.value = evt.category || 'FIESTA';
+                if (elPrice) elPrice.value = evt.price !== undefined ? evt.price : 0;
+                if (elDate) elDate.value = evt.date || '';
+                if (elTime) elTime.value = evt.time || '';
+                if (elVenue) elVenue.value = evt.venue || '';
+                if (elCap) elCap.value = evt.capacity || '';
+                if (elImgUrl) elImgUrl.value = evt.image || '';
+
+                // Cargar datos del combo si existía
+                const hasComboCheck = document.getElementById('formHasCombo');
+                const comboName = document.getElementById('formComboName');
+                const comboCount = document.getElementById('formComboTicketsCount');
+                const comboPrice = document.getElementById('formComboPrice');
+
+                if (evt.combo && evt.combo.enabled) {
+                    if (hasComboCheck) hasComboCheck.checked = true;
+                    toggleComboFormFields(true);
+                    if (comboName) comboName.value = evt.combo.name || '';
+                    if (comboCount) comboCount.value = evt.combo.ticketsCount || 3;
+                    if (comboPrice) comboPrice.value = evt.combo.price !== undefined ? evt.combo.price : 0;
+                } else {
+                    if (hasComboCheck) hasComboCheck.checked = false;
+                    toggleComboFormFields(false);
+                    if (comboName) comboName.value = '';
+                    if (comboCount) comboCount.value = '3';
+                    if (comboPrice) comboPrice.value = '';
+                }
 
                 if (evt.image) {
-                    document.getElementById('imagePreviewEl').src = evt.image;
-                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                    const previewEl = document.getElementById('imagePreviewEl');
+                    const previewBox = document.getElementById('imagePreviewContainer');
+                    if (previewEl) previewEl.src = evt.image;
+                    if (previewBox) previewBox.classList.remove('hidden');
                 } else {
                     clearEventImagePreview();
                 }
@@ -4406,6 +5085,18 @@ service cloud.firestore {
                 const capacity = parseInt(document.getElementById('formCapacity').value) || 1000;
                 const urlImg = document.getElementById('formImageUrl').value.trim();
 
+                const hasCombo = document.getElementById('formHasCombo')?.checked || false;
+                const comboName = document.getElementById('formComboName')?.value.trim() || 'Promo 3x2';
+                const comboTicketsCount = parseInt(document.getElementById('formComboTicketsCount')?.value) || 3;
+                const comboPrice = parseFloat(document.getElementById('formComboPrice')?.value) || 0;
+
+                const comboData = {
+                    enabled: hasCombo,
+                    name: comboName,
+                    ticketsCount: comboTicketsCount,
+                    price: comboPrice
+                };
+
                 const finalImage = state.stagedBase64Image || urlImg || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80';
 
                 if (id) {
@@ -4419,6 +5110,7 @@ service cloud.firestore {
                         existing.venue = venue;
                         existing.capacity = capacity;
                         existing.image = finalImage;
+                        existing.combo = comboData;
                         StateModule.saveDocument('events', existing.id, existing);
                     }
                 } else {
@@ -4432,7 +5124,8 @@ service cloud.firestore {
                         venue,
                         capacity,
                         ticketsSold: 0,
-                        image: finalImage
+                        image: finalImage,
+                        combo: comboData
                     };
                     state.events.unshift(newEvt);
                     StateModule.saveDocument('events', newEvt.id, newEvt);
@@ -4703,6 +5396,7 @@ service cloud.firestore {
                 renderStoreEvents,
                 filterCategory,
                 openEventDetailModal,
+                handleTicketModeChange,
                 calculatePurchaseTotal,
                 togglePurchaseChoice,
                 handlePurchaseSubmit,
@@ -4718,6 +5412,8 @@ service cloud.firestore {
                 renderVendorDashboard,
                 sendTicketViaWhatsApp,
                 openVendorDirectSaleModal,
+                handleVendorEventSelectChange,
+                handleVdsTicketModeChange,
                 toggleVendorSaleType,
                 handleVendorBusSelectChange,
                 calculateVendorDirectSaleTotal,
@@ -4734,9 +5430,17 @@ service cloud.firestore {
                 renderAdminVendorsTable,
                 handleImageFileSelect,
                 clearEventImagePreview,
+                toggleComboFormFields,
                 openCreateEventModal,
                 openEditEventModal,
                 handleSaveEventSubmit,
+                renderAdminCombosTable,
+                openCreateComboModal,
+                openEditComboModal,
+                handleComboEventSelectChange,
+                updateComboSimulation,
+                handleSaveComboSubmit,
+                deleteCombo,
                 openCreateBusModal,
                 openEditBusModal,
                 deleteBusCombo,
