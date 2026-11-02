@@ -4509,6 +4509,9 @@ service cloud.firestore {
                                 <button onclick="UIModule.openEditEventModal('${evt.id}')" class="px-2.5 py-1.5 bg-slate-800 text-slate-300 hover:text-white rounded-lg text-xs" title="Editar Evento">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
+                                <button onclick="UIModule.deleteEvent('${evt.id}')" class="px-2.5 py-1.5 bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white border border-rose-500/30 hover:border-rose-600 rounded-lg text-xs font-bold transition-all" title="Eliminar Evento">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
                             </td>
                         </tr>
                     `;
@@ -5136,6 +5139,39 @@ service cloud.firestore {
                 renderAdminEventsTable();
             };
 
+            const deleteEvent = (eventId) => {
+                const state = StateModule.get();
+                const evt = state.events.find(e => e.id === eventId);
+                if (!evt) return;
+
+                const soldTickets = state.tickets.filter(t => t.eventId === eventId).length;
+                let warningMessage = `¿Estás seguro de que deseas eliminar permanentemente el evento "${evt.title}"?`;
+                if (soldTickets > 0) {
+                    warningMessage = `⚠️ ¡ATENCIÓN! Este evento ya tiene ${soldTickets} entrada(s) emitida(s).\n\nSi lo eliminás, el evento desaparecerá de la tienda pública y del panel.\n\n¿Confirmás la eliminación permanente de "${evt.title}"?`;
+                }
+
+                const confirmed = window.confirm(warningMessage);
+                if (!confirmed) return;
+
+                // 1. Quitar evento del estado
+                state.events = state.events.filter(e => e.id !== eventId);
+
+                // 2. Eliminar de Cloud Firestore
+                StateModule.removeDocument('events', eventId);
+
+                // 3. Quitar costos personalizados asociados si existían
+                if (state.serviceFee.eventFees && state.serviceFee.eventFees[eventId]) {
+                    delete state.serviceFee.eventFees[eventId];
+                    StateModule.saveSettingsCloud();
+                }
+
+                // 4. Refrescar vistas
+                renderAdminEventsTable();
+                renderAdminCombosTable();
+                renderStoreEvents();
+                renderAdminFullDashboard();
+            };
+
             const openCreateBusModal = () => {
                 const state = StateModule.get();
                 const select = document.getElementById('busFormEventSelect');
@@ -5434,6 +5470,7 @@ service cloud.firestore {
                 openCreateEventModal,
                 openEditEventModal,
                 handleSaveEventSubmit,
+                deleteEvent,
                 renderAdminCombosTable,
                 openCreateComboModal,
                 openEditComboModal,
