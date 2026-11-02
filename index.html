@@ -1506,16 +1506,16 @@ service cloud.firestore {
             const loadLocalFallback = () => {
                 try {
                     const localEvents = localStorage.getItem('eqr_events');
-                    if (localEvents) state.events = JSON.parse(localEvents);
+                    if (localEvents && state.events.length === 0) state.events = JSON.parse(localEvents);
 
                     const localBuses = localStorage.getItem('eqr_busCombos');
-                    if (localBuses) state.busCombos = JSON.parse(localBuses);
+                    if (localBuses && state.busCombos.length === 0) state.busCombos = JSON.parse(localBuses);
 
                     const localVendors = localStorage.getItem('eqr_vendors');
-                    if (localVendors) state.vendors = JSON.parse(localVendors);
+                    if (localVendors && state.vendors.length === 0) state.vendors = JSON.parse(localVendors);
 
                     const localTickets = localStorage.getItem('eqr_tickets');
-                    if (localTickets) state.tickets = JSON.parse(localTickets);
+                    if (localTickets && state.tickets.length === 0) state.tickets = JSON.parse(localTickets);
 
                     const localFee = localStorage.getItem('eqr_serviceFee');
                     if (localFee) state.serviceFee = JSON.parse(localFee);
@@ -1539,24 +1539,24 @@ service cloud.firestore {
                 if (status === 'connected') {
                     const isAdm = authInstance?.currentUser?.email === 'admin@experienceqr.com';
                     if (isAdm) {
-                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Admin Conectado (Nube Sincronizada)`;
+                        badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span> Sincronizado en Vivo (Admin)`;
                         badge.className = 'text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
-                        badge.title = 'Sesión iniciada como admin@experienceqr.com con permisos completos de escritura';
+                        badge.title = 'Sesión activa como admin@experienceqr.com. Sincronizando con todos los dispositivos.';
                     } else {
-                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400"></span> Modo Público (Lectura Activa)`;
+                        badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span> Sincronizando en Vivo`;
                         badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
-                        badge.title = 'Iniciá sesión como admin@experienceqr.com para gestionar eventos';
+                        badge.title = 'Conectado a Firestore. Cualquier cambio en otro dispositivo se reflejará aquí al instante.';
                     }
                 } else if (status === 'saving') {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span> Guardando en Firestore...`;
-                    badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                    badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span> Enviando a la Nube...`;
+                    badge.className = 'text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
                 } else if (status === 'permission_denied') {
                     badge.innerHTML = `<i class="fa-solid fa-lock text-amber-400"></i> Requiere Login admin@experienceqr.com`;
                     badge.className = 'text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
                     badge.title = 'Esta acción requiere estar autenticado como admin@experienceqr.com';
-                } else if (status === 'local_fallback') {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Guardando Local (Offline)`;
-                    badge.className = 'text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                } else if (status === 'connecting') {
+                    badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-slate-400 animate-spin"></span> Conectando Nube...`;
+                    badge.className = 'text-xs bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
                 }
             };
 
@@ -1564,14 +1564,18 @@ service cloud.firestore {
                 if (!db || !firestoreMethods) return;
                 const { collection, onSnapshot } = firestoreMethods;
                 try {
+                    // onSnapshot escucha cambios directos de la nube en tiempo real
                     onSnapshot(collection(db, colName), (snapshot) => {
                         const items = [];
                         snapshot.forEach((d) => {
-                            items.push({ id: d.id, ...d.data() });
+                            const dataObj = d.data();
+                            items.push({ id: d.id, ...dataObj });
                         });
+                        // Pasar siempre el arreglo completo de Firestore para que refleje altas, bajas y modificaciones
                         callback(items);
+                        updateCloudStatusBadge('connected');
                     }, (err) => {
-                        console.warn(`Lectura de colección ${colName}:`, err.message);
+                        console.warn(`Lectura en tiempo real de ${colName}:`, err.message);
                         if (err.code === 'permission-denied') {
                             updateCloudStatusBadge('permission_denied');
                         }
@@ -1593,6 +1597,8 @@ service cloud.firestore {
                                 const val = snap.data();
                                 if (val.serviceFee) state.serviceFee = val.serviceFee;
                                 if (val.mercadoPago) state.mercadoPago = val.mercadoPago;
+                                persistLocalFallback('serviceFee', state.serviceFee);
+                                persistLocalFallback('mercadoPago', state.mercadoPago);
                             }
                         }, (err) => {
                             console.warn("Lectura de settings:", err.message);
@@ -1608,6 +1614,7 @@ service cloud.firestore {
 
             const initFirebaseCloud = async () => {
                 loadLocalFallback();
+                updateCloudStatusBadge('connecting');
                 try {
                     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
                     const { 
@@ -1632,6 +1639,53 @@ service cloud.firestore {
                     db = getFirestore(app);
                     firestoreMethods = { collection, doc, setDoc, deleteDoc, onSnapshot };
 
+                    // 1. Suscripciones directas en tiempo real: sincronizan de inmediato entre dispositivos
+                    setupCollectionListener('events', (data) => {
+                        state.events = data;
+                        persistLocalFallback('events', state.events);
+                        UIModule.renderStoreEvents();
+                        if (state.adminUnlockedSession) {
+                            UIModule.renderAdminEventsTable();
+                            UIModule.renderAdminFullDashboard();
+                        }
+                    });
+
+                    setupCollectionListener('busCombos', (data) => {
+                        state.busCombos = data;
+                        persistLocalFallback('busCombos', state.busCombos);
+                        UIModule.renderPublicBuses();
+                        if (state.adminUnlockedSession) {
+                            UIModule.renderAdminBusesTable();
+                        }
+                    });
+
+                    setupCollectionListener('vendors', (data) => {
+                        state.vendors = data;
+                        persistLocalFallback('vendors', state.vendors);
+                        UIModule.renderPublicVendorsContact();
+                        if (state.adminUnlockedSession) {
+                            UIModule.renderAdminVendorsTable();
+                            UIModule.initOrUpdateVendorsHorizontalBarChart();
+                        }
+                    });
+
+                    setupCollectionListener('tickets', (data) => {
+                        state.tickets = data;
+                        persistLocalFallback('tickets', state.tickets);
+                        // Cuando otro dispositivo compra o anula una entrada, recalcular ocupaciones y dashboards
+                        UIModule.renderStoreEvents();
+                        if (state.adminUnlockedSession) {
+                            UIModule.renderAdminFullDashboard();
+                            if (UIModule.getActiveAuditEvtId()) {
+                                UIModule.openEventLiveAuditModal(UIModule.getActiveAuditEvtId());
+                            }
+                        }
+                        if (state.currentActiveVendor) {
+                            UIModule.renderVendorDashboard();
+                        }
+                    });
+
+                    // 2. Control de estado de autenticación
                     onAuthStateChanged(authInstance, (user) => {
                         if (user && !user.isAnonymous && user.email === 'admin@experienceqr.com') {
                             state.adminUnlockedSession = true;
@@ -1645,26 +1699,23 @@ service cloud.firestore {
                             subscribeSettingsIfAdmin();
                             updateCloudStatusBadge('connected');
                         } else if (!user) {
-                            // Autenticación anónima para permitir compra y reserva según tus reglas
-                            signInAnonymously(authInstance).catch(() => {});
-                            updateCloudStatusBadge('connected');
+                            signInAnonymously(authInstance).then(() => {
+                                updateCloudStatusBadge('connected');
+                            }).catch(() => {});
                         } else {
                             updateCloudStatusBadge('connected');
                         }
                     });
 
-                    try {
-                        if (!authInstance.currentUser) {
-                            await signInAnonymously(authInstance);
-                        }
-                    } catch (authErr) {
-                        console.warn("Autenticación anónima de clientes:", authErr.message);
+                    // Si no hay usuario activo, autenticar anónimo para permitir leer y reservar butacas
+                    if (!authInstance.currentUser) {
+                        await signInAnonymously(authInstance);
                     }
 
                     isFirebaseConnected = true;
                     updateCloudStatusBadge('connected');
 
-                    // Procesar cola de escrituras pendientes
+                    // Enviar pendientes acumulados si existieran
                     if (pendingCloudQueue.length > 0) {
                         const queue = [...pendingCloudQueue];
                         pendingCloudQueue = [];
@@ -1673,62 +1724,13 @@ service cloud.firestore {
                         }
                     }
 
-                    // Suscripciones reactivas permitidas por tus reglas públicas
-                    setupCollectionListener('events', (data) => {
-                        if (data && data.length > 0) {
-                            state.events = data;
-                            persistLocalFallback('events', state.events);
-                            UIModule.renderStoreEvents();
-                            if (state.adminUnlockedSession) UIModule.renderAdminEventsTable();
-                        }
-                    });
-
-                    setupCollectionListener('busCombos', (data) => {
-                        if (data && data.length > 0) {
-                            state.busCombos = data;
-                            persistLocalFallback('busCombos', state.busCombos);
-                            UIModule.renderPublicBuses();
-                            if (state.adminUnlockedSession) UIModule.renderAdminBusesTable();
-                        }
-                    });
-
-                    setupCollectionListener('vendors', (data) => {
-                        if (data && data.length > 0) {
-                            state.vendors = data;
-                            persistLocalFallback('vendors', state.vendors);
-                            UIModule.renderPublicVendorsContact();
-                            if (state.adminUnlockedSession) {
-                                UIModule.renderAdminVendorsTable();
-                                UIModule.initOrUpdateVendorsHorizontalBarChart();
-                            }
-                        }
-                    });
-
-                    setupCollectionListener('tickets', (data) => {
-                        if (data && data.length > 0) {
-                            state.tickets = data;
-                            persistLocalFallback('tickets', state.tickets);
-                        }
-                        if (state.adminUnlockedSession) {
-                            UIModule.renderAdminFullDashboard();
-                        }
-                        if (state.currentActiveVendor) {
-                            UIModule.renderVendorDashboard();
-                        }
-                    });
-
                 } catch (err) {
-                    console.warn("Firebase funcionará con respaldo local:", err);
+                    console.warn("Error al inicializar Firebase Cloud:", err);
                     updateCloudStatusBadge('local_fallback');
                 }
             };
 
             const saveDocument = async (colName, docId, data) => {
-                if (colName === 'events') persistLocalFallback('events', state.events);
-                if (colName === 'busCombos') persistLocalFallback('busCombos', state.busCombos);
-                if (colName === 'vendors') persistLocalFallback('vendors', state.vendors);
-                if (colName === 'tickets') persistLocalFallback('tickets', state.tickets);
-
                 if (!db || !firestoreMethods || !isFirebaseConnected) {
                     pendingCloudQueue.push({ colName, docId, data });
                     return;
@@ -1739,25 +1741,19 @@ service cloud.firestore {
                     const { doc, setDoc } = firestoreMethods;
                     const cleanData = JSON.parse(JSON.stringify(data));
                     delete cleanData.id;
+                    // Guarda en Firestore. El onSnapshot de este y todos los demás dispositivos se disparará automáticamente.
                     await setDoc(doc(db, colName, String(docId)), cleanData, { merge: true });
                     updateCloudStatusBadge('connected');
                 } catch (err) {
                     console.error(`Error guardando en Firestore (${colName}/${docId}):`, err);
                     if (err.code === 'permission-denied') {
                         updateCloudStatusBadge('permission_denied');
+                        alert("Permiso denegado por Firestore: para crear o modificar este elemento debés tener sesión iniciada como admin@experienceqr.com.");
                     }
                 }
             };
 
             const removeDocument = async (colName, docId) => {
-                if (colName === 'tickets') {
-                    state.tickets = state.tickets.filter(t => t.id !== docId);
-                    persistLocalFallback('tickets', state.tickets);
-                } else if (colName === 'busCombos') {
-                    state.busCombos = state.busCombos.filter(b => b.id !== docId);
-                    persistLocalFallback('busCombos', state.busCombos);
-                }
-
                 if (!db || !firestoreMethods || !isFirebaseConnected) return;
 
                 try {
@@ -1769,6 +1765,7 @@ service cloud.firestore {
                     console.error(`Error eliminando en Firestore (${colName}/${docId}):`, err);
                     if (err.code === 'permission-denied') {
                         updateCloudStatusBadge('permission_denied');
+                        alert("Permiso denegado: solo admin@experienceqr.com puede borrar este registro.");
                     }
                 }
             };
