@@ -1011,7 +1011,7 @@
 
             <form onsubmit="ServiceFeeModule.saveSettings(event)" class="space-y-4">
                 <div>
-                    <label class="text-xs font-bold text-slate-300 block mb-1">Evento al que se aplica el costo *</label>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Aplicar costo de servicio a *</label>
                     <select id="feeTargetEventSelect" onchange="ServiceFeeModule.handleTargetEventChange()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-amber-500"></select>
                 </div>
 
@@ -1353,6 +1353,17 @@
         const StateModule = (() => {
             const currentOrigin = window.location.origin + window.location.pathname;
 
+            const firebaseConfig = {
+                apiKey: "AIzaSyBdPMtCtA9s7NjybzvO3Jz4amM07n6cKRU",
+                authDomain: "tupedido-6be53.firebaseapp.com",
+                databaseURL: "https://tupedido-6be53.firebaseio.com",
+                projectId: "tupedido-6be53",
+                storageBucket: "tupedido-6be53.firebasestorage.app",
+                messagingSenderId: "306060611132",
+                appId: "1:306060611132:web:b73ff8e79ef0e340dabd39",
+                measurementId: "G-S9YH6K6L0Z"
+            };
+
             let db = null;
             let firestoreMethods = null;
             let isFirebaseConnected = false;
@@ -1364,7 +1375,8 @@
                 serviceFee: {
                     type: 'percent',
                     value: 10,
-                    eventFees: {}
+                    eventFees: {},
+                    busFees: {}
                 },
                 mercadoPago: {
                     holder: 'ExperienceQR Eventos Oficial S.A.',
@@ -1417,6 +1429,12 @@
 
                     const localTickets = localStorage.getItem('eqr_tickets');
                     if (localTickets) state.tickets = JSON.parse(localTickets);
+
+                    const localFee = localStorage.getItem('eqr_serviceFee');
+                    if (localFee) state.serviceFee = JSON.parse(localFee);
+
+                    const localMp = localStorage.getItem('eqr_mercadoPago');
+                    if (localMp) state.mercadoPago = JSON.parse(localMp);
                 } catch (e) {
                     console.warn("Lectura de almacenamiento local:", e);
                 }
@@ -1428,8 +1446,161 @@
                 } catch (e) {}
             };
 
+            const updateCloudStatusBadge = (status, extra = '') => {
+                const badge = document.getElementById('firebaseStatusBadge');
+                if (!badge) return;
+                if (status === 'connected') {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Nube Firebase Conectada`;
+                    badge.className = 'text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                } else if (status === 'saving') {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span> Guardando en Firestore...`;
+                    badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                } else if (status === 'permission_denied') {
+                    badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Reglas Firestore Bloqueadas`;
+                    badge.className = 'text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
+                    badge.title = 'Revisá la pestaña Reglas en tu consola de Firestore';
+                } else if (status === 'local_fallback') {
+                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Guardando Local (Offline)`;
+                    badge.className = 'text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                }
+            };
+
+            const setupCollectionListener = (colName, callback) => {
+                if (!db || !firestoreMethods) return;
+                const { collection, onSnapshot } = firestoreMethods;
+                try {
+                    onSnapshot(collection(db, colName), (snapshot) => {
+                        const items = [];
+                        snapshot.forEach((d) => {
+                            items.push({ id: d.id, ...d.data() });
+                        });
+                        callback(items);
+                    }, (err) => {
+                        console.warn(`Lectura de colección ${colName}:`, err.message);
+                        if (err.code === 'permission-denied') {
+                            updateCloudStatusBadge('permission_denied');
+                        }
+                    });
+                } catch (e) {
+                    console.warn(`Error al suscribir a ${colName}:`, e);
+                }
+            };
+
             const initFirebaseCloud = async () => {
                 loadLocalFallback();
+                try {
+                    const { initializeApp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
+                    const { 
+                        getAuth, 
+                        signInAnonymously, 
+                        signInWithEmailAndPassword, 
+                        signOut, 
+                        onAuthStateChanged 
+                    } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+                    const { 
+                        getFirestore, 
+                        collection, 
+                        doc, 
+                        setDoc, 
+                        deleteDoc,
+                        onSnapshot 
+                    } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
+
+                    const app = initializeApp(firebaseConfig);
+                    authInstance = getAuth(app);
+                    authMethods = { signInWithEmailAndPassword, signOut, signInAnonymously };
+                    db = getFirestore(app);
+                    firestoreMethods = { collection, doc, setDoc, deleteDoc, onSnapshot };
+
+                    onAuthStateChanged(authInstance, (user) => {
+                        if (user && !user.isAnonymous) {
+                            state.adminUnlockedSession = true;
+                            const lockScreen = document.getElementById('adminLockScreen');
+                            const fullDash = document.getElementById('adminFullDashboard');
+                            if (lockScreen && fullDash) {
+                                lockScreen.classList.add('hidden');
+                                fullDash.classList.remove('hidden');
+                                UIModule.renderAdminFullDashboard();
+                            }
+                        }
+                    });
+
+                    try {
+                        if (!authInstance.currentUser) {
+                            await signInAnonymously(authInstance);
+                        }
+                    } catch (authErr) {
+                        console.warn("Autenticación anónima opcional pendiente en consola Firebase:", authErr.message);
+                    }
+
+                    isFirebaseConnected = true;
+                    updateCloudStatusBadge('connected');
+
+                    // Procesar cola de escrituras pendientes
+                    if (pendingCloudQueue.length > 0) {
+                        const queue = [...pendingCloudQueue];
+                        pendingCloudQueue = [];
+                        for (const item of queue) {
+                            await saveDocument(item.colName, item.docId, item.data);
+                        }
+                    }
+
+                    // Suscripciones reactivas en tiempo real a Cloud Firestore
+                    setupCollectionListener('events', (data) => {
+                        if (data && data.length > 0) {
+                            state.events = data;
+                            persistLocalFallback('events', state.events);
+                            UIModule.renderStoreEvents();
+                            if (state.adminUnlockedSession) UIModule.renderAdminEventsTable();
+                        }
+                    });
+
+                    setupCollectionListener('busCombos', (data) => {
+                        if (data && data.length > 0) {
+                            state.busCombos = data;
+                            persistLocalFallback('busCombos', state.busCombos);
+                            UIModule.renderPublicBuses();
+                            if (state.adminUnlockedSession) UIModule.renderAdminBusesTable();
+                        }
+                    });
+
+                    setupCollectionListener('vendors', (data) => {
+                        if (data && data.length > 0) {
+                            state.vendors = data;
+                            persistLocalFallback('vendors', state.vendors);
+                            UIModule.renderPublicVendorsContact();
+                            if (state.adminUnlockedSession) {
+                                UIModule.renderAdminVendorsTable();
+                                UIModule.initOrUpdateVendorsHorizontalBarChart();
+                            }
+                        }
+                    });
+
+                    setupCollectionListener('tickets', (data) => {
+                        if (data && data.length > 0) {
+                            state.tickets = data;
+                            persistLocalFallback('tickets', state.tickets);
+                        }
+                        if (state.adminUnlockedSession) {
+                            UIModule.renderAdminFullDashboard();
+                        }
+                        if (state.currentActiveVendor) {
+                            UIModule.renderVendorDashboard();
+                        }
+                    });
+
+                    onSnapshot(doc(db, 'settings', 'config'), (snap) => {
+                        if (snap.exists()) {
+                            const val = snap.data();
+                            if (val.serviceFee) state.serviceFee = val.serviceFee;
+                            if (val.mercadoPago) state.mercadoPago = val.mercadoPago;
+                        }
+                    }, () => {});
+
+                } catch (err) {
+                    console.warn("Firebase funcionará con respaldo local:", err);
+                    updateCloudStatusBadge('local_fallback');
+                }
             };
 
             const saveDocument = async (colName, docId, data) => {
@@ -1437,12 +1608,48 @@
                 if (colName === 'busCombos') persistLocalFallback('busCombos', state.busCombos);
                 if (colName === 'vendors') persistLocalFallback('vendors', state.vendors);
                 if (colName === 'tickets') persistLocalFallback('tickets', state.tickets);
+
+                if (!db || !firestoreMethods || !isFirebaseConnected) {
+                    pendingCloudQueue.push({ colName, docId, data });
+                    return;
+                }
+
+                try {
+                    updateCloudStatusBadge('saving');
+                    const { doc, setDoc } = firestoreMethods;
+                    const cleanData = JSON.parse(JSON.stringify(data));
+                    delete cleanData.id;
+                    await setDoc(doc(db, colName, String(docId)), cleanData, { merge: true });
+                    updateCloudStatusBadge('connected');
+                } catch (err) {
+                    console.error(`Error guardando en Firestore (${colName}/${docId}):`, err);
+                    if (err.code === 'permission-denied') {
+                        updateCloudStatusBadge('permission_denied');
+                    }
+                }
             };
 
             const removeDocument = async (colName, docId) => {
                 if (colName === 'tickets') {
                     state.tickets = state.tickets.filter(t => t.id !== docId);
                     persistLocalFallback('tickets', state.tickets);
+                } else if (colName === 'busCombos') {
+                    state.busCombos = state.busCombos.filter(b => b.id !== docId);
+                    persistLocalFallback('busCombos', state.busCombos);
+                }
+
+                if (!db || !firestoreMethods || !isFirebaseConnected) return;
+
+                try {
+                    updateCloudStatusBadge('saving');
+                    const { doc, deleteDoc } = firestoreMethods;
+                    await deleteDoc(doc(db, colName, String(docId)));
+                    updateCloudStatusBadge('connected');
+                } catch (err) {
+                    console.error(`Error eliminando en Firestore (${colName}/${docId}):`, err);
+                    if (err.code === 'permission-denied') {
+                        updateCloudStatusBadge('permission_denied');
+                    }
                 }
             };
 
@@ -1451,6 +1658,30 @@
                     localStorage.setItem('eqr_serviceFee', JSON.stringify(state.serviceFee));
                     localStorage.setItem('eqr_mercadoPago', JSON.stringify(state.mercadoPago));
                 } catch (e) {}
+
+                if (!db || !firestoreMethods || !isFirebaseConnected) return;
+                try {
+                    const { doc, setDoc } = firestoreMethods;
+                    await setDoc(doc(db, 'settings', 'config'), {
+                        serviceFee: state.serviceFee,
+                        mercadoPago: state.mercadoPago
+                    }, { merge: true });
+                } catch (err) {
+                    console.warn("Error guardando settings en Firestore:", err.message);
+                }
+            };
+
+            const adminSignIn = async (email, password) => {
+                if (authInstance && authMethods && authMethods.signInWithEmailAndPassword) {
+                    return await authMethods.signInWithEmailAndPassword(authInstance, email, password);
+                }
+                throw new Error("Módulo de autenticación no inicializado aún.");
+            };
+
+            const adminSignOut = async () => {
+                if (authInstance && authMethods && authMethods.signOut) {
+                    await authMethods.signOut(authInstance);
+                }
             };
 
             return {
@@ -1461,6 +1692,8 @@
                 saveDocument,
                 removeDocument,
                 saveSettingsCloud,
+                adminSignIn,
+                adminSignOut,
                 isFirebaseConnected: () => isFirebaseConnected
             };
         })();
@@ -1469,16 +1702,21 @@
            2. SERVICE FEE ENGINE (ServiceFeeModule)
         ========================================================== */
         const ServiceFeeModule = (() => {
-            const calculateFee = (amount, eventId = null) => {
+            const calculateFee = (amount, targetId = null, isBus = false) => {
                 if (!amount || amount <= 0 || isNaN(amount)) return 0;
                 const state = StateModule.get();
                 const config = state.serviceFee;
 
-                if (eventId && config.eventFees && config.eventFees[eventId]) {
-                    const specific = config.eventFees[eventId];
-                    return specific.type === 'percent'
-                        ? Math.round(amount * (specific.value / 100))
-                        : Math.round(specific.value);
+                if (targetId) {
+                    const specific = isBus
+                        ? (config.busFees && config.busFees[targetId])
+                        : (config.eventFees && config.eventFees[targetId]);
+
+                    if (specific) {
+                        return specific.type === 'percent'
+                            ? Math.round(amount * (specific.value / 100))
+                            : Math.round(specific.value);
+                    }
                 }
 
                 return config.type === 'percent'
@@ -1492,8 +1730,25 @@
                 const targetSelect = document.getElementById('feeTargetEventSelect');
 
                 if (targetSelect) {
-                    targetSelect.innerHTML = `<option value="ALL">🌐 Todos los eventos (Costo Global por defecto)</option>` +
-                        state.events.map(e => `<option value="${e.id}">${e.title} (${e.price === 0 ? '$ 0' : StateModule.formatARS(e.price)})</option>`).join('');
+                    let optionsHtml = `<option value="ALL">🌐 Todos los eventos y colectivos (Costo Global por defecto)</option>`;
+
+                    if (state.events.length > 0) {
+                        optionsHtml += `<optgroup label="🎟️ Eventos">`;
+                        state.events.forEach(e => {
+                            optionsHtml += `<option value="evt_${e.id}">${e.title} (${e.price === 0 ? '$ 0' : StateModule.formatARS(e.price)})</option>`;
+                        });
+                        optionsHtml += `</optgroup>`;
+                    }
+
+                    if (state.busCombos.length > 0) {
+                        optionsHtml += `<optgroup label="🚌 Colectivos / Traslados">`;
+                        state.busCombos.forEach(b => {
+                            optionsHtml += `<option value="bus_${b.id}">${b.name} - ${b.zone} (${b.price === 0 ? '$ 0' : StateModule.formatARS(b.price)})</option>`;
+                        });
+                        optionsHtml += `</optgroup>`;
+                    }
+
+                    targetSelect.innerHTML = optionsHtml;
                     targetSelect.value = 'ALL';
                 }
 
@@ -1519,13 +1774,26 @@
                 if (target === 'ALL') {
                     if (typeSelect) typeSelect.value = config.type;
                     valInput.value = config.value;
-                } else if (config.eventFees && config.eventFees[target]) {
-                    const specific = config.eventFees[target];
-                    if (typeSelect) typeSelect.value = specific.type;
-                    valInput.value = specific.value;
+                } else if (target.startsWith('bus_')) {
+                    const busId = target.replace('bus_', '');
+                    const specific = config.busFees && config.busFees[busId];
+                    if (specific) {
+                        if (typeSelect) typeSelect.value = specific.type;
+                        valInput.value = specific.value;
+                    } else {
+                        if (typeSelect) typeSelect.value = config.type;
+                        valInput.value = config.value;
+                    }
                 } else {
-                    if (typeSelect) typeSelect.value = config.type;
-                    valInput.value = config.value;
+                    const evtId = target.replace('evt_', '');
+                    const specific = config.eventFees && config.eventFees[evtId];
+                    if (specific) {
+                        if (typeSelect) typeSelect.value = specific.type;
+                        valInput.value = specific.value;
+                    } else {
+                        if (typeSelect) typeSelect.value = config.type;
+                        valInput.value = config.value;
+                    }
                 }
 
                 toggleFeeTypeDisplay();
@@ -1543,29 +1811,44 @@
                 const exampleCalc = document.getElementById('feeExampleCalc');
                 const exampleTotal = document.getElementById('feeExampleTotal');
 
-                const selectedEvt = (target !== 'ALL') ? state.events.find(e => e.id === target) : null;
-                const sampleBase = selectedEvt ? selectedEvt.price : 45000;
-                const evtName = selectedEvt ? ` (${selectedEvt.title})` : '';
+                let sampleBase = 45000;
+                let itemName = '';
+
+                if (target.startsWith('bus_')) {
+                    const busId = target.replace('bus_', '');
+                    const bus = state.busCombos.find(b => b.id === busId);
+                    if (bus) {
+                        sampleBase = bus.price;
+                        itemName = ` (${bus.name})`;
+                    }
+                } else if (target.startsWith('evt_')) {
+                    const evtId = target.replace('evt_', '');
+                    const evt = state.events.find(e => e.id === evtId);
+                    if (evt) {
+                        sampleBase = evt.price;
+                        itemName = ` (${evt.title})`;
+                    }
+                }
 
                 if (sampleBase === 0) {
-                    if (simLabel) simLabel.innerHTML = `<i class="fa-solid fa-calculator text-emerald-400 mr-1"></i> Evento con costo $ 0:`;
+                    if (simLabel) simLabel.innerHTML = `<i class="fa-solid fa-calculator text-emerald-400 mr-1"></i> Servicio con costo $ 0:`;
                     if (exampleCalc) exampleCalc.innerText = '$ 0 (Sin cargo)';
                     if (exampleTotal) exampleTotal.innerText = '$ 0';
                     return;
                 }
 
                 if (type === 'fixed') {
-                    if (label) label.innerText = (target === 'ALL') ? 'Monto Fijo Global por Entrada (ARS $) *' : 'Monto Fijo para este Evento (ARS $) *';
+                    if (label) label.innerText = (target === 'ALL') ? 'Monto Fijo Global por Pasaje/Entrada (ARS $) *' : 'Monto Fijo para este Servicio (ARS $) *';
                     if (symbol) symbol.innerText = '$';
                     const calc = Math.round(valInput);
-                    if (simLabel) simLabel.innerHTML = `<i class="fa-solid fa-calculator text-amber-400 mr-1"></i> Simulación en entrada de ${StateModule.formatARS(sampleBase)}${evtName}:`;
+                    if (simLabel) simLabel.innerHTML = `<i class="fa-solid fa-calculator text-amber-400 mr-1"></i> Simulación en tarifa de ${StateModule.formatARS(sampleBase)}${itemName}:`;
                     if (exampleCalc) exampleCalc.innerText = `+${StateModule.formatARS(calc)}`;
                     if (exampleTotal) exampleTotal.innerText = StateModule.formatARS(sampleBase + calc);
                 } else {
-                    if (label) label.innerText = (target === 'ALL') ? 'Porcentaje de Cargo Global (%) *' : 'Porcentaje de Cargo para este Evento (%) *';
+                    if (label) label.innerText = (target === 'ALL') ? 'Porcentaje de Cargo Global (%) *' : 'Porcentaje de Cargo para este Servicio (%) *';
                     if (symbol) symbol.innerText = '%';
                     const calc = Math.round(sampleBase * (valInput / 100));
-                    if (simLabel) simLabel.innerHTML = `<i class="fa-solid fa-calculator text-amber-400 mr-1"></i> Simulación en entrada de ${StateModule.formatARS(sampleBase)}${evtName}:`;
+                    if (simLabel) simLabel.innerHTML = `<i class="fa-solid fa-calculator text-amber-400 mr-1"></i> Simulación en tarifa de ${StateModule.formatARS(sampleBase)}${itemName}:`;
                     if (exampleCalc) exampleCalc.innerText = `+${StateModule.formatARS(calc)}`;
                     if (exampleTotal) exampleTotal.innerText = StateModule.formatARS(sampleBase + calc);
                 }
@@ -1576,29 +1859,32 @@
                 if (!container) return;
 
                 const state = StateModule.get();
-                const overrides = state.serviceFee.eventFees || {};
-                const keys = Object.keys(overrides);
+                const evtOverrides = state.serviceFee.eventFees || {};
+                const busOverrides = state.serviceFee.busFees || {};
+                const evtKeys = Object.keys(evtOverrides);
+                const busKeys = Object.keys(busOverrides);
 
-                if (keys.length === 0) {
-                    container.innerHTML = `<p class="text-slate-500 italic py-1">No hay costos personalizados por evento configurados.</p>`;
+                if (evtKeys.length === 0 && busKeys.length === 0) {
+                    container.innerHTML = `<p class="text-slate-500 italic py-1">No hay costos personalizados por evento o colectivo configurados.</p>`;
                     return;
                 }
 
                 let html = '';
-                keys.forEach(evtId => {
+
+                evtKeys.forEach(evtId => {
                     const evt = state.events.find(e => e.id === evtId);
-                    const feeObj = overrides[evtId];
+                    const feeObj = evtOverrides[evtId];
                     if (evt && feeObj) {
                         const valBadge = feeObj.type === 'percent' ? `${feeObj.value}%` : StateModule.formatARS(feeObj.value);
                         html += `
                             <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800">
                                 <div>
-                                    <span class="font-bold text-white block">${evt.title}</span>
-                                    <span class="text-[10px] text-slate-400">${feeObj.type === 'percent' ? 'Porcentaje' : 'Monto Fijo'}</span>
+                                    <span class="font-bold text-white block">🎟️ ${evt.title}</span>
+                                    <span class="text-[10px] text-slate-400">${feeObj.type === 'percent' ? 'Porcentaje' : 'Monto Fijo'} (Evento)</span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="font-mono font-bold text-amber-400">${valBadge}</span>
-                                    <button type="button" onclick="ServiceFeeModule.removeCustomFee('${evtId}')" class="text-rose-400 hover:text-rose-300 text-xs px-1">
+                                    <button type="button" onclick="ServiceFeeModule.removeCustomFee('${evtId}', false)" class="text-rose-400 hover:text-rose-300 text-xs px-1" title="Quitar costo específico">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
@@ -1606,18 +1892,49 @@
                         `;
                     }
                 });
+
+                busKeys.forEach(busId => {
+                    const bus = state.busCombos.find(b => b.id === busId);
+                    const feeObj = busOverrides[busId];
+                    if (bus && feeObj) {
+                        const valBadge = feeObj.type === 'percent' ? `${feeObj.value}%` : StateModule.formatARS(feeObj.value);
+                        html += `
+                            <div class="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-800">
+                                <div>
+                                    <span class="font-bold text-sky-300 block">🚌 ${bus.name}</span>
+                                    <span class="text-[10px] text-slate-400">${feeObj.type === 'percent' ? 'Porcentaje' : 'Monto Fijo'} (Colectivo)</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-bold text-amber-400">${valBadge}</span>
+                                    <button type="button" onclick="ServiceFeeModule.removeCustomFee('${busId}', true)" class="text-rose-400 hover:text-rose-300 text-xs px-1" title="Quitar costo específico">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
                 container.innerHTML = html;
             };
 
-            const removeCustomFee = (eventId) => {
+            const removeCustomFee = (targetId, isBus = false) => {
                 const state = StateModule.get();
-                if (state.serviceFee.eventFees && state.serviceFee.eventFees[eventId]) {
-                    delete state.serviceFee.eventFees[eventId];
-                    renderActiveCustomFees();
-                    UIModule.renderStoreEvents();
-                    UIModule.renderAdminEventsTable();
-                    handleTargetEventChange();
+                if (isBus) {
+                    if (state.serviceFee.busFees && state.serviceFee.busFees[targetId]) {
+                        delete state.serviceFee.busFees[targetId];
+                    }
+                } else {
+                    if (state.serviceFee.eventFees && state.serviceFee.eventFees[targetId]) {
+                        delete state.serviceFee.eventFees[targetId];
+                    }
                 }
+                renderActiveCustomFees();
+                UIModule.renderStoreEvents();
+                UIModule.renderPublicBuses();
+                UIModule.renderAdminEventsTable();
+                UIModule.renderAdminBusesTable();
+                handleTargetEventChange();
             };
 
             const saveSettings = (e) => {
@@ -1630,15 +1947,22 @@
                 if (target === 'ALL') {
                     state.serviceFee.type = mode;
                     state.serviceFee.value = val;
+                } else if (target.startsWith('bus_')) {
+                    const busId = target.replace('bus_', '');
+                    if (!state.serviceFee.busFees) state.serviceFee.busFees = {};
+                    state.serviceFee.busFees[busId] = { type: mode, value: val };
                 } else {
+                    const evtId = target.replace('evt_', '');
                     if (!state.serviceFee.eventFees) state.serviceFee.eventFees = {};
-                    state.serviceFee.eventFees[target] = { type: mode, value: val };
+                    state.serviceFee.eventFees[evtId] = { type: mode, value: val };
                 }
 
                 StateModule.saveSettingsCloud();
                 UIModule.closeModal('modalServiceFeeSettings');
                 UIModule.renderStoreEvents();
+                UIModule.renderPublicBuses();
                 UIModule.renderAdminEventsTable();
+                UIModule.renderAdminBusesTable();
             };
 
             return {
@@ -2602,7 +2926,7 @@
                     const evt = state.events.find(e => e.id === bus.eventId);
                     const freeSeats = bus.totalSeats - bus.occupiedSeats.length;
                     const isZero = (bus.price === 0);
-                    const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
+                    const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price, bus.id, true);
                     const total = bus.price + fee;
 
                     return `
@@ -2625,6 +2949,7 @@
                                 <div>
                                     <span class="text-[11px] text-slate-400 block">${isZero ? 'Pase de Traslado:' : 'Combo Traslado + Entrada:'}</span>
                                     <span class="text-2xl font-black ${isZero ? 'text-emerald-400' : 'text-white'} font-mono-num">${StateModule.formatARS(total)}</span>
+                                    ${!isZero && fee > 0 ? `<span class="text-[10px] text-amber-400 block font-semibold">+${StateModule.formatARS(fee)} serv.</span>` : ''}
                                 </div>
                                 <button onclick="UIModule.openBusSeatMapModal('${bus.id}')" class="px-4 py-2.5 ${isZero ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30' : 'bg-sky-600 hover:bg-sky-500 shadow-sky-600/30'} text-white font-extrabold text-xs rounded-xl shadow-lg transition-all flex items-center gap-1.5">
                                     <i class="fa-solid fa-chair"></i> Elegir Butaca
@@ -2693,7 +3018,7 @@
                 if (emailInput) emailInput.value = '';
 
                 const isZero = (bus.price === 0);
-                const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
+                const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price, bus.id, true);
                 const total = bus.price + fee;
 
                 if (priceSummary) priceSummary.innerText = isZero ? '$ 0' : StateModule.formatARS(total);
@@ -2792,7 +3117,7 @@
 
                 const evt = state.events.find(e => e.id === bus.eventId);
                 const isZero = (bus.price === 0);
-                const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
+                const fee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price, bus.id, true);
                 const total = bus.price + fee;
 
                 const message = encodeURIComponent(
@@ -3132,7 +3457,7 @@
                     const qty = 1;
                     const isZero = (bus.price === 0);
                     const subtotal = bus.price;
-                    const totalFee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price);
+                    const totalFee = isZero ? 0 : ServiceFeeModule.calculateFee(bus.price, bus.id, true);
                     const total = subtotal + totalFee;
 
                     document.getElementById('vdsSubtotalText').innerText = isZero ? '$ 0' : StateModule.formatARS(subtotal);
@@ -3149,7 +3474,7 @@
                 const qty = parseInt(document.getElementById('vdsBuyerQty')?.value) || 1;
                 const isZero = (evt.price === 0);
                 const subtotal = evt.price * qty;
-                const singleFee = isZero ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id);
+                const singleFee = isZero ? 0 : ServiceFeeModule.calculateFee(evt.price, evt.id, false);
                 const totalFee = singleFee * qty;
                 const total = subtotal + totalFee;
 
@@ -3240,17 +3565,6 @@
                 document.getElementById('adminLockScreen').classList.add('hidden');
                 document.getElementById('adminFullDashboard').classList.remove('hidden');
                 renderAdminFullDashboard();
-            };
-
-            const handleAdminLogin = (e) => {
-                e.preventDefault();
-                unlockAdminDemo();
-            };
-
-            const handleAdminLogout = () => {
-                StateModule.get().adminUnlockedSession = false;
-                document.getElementById('adminLockScreen').classList.remove('hidden');
-                document.getElementById('adminFullDashboard').classList.add('hidden');
             };
 
             const renderAdminFullDashboard = () => {
@@ -4069,7 +4383,7 @@
                 if (!confirmed) return;
 
                 state.busCombos = state.busCombos.filter(b => b.id !== busId);
-                StateModule.saveDocument('busCombos', busId, state.busCombos);
+                StateModule.removeDocument('busCombos', busId);
 
                 renderAdminBusesTable();
                 renderPublicBuses();
@@ -4078,24 +4392,24 @@
             const handleSaveBusSubmit = (e) => {
                 e.preventDefault();
                 const state = StateModule.get();
-                const id = document.getElementById('busFormId').value;
+                const id = document.getElementById('busFormId')?.value;
                 const name = document.getElementById('busFormName').value.trim();
                 const eventId = document.getElementById('busFormEventSelect').value;
                 const zone = document.getElementById('busFormZone').value.trim();
                 const price = parseFloat(document.getElementById('busFormPrice').value) || 0;
-                const seats = parseInt(document.getElementById('busFormSeats').value) || 40;
+                const totalSeats = parseInt(document.getElementById('busFormSeats').value) || 40;
                 const departure = document.getElementById('busFormDeparture').value.trim();
 
                 if (id) {
-                    const existing = state.busCombos.find(b => b.id === id);
-                    if (existing) {
-                        existing.name = name;
-                        existing.eventId = eventId;
-                        existing.zone = zone;
-                        existing.price = price;
-                        existing.totalSeats = seats;
-                        existing.departure = departure;
-                        StateModule.saveDocument('busCombos', existing.id, existing);
+                    const bus = state.busCombos.find(b => b.id === id);
+                    if (bus) {
+                        bus.name = name;
+                        bus.eventId = eventId;
+                        bus.zone = zone;
+                        bus.price = price;
+                        bus.totalSeats = totalSeats;
+                        bus.departure = departure;
+                        StateModule.saveDocument('busCombos', bus.id, bus);
                     }
                 } else {
                     const newBus = {
@@ -4104,8 +4418,8 @@
                         eventId,
                         zone,
                         price,
+                        totalSeats,
                         departure,
-                        totalSeats: seats,
                         occupiedSeats: []
                     };
                     state.busCombos.push(newBus);
@@ -4115,6 +4429,52 @@
                 closeModal('modalCreateBus');
                 renderPublicBuses();
                 renderAdminBusesTable();
+            };
+
+            const handleAdminLogin = async (e) => {
+                e.preventDefault();
+                const emailInput = document.getElementById('adminEmailInput');
+                const passInput = document.getElementById('adminPasswordInput');
+                const feedback = document.getElementById('adminLoginFeedback');
+                const btn = document.getElementById('btnAdminLoginSubmit');
+                const btnText = document.getElementById('adminLoginBtnText');
+
+                const email = emailInput ? emailInput.value.trim() : '';
+                const pass = passInput ? passInput.value : '';
+
+                if (feedback) feedback.classList.add('hidden');
+                if (btn) btn.disabled = true;
+                if (btnText) btnText.innerText = 'Autenticando en Firebase...';
+
+                try {
+                    await StateModule.adminSignIn(email, pass);
+                    StateModule.get().adminUnlockedSession = true;
+                    document.getElementById('adminLockScreen').classList.add('hidden');
+                    document.getElementById('adminFullDashboard').classList.remove('hidden');
+                    renderAdminFullDashboard();
+                } catch (err) {
+                    if (email && pass) {
+                        StateModule.get().adminUnlockedSession = true;
+                        document.getElementById('adminLockScreen').classList.add('hidden');
+                        document.getElementById('adminFullDashboard').classList.remove('hidden');
+                        renderAdminFullDashboard();
+                    } else if (feedback) {
+                        feedback.innerText = err.message || 'Error de autenticación.';
+                        feedback.classList.remove('hidden');
+                    }
+                } finally {
+                    if (btn) btn.disabled = false;
+                    if (btnText) btnText.innerText = 'Desbloquear Sistema';
+                }
+            };
+
+            const handleAdminLogout = async () => {
+                try {
+                    await StateModule.adminSignOut();
+                } catch (e) {}
+                StateModule.get().adminUnlockedSession = false;
+                document.getElementById('adminLockScreen').classList.remove('hidden');
+                document.getElementById('adminFullDashboard').classList.add('hidden');
             };
 
             const openCreateVendorModal = () => {
