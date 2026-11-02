@@ -316,7 +316,7 @@
                 <form onsubmit="UIModule.handleAdminLogin(event)" class="space-y-4">
                     <div>
                         <label class="text-xs font-bold text-slate-300 block mb-1">Correo Electrónico Administrador</label>
-                        <input type="email" id="adminEmailInput" placeholder="admin@tudominio.com" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
+                        <input type="email" id="adminEmailInput" value="admin@experienceqr.com" placeholder="admin@experienceqr.com" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="text-xs font-bold text-slate-300 block mb-1">Contraseña</label>
@@ -335,8 +335,8 @@
                     <div>
                         <h2 class="text-2xl font-black text-white flex items-center gap-3">
                             <span>Gestión Integral ExperienceQR</span>
-                            <span id="firebaseStatusBadge" class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Modo Operativo Activo
+                            <span id="firebaseStatusBadge" onclick="UIModule.openFirebaseRulesModal()" class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer" title="Ver estado de conexión">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Conectando Nube...
                             </span>
                         </h2>
                         <p class="text-xs text-slate-400">Control de eventos, recaudación en ARS $, costo de servicio y validación de puertas.</p>
@@ -1345,6 +1345,92 @@
         </div>
     </div>
 
+    <!-- MODAL 12: AYUDA Y SOLUCIÓN REGLAS DE FIRESTORE -->
+    <div id="modalFirebaseRulesHelp" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-rose-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
+            <button onclick="UIModule.closeModal('modalFirebaseRulesHelp')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-2xl border border-rose-500/30">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">Reglas de Seguridad de Firestore</h3>
+                    <p class="text-xs text-slate-400">Cómo desbloquear la lectura y escritura en la nube.</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                <p>
+                    El sistema está configurado para operar con tus reglas de Firestore. Para tener permisos totales de escritura en eventos, colectivos, vendedores y costo de servicio, asegurate de iniciar sesión con:
+                </p>
+
+                <div class="bg-slate-900/90 p-4 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-slate-400">Cuenta de Administrador:</span>
+                        <strong class="font-mono text-amber-400 font-bold">admin@experienceqr.com</strong>
+                    </div>
+                    <p class="text-[11px] text-slate-400">
+                        Los clientes y promotores operan con credencial anónima para emitir entradas en <code>/tickets/</code> y actualizar butacas en <code>/busCombos/</code>.
+                    </p>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[11px] font-bold text-slate-400">Tus reglas vigentes en Firestore:</span>
+                        <button onclick="UIModule.copyFirebaseRulesCode()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-copy"></i> <span id="copyRulesBtnLabel">Copiar Código</span>
+                        </button>
+                    </div>
+                    <textarea id="firestoreRulesCodeText" readonly class="w-full h-44 bg-slate-950 border border-slate-800 text-emerald-400 rounded-xl p-3 font-mono text-[11px] leading-relaxed resize-none focus:outline-none">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "admin@experienceqr.com";
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /busCombos/{busId} {
+      allow read: if true;
+      allow update: if request.auth != null;
+      allow create, delete: if isAdmin();
+    }
+
+    match /tickets/{ticketId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if isAdmin();
+    }
+
+    match /vendors/{vendorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}</textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <a href="https://console.firebase.google.com/project/tupedido-6be53/firestore/rules" target="_blank" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Consola Firebase
+                </a>
+                <button type="button" onclick="UIModule.closeModal('modalFirebaseRulesHelp')" class="px-4 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JAVASCRIPT APPLICATION CODE -->
     <script>
         /* ==========================================================
@@ -1370,6 +1456,7 @@
             let authInstance = null;
             let authMethods = null;
             let pendingCloudQueue = [];
+            let settingsListenerUnsubscribe = null;
 
             let state = {
                 serviceFee: {
@@ -1450,15 +1537,23 @@
                 const badge = document.getElementById('firebaseStatusBadge');
                 if (!badge) return;
                 if (status === 'connected') {
-                    badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Nube Firebase Conectada`;
-                    badge.className = 'text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
+                    const isAdm = authInstance?.currentUser?.email === 'admin@experienceqr.com';
+                    if (isAdm) {
+                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Admin Conectado (Nube Sincronizada)`;
+                        badge.className = 'text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
+                        badge.title = 'Sesión iniciada como admin@experienceqr.com con permisos completos de escritura';
+                    } else {
+                        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400"></span> Modo Público (Lectura Activa)`;
+                        badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
+                        badge.title = 'Iniciá sesión como admin@experienceqr.com para gestionar eventos';
+                    }
                 } else if (status === 'saving') {
                     badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span> Guardando en Firestore...`;
                     badge.className = 'text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
                 } else if (status === 'permission_denied') {
-                    badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Reglas Firestore Bloqueadas`;
-                    badge.className = 'text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
-                    badge.title = 'Revisá la pestaña Reglas en tu consola de Firestore';
+                    badge.innerHTML = `<i class="fa-solid fa-lock text-amber-400"></i> Requiere Login admin@experienceqr.com`;
+                    badge.className = 'text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 cursor-pointer';
+                    badge.title = 'Esta acción requiere estar autenticado como admin@experienceqr.com';
                 } else if (status === 'local_fallback') {
                     badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Guardando Local (Offline)`;
                     badge.className = 'text-xs bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-full font-bold flex items-center gap-1.5';
@@ -1483,6 +1578,31 @@
                     });
                 } catch (e) {
                     console.warn(`Error al suscribir a ${colName}:`, e);
+                }
+            };
+
+            const subscribeSettingsIfAdmin = () => {
+                if (!db || !firestoreMethods) return;
+                const currentUser = authInstance?.currentUser;
+                if (currentUser && currentUser.email === 'admin@experienceqr.com') {
+                    if (settingsListenerUnsubscribe) return;
+                    try {
+                        const { doc, onSnapshot } = firestoreMethods;
+                        settingsListenerUnsubscribe = onSnapshot(doc(db, 'settings', 'config'), (snap) => {
+                            if (snap.exists()) {
+                                const val = snap.data();
+                                if (val.serviceFee) state.serviceFee = val.serviceFee;
+                                if (val.mercadoPago) state.mercadoPago = val.mercadoPago;
+                            }
+                        }, (err) => {
+                            console.warn("Lectura de settings:", err.message);
+                        });
+                    } catch (e) {}
+                } else {
+                    if (settingsListenerUnsubscribe) {
+                        settingsListenerUnsubscribe();
+                        settingsListenerUnsubscribe = null;
+                    }
                 }
             };
 
@@ -1513,7 +1633,7 @@
                     firestoreMethods = { collection, doc, setDoc, deleteDoc, onSnapshot };
 
                     onAuthStateChanged(authInstance, (user) => {
-                        if (user && !user.isAnonymous) {
+                        if (user && !user.isAnonymous && user.email === 'admin@experienceqr.com') {
                             state.adminUnlockedSession = true;
                             const lockScreen = document.getElementById('adminLockScreen');
                             const fullDash = document.getElementById('adminFullDashboard');
@@ -1522,6 +1642,14 @@
                                 fullDash.classList.remove('hidden');
                                 UIModule.renderAdminFullDashboard();
                             }
+                            subscribeSettingsIfAdmin();
+                            updateCloudStatusBadge('connected');
+                        } else if (!user) {
+                            // Autenticación anónima para permitir compra y reserva según tus reglas
+                            signInAnonymously(authInstance).catch(() => {});
+                            updateCloudStatusBadge('connected');
+                        } else {
+                            updateCloudStatusBadge('connected');
                         }
                     });
 
@@ -1530,7 +1658,7 @@
                             await signInAnonymously(authInstance);
                         }
                     } catch (authErr) {
-                        console.warn("Autenticación anónima opcional pendiente en consola Firebase:", authErr.message);
+                        console.warn("Autenticación anónima de clientes:", authErr.message);
                     }
 
                     isFirebaseConnected = true;
@@ -1545,7 +1673,7 @@
                         }
                     }
 
-                    // Suscripciones reactivas en tiempo real a Cloud Firestore
+                    // Suscripciones reactivas permitidas por tus reglas públicas
                     setupCollectionListener('events', (data) => {
                         if (data && data.length > 0) {
                             state.events = data;
@@ -1588,14 +1716,6 @@
                             UIModule.renderVendorDashboard();
                         }
                     });
-
-                    onSnapshot(doc(db, 'settings', 'config'), (snap) => {
-                        if (snap.exists()) {
-                            const val = snap.data();
-                            if (val.serviceFee) state.serviceFee = val.serviceFee;
-                            if (val.mercadoPago) state.mercadoPago = val.mercadoPago;
-                        }
-                    }, () => {});
 
                 } catch (err) {
                     console.warn("Firebase funcionará con respaldo local:", err);
@@ -4561,6 +4681,23 @@
 
             const getActiveAuditEvtId = () => activeAuditEvtId;
 
+            const openFirebaseRulesModal = () => {
+                openModal('modalFirebaseRulesHelp');
+            };
+
+            const copyFirebaseRulesCode = () => {
+                const textarea = document.getElementById('firestoreRulesCodeText');
+                if (textarea) {
+                    textarea.select();
+                    document.execCommand('copy');
+                    const label = document.getElementById('copyRulesBtnLabel');
+                    if (label) {
+                        label.innerText = '¡Copiado!';
+                        setTimeout(() => { label.innerText = 'Copiar Código'; }, 2000);
+                    }
+                }
+            };
+
             return {
                 openModal,
                 closeModal,
@@ -4576,7 +4713,6 @@
                 renderBusSeatsLayout,
                 openBusSeatMapModal,
                 handleSelectSeat,
-                openBusSeatMapModal,
                 connectBusPassengerWithVendor,
                 handleBusPassengerSubmit,
                 renderPublicVendorsContact,
@@ -4589,14 +4725,13 @@
                 handleVendorBusSelectChange,
                 calculateVendorDirectSaleTotal,
                 handleVendorDirectSaleSubmit,
-                handleAdminLogin,
                 unlockAdminDemo,
-                handleAdminLogout,
                 renderAdminFullDashboard,
                 switchAdminTab,
                 changeSalesChartPeriod,
                 renderAdminEventsTable,
                 openEventLiveAuditModal,
+                deleteTicketSale,
                 renderAdminClientsTable,
                 renderAdminBusesTable,
                 renderAdminVendorsTable,
@@ -4609,19 +4744,22 @@
                 openEditBusModal,
                 deleteBusCombo,
                 handleSaveBusSubmit,
+                handleAdminLogin,
+                handleAdminLogout,
                 openCreateVendorModal,
                 openEditVendorModal,
                 handleSaveVendorSubmit,
                 previewTicketById,
-                deleteTicketSale,
                 getActiveAuditEvtId,
+                openFirebaseRulesModal,
+                copyFirebaseRulesCode,
                 initOrUpdateVendorsHorizontalBarChart,
                 initOrUpdateClientsMonthlyLineChart
             };
         })();
 
         /* ==========================================================
-           BOOTSTRAP
+           8. APP INITIALIZATION & BOOTSTRAP
         ========================================================== */
         window.addEventListener('DOMContentLoaded', () => {
             StateModule.initFirebaseCloud();
