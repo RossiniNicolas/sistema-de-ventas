@@ -747,6 +747,76 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL 3: VENTA DIRECTA EN MANO (PROMOTOR - SOLO EFECTIVO) -->
+    <div id="modalVendorDirectSale" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-emerald-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
+            <button onclick="UIModule.closeModal('modalVendorDirectSale')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">Venta Directa en Mano</h3>
+                    <p class="text-xs text-slate-400">Cobro en efectivo exclusivo para promotores. Emisión de entrada QR en el acto.</p>
+                </div>
+            </div>
+
+            <form onsubmit="UIModule.handleVendorDirectSaleSubmit(event)" class="space-y-4">
+                <!-- Tipo de Producto a Vender: Evento, Combo o Colectivo -->
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Tipo de Venta *</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
+                            <input type="radio" name="vdsSaleType" value="EVENT" checked onchange="UIModule.toggleVendorSaleType(this.value)">
+                            <i class="fa-solid fa-ticket text-indigo-400"></i> Evento
+                        </label>
+                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
+                            <input type="radio" name="vdsSaleType" value="COMBO_DIRECT" onchange="UIModule.toggleVendorSaleType(this.value)">
+                            <i class="fa-solid fa-tags text-purple-400"></i> Combo
+                        </label>
+                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
+                            <input type="radio" name="vdsSaleType" value="BUS" onchange="UIModule.toggleVendorSaleType(this.value)">
+                            <i class="fa-solid fa-bus text-sky-400"></i> Colectivo
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Campo para selección de Evento -->
+                <div id="vdsEventSelectContainer">
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Evento *</label>
+                    <select id="vdsEventSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-emerald-500"></select>
+                </div>
+
+                <!-- Campo para selección de Combo Promocional dedicado -->
+                <div id="vdsComboDirectSelectContainer" class="hidden space-y-2">
+                    <label class="text-xs font-bold text-purple-300 block mb-1">Seleccionar Combo Promocional *</label>
+                    <select id="vdsComboDirectSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-purple-500/50 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-purple-400"></select>
+                    <p id="vdsComboDirectDetailNote" class="text-[11px] text-purple-300 font-semibold"></p>
+                </div>
+
+                <!-- Campo para selección de Colectivo y Butaca (oculto por defecto) -->
+                <div id="vdsBusSelectContainer" class="hidden space-y-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Unidad / Colectivo *</label>
+                        <select id="vdsBusSelect" onchange="UIModule.handleVendorBusSelectChange()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-sky-500"></select>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">Butaca a Asignar *</label>
+                            <select id="vdsBusSeatSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">DNI del Pasajero *</label>
+                            <input type="text" id="vdsBuyerDni" placeholder="40123456" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono focus:border-sky-500">
+                        </div>
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
