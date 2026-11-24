@@ -752,6 +752,152 @@
 
     </main>
 
+    <!-- MODAL 1: DETALLE Y COMPRA / GENERACIÓN DE ENTRADA -->
+    <div id="modalEventDetail" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto pt-6 sm:pt-4 pb-16">
+        <div class="glass-panel w-full max-w-xl max-h-[88vh] rounded-3xl border border-indigo-500/40 relative shadow-2xl flex flex-col overflow-hidden my-auto">
+            
+            <!-- Header FIJO -->
+            <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 z-20">
+                <div class="flex items-center gap-3 min-w-0 pr-2">
+                    <img id="detailEvtImg" src="" alt="Flyer" class="w-12 h-12 rounded-xl object-cover border border-slate-700 shadow-md shrink-0">
+                    <div class="space-y-0.5 min-w-0">
+                        <span id="detailEvtBadge" class="text-[10px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 inline-block">Fiesta</span>
+                        <h3 id="detailEvtTitle" class="text-base sm:text-lg font-black text-white truncate leading-tight">Nombre Evento</h3>
+                        <p id="detailEvtVenue" class="text-xs text-slate-400 truncate"><i class="fa-solid fa-location-dot mr-1"></i> Lugar</p>
+                    </div>
+                </div>
+
+                <button type="button" onclick="UIModule.closeModal('modalEventDetail')" class="shrink-0 w-11 h-11 rounded-2xl bg-slate-900 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-rose-500 flex items-center justify-center transition-all shadow-xl active:scale-95" title="Cerrar ventana">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Cuerpo con scroll interno independiente -->
+            <div class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
+                <form onsubmit="UIModule.handlePurchaseSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="purchaseEventId">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">Nombre y Apellido *</label>
+                            <input type="text" id="buyerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-300 block mb-1">Celular / WhatsApp *</label>
+                            <input type="tel" id="buyerPhone" placeholder="+54 9 351 1234567" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Selector de Modalidad: Entrada Individual o Combo Promocional -->
+                    <div id="buyerPackageTypeContainer" class="space-y-2">
+                        <label class="text-xs font-bold text-slate-300 block">Tipo de Pase *</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all">
+                                <input type="radio" name="buyerTicketMode" value="SINGLE" checked onchange="UIModule.handleTicketModeChange(this.value)">
+                                <span>Entrada Individual</span>
+                            </label>
+                            <label id="buyerComboOptionLabel" class="hidden flex items-center justify-center gap-2 p-2.5 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-purple-300 transition-all">
+                                <input type="radio" name="buyerTicketMode" value="COMBO" onchange="UIModule.handleTicketModeChange(this.value)">
+                                <span id="buyerComboOptionTitle">Combo Promocional</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="buyerQtyContainer">
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
+                        <select id="buyerQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                            <option value="1">1 Entrada</option>
+                            <option value="2">2 Entradas</option>
+                            <option value="3">3 Entradas</option>
+                            <option value="4">4 Entradas</option>
+                            <option value="6">6 Entradas</option>
+                        </select>
+                    </div>
+
+                    <div id="buyerComboQtyContainer" class="hidden">
+                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Combos</label>
+                        <select id="buyerComboQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
+                            <option value="1">1 Combo</option>
+                            <option value="2">2 Combos</option>
+                            <option value="3">3 Combos</option>
+                        </select>
+                        <p id="buyerComboDetailNote" class="text-[11px] text-purple-300 mt-1 font-semibold"></p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
+                        <div class="flex justify-between text-slate-400">
+                            <span>Subtotal Entradas:</span>
+                            <strong id="purchaseSubtotalText" class="font-mono text-white">$ 0</strong>
+                        </div>
+                        <div class="flex justify-between text-slate-400">
+                            <span id="purchaseFeeLabel">Costo por Servicio:</span>
+                            <strong id="purchaseFeeText" class="font-mono text-amber-400">+$ 0</strong>
+                        </div>
+                        <div class="flex justify-between text-sm font-bold border-t border-slate-800 pt-2 text-white">
+                            <span id="purchaseTotalHeading">Total Final a Pagar:</span>
+                            <strong id="purchaseTotalText" class="font-mono text-emerald-400 text-base">$ 0</strong>
+                        </div>
+                    </div>
+
+                    <!-- Payment Choice Container (Auto hidden if $0) -->
+                    <div id="paymentChoiceContainer" class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-800 bg-slate-900/50 cursor-not-allowed opacity-50 relative overflow-hidden" title="Temporalmente deshabilitado">
+                            <input type="radio" name="purchaseFlow" value="MP" disabled onchange="UIModule.togglePurchaseChoice('MP')">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-credit-card mr-1"></i> Mercado Pago</span>
+                                <span class="text-[9px] text-amber-400 font-semibold">(Temporalmente deshabilitado)</span>
+                            </div>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer">
+                            <input type="radio" name="purchaseFlow" value="CASH" checked onchange="UIModule.togglePurchaseChoice('CASH')">
+                            <span class="text-xs font-bold text-emerald-300"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Vendedor Efectivo</span>
+                        </label>
+                    </div>
+
+                    <div id="cashVendorSelectionBox" class="hidden p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
+                        <div class="flex items-center justify-between pb-1 border-b border-emerald-500/20">
+                            <p class="font-bold text-emerald-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
+                                <i class="fa-brands fa-whatsapp text-emerald-400"></i> Seleccioná tu promotor oficial:
+                            </p>
+                            <span class="text-[10px] text-emerald-400/80 font-medium">Pago en efectivo</span>
+                        </div>
+                        <div id="cashVendorsContactMiniList" class="space-y-1.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
+                    </div>
+
+                    <button type="submit" id="btnSubmitPurchase" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg shadow-sky-600/30 text-sm transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock"></i> Proceder al Pago Seguro
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: PASARELA MERCADO PAGO -->
+    <div id="modalMercadoPagoGateway" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-md rounded-3xl border border-sky-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
+            <button onclick="UIModule.closeModal('modalMercadoPagoGateway')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="text-center space-y-2 border-b border-slate-800 pb-4">
+                <div class="w-14 h-14 rounded-2xl bg-sky-500/20 border border-sky-500/40 text-sky-400 flex items-center justify-center text-3xl mx-auto">
+                    <i class="fa-solid fa-handshake"></i>
+                </div>
+                <h3 class="text-xl font-black text-white">Mercado Pago Checkout</h3>
+                <p class="text-xs text-slate-400" id="mpGatewayAccountHolder">Cobro oficial</p>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Monto a Debitar</span>
+                <div class="text-3xl font-extrabold text-emerald-400 font-mono-num" id="mpGatewayAmount">$ 0</div>
+                <span class="text-[11px] text-slate-400" id="mpGatewayItemDetail">Entrada + Costo de Servicio</span>
+                <span class="text-[11px] text-slate-500 block" id="mpGatewayBuyerEmail"></span>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="UIModule.closeModal('modalMercadoPagoGateway')" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl">Cancelar</button>
+                <button id="btnProceedMpCheckout" onclick="MercadoPagoModule.executeCheckoutOrder()" class="w-1/2 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-black text-xs rounded-xl shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-right"></i> <span id="btnMpCheckoutLabel">Ir a Mercado Pago</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL 3: VENTA DIRECTA EN MANO (PROMOTOR - SOLO EFECTIVO) -->
     <div id="modalVendorDirectSale" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-lg rounded-3xl border border-emerald-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
