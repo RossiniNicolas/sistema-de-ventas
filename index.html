@@ -523,8 +523,9 @@
                         <div>
                             <h3 class="text-xl font-black text-white flex items-center gap-2">
                                 <i class="fa-solid fa-users text-pink-400"></i> Base de Datos de Clientes
+                                <span id="adminClientsCountBadge" class="text-xs font-mono font-bold bg-pink-500/20 text-pink-300 border border-pink-500/30 px-2.5 py-0.5 rounded-full">0 clientes</span>
                             </h3>
-                            <p class="text-xs text-slate-400">Registro unificado de todos los compradores de eventos y combos.</p>
+                            <p class="text-xs text-slate-400">Registro unificado de todos los compradores de eventos, promos y colectivos.</p>
                         </div>
                         <button onclick="ExportModule.exportClientsToXLSX()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-2">
                             <i class="fa-solid fa-file-excel"></i> Exportar Clientes (.xlsx)
@@ -642,13 +643,50 @@
                                         <th class="pb-3">Promotor</th>
                                         <th class="pb-3">Código Acceso</th>
                                         <th class="pb-3">Teléfono / WhatsApp</th>
-                                        <th class="pb-3">Entradas</th>
-                                        <th class="pb-3">Total Bruto</th>
-                                        <th class="pb-3">Efectivo a Rendir</th>
+                                        <th class="pb-3">Entradas Pendientes</th>
+                                        <th class="pb-3">Bruto Pendiente</th>
+                                        <th class="pb-3">Comisión (10% s/Entrada)</th>
+                                        <th class="pb-3">Neto a Rendir</th>
                                         <th class="pb-3 text-right">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="adminVendorsTableBody" class="divide-y divide-slate-800/60 text-slate-200"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL DE LIQUIDACIONES Y CIERRES DE CAJA POR EVENTO -->
+                    <div class="glass-panel rounded-3xl border border-emerald-500/20 p-6 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                            <div>
+                                <h4 class="text-lg font-black text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i> Historial de Liquidaciones y Cierres de Caja
+                                </h4>
+                                <p class="text-xs text-slate-400">Registro auditado de rendiciones cerradas por promotor y evento (con descuento del 10% de comisión).</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <select id="settlementHistoryEventFilter" onchange="UIModule.renderSettlementsHistoryTable()" class="bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs font-bold focus:border-emerald-500">
+                                    <option value="ALL">Todos los eventos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="text-slate-400 border-b border-slate-800 uppercase font-semibold">
+                                    <tr>
+                                        <th class="pb-3">N° Cierre</th>
+                                        <th class="pb-3">Fecha y Hora</th>
+                                        <th class="pb-3">Promotor</th>
+                                        <th class="pb-3">Evento Liquidado</th>
+                                        <th class="pb-3">Entradas</th>
+                                        <th class="pb-3">Total Cobrado</th>
+                                        <th class="pb-3">Comisión (10%)</th>
+                                        <th class="pb-3">Neto Rendido</th>
+                                        <th class="pb-3 text-right">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminSettlementsHistoryBody" class="divide-y divide-slate-800/60 text-slate-200"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1500,6 +1538,81 @@
         </div>
     </div>
 
+    <!-- MODAL 13: LIQUIDACIÓN Y CIERRE DE CAJA POR PROMOTOR Y EVENTO -->
+    <div id="modalVendorSettlement" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="glass-panel w-full max-w-lg rounded-3xl border border-amber-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
+            <button onclick="UIModule.closeModal('modalVendorSettlement')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl border border-amber-500/30">
+                    <i class="fa-solid fa-cash-register"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg font-black text-white">Liquidación y Cierre de Caja</h3>
+                    <p class="text-xs text-slate-400">Rendición de efectivo físico y puesta a $ 0 del saldo del promotor.</p>
+                </div>
+            </div>
+
+            <form onsubmit="UIModule.handleConfirmSettlementSubmit(event)" class="space-y-4">
+                <input type="hidden" id="settlementVendorId">
+
+                <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase text-purple-400 font-mono block" id="settlementVendorCode">PROM-XXX</span>
+                        <strong class="text-sm font-extrabold text-white" id="settlementVendorName">Nombre Promotor</strong>
+                    </div>
+                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        Rendición Física
+                    </span>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Evento a Liquidar *</label>
+                    <select id="settlementEventSelect" onchange="UIModule.updateSettlementPreview()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-amber-500"></select>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-slate-900 border border-amber-500/30 space-y-2.5 text-xs">
+                    <div class="flex justify-between text-slate-400">
+                        <span>Entradas pendientes de rendición:</span>
+                        <strong id="settlementTicketsCountText" class="font-mono text-white font-bold">0 entradas</strong>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Total cobrado por el promotor (con cargo):</span>
+                        <strong id="settlementGrossCollectedText" class="font-mono text-slate-200 font-bold">$ 0</strong>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>Base neta entradas (sin cargo de servicio):</span>
+                        <strong id="settlementBaseNetText" class="font-mono text-indigo-300 font-bold">$ 0</strong>
+                    </div>
+                    <div class="flex justify-between text-purple-300">
+                        <span><i class="fa-solid fa-percent mr-1"></i> Ganancia Promotor (10% s/ entrada):</span>
+                        <strong id="settlementCommissionText" class="font-mono text-purple-400 font-bold">-$ 0</strong>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800 pt-2 text-amber-400 font-bold">
+                        <span>Total Neto a Rendir en Caja:</span>
+                        <strong id="settlementAmountDueText" class="font-mono text-amber-400 font-extrabold text-base">$ 0</strong>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-800 pt-2 text-emerald-400 font-bold">
+                        <span>Nuevo saldo a rendir tras cierre:</span>
+                        <strong class="font-mono text-sm">$ 0 (Caja Limpia)</strong>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-300 block mb-1">Observaciones del Cierre (Opcional)</label>
+                    <input type="text" id="settlementNotesInput" placeholder="Ej: Efectivo recibido completo al finalizar el evento" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-amber-500">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="UIModule.closeModal('modalVendorSettlement')" class="px-4 py-2.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl">Cancelar</button>
+                    <button type="submit" id="btnConfirmSettlement" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-xl shadow-lg shadow-emerald-600/30 flex items-center gap-2">
+                        <i class="fa-solid fa-check-double"></i> Confirmar Liquidación y Limpiar Saldo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL 11: CONFIGURACIÓN MERCADO PAGO -->
     <div id="modalMpSettings" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="glass-panel w-full max-w-lg rounded-3xl border border-sky-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
@@ -1629,6 +1742,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /settlements/{settlementId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /settings/{docId} {
       allow read, write: if isAdmin();
     }
@@ -1651,7 +1769,7 @@ service cloud.firestore {
     <!-- JAVASCRIPT APPLICATION CODE -->
     <script>
         /* ==========================================================
-           1. STATE STORE & PERSISTENCE (StateModule)
+1. STATE STORE & PERSISTENCE (StateModule)
         ========================================================== */
         const StateModule = (() => {
             const currentOrigin = window.location.origin + window.location.pathname;
@@ -1694,6 +1812,7 @@ service cloud.firestore {
                 busCombos: [],
                 vendors: [],
                 tickets: [],
+                settlements: [],
                 currentActiveVendor: null,
                 selectedCategoryFilter: 'ALL',
                 currentSalesPeriod: 7,
@@ -1733,6 +1852,9 @@ service cloud.firestore {
 
                     const localTickets = localStorage.getItem('eqr_tickets');
                     if (localTickets && state.tickets.length === 0) state.tickets = JSON.parse(localTickets);
+
+                    const localSettlements = localStorage.getItem('eqr_settlements');
+                    if (localSettlements && state.settlements.length === 0) state.settlements = JSON.parse(localSettlements);
 
                     const localFee = localStorage.getItem('eqr_serviceFee');
                     if (localFee) state.serviceFee = JSON.parse(localFee);
@@ -1903,6 +2025,15 @@ service cloud.firestore {
                         }
                     });
 
+                    setupCollectionListener('settlements', (data) => {
+                        state.settlements = data.sort((a, b) => (b.settledAt || '').localeCompare(a.settledAt || ''));
+                        persistLocalFallback('settlements', state.settlements);
+                        if (state.adminUnlockedSession) {
+                            UIModule.renderSettlementsHistoryTable();
+                            UIModule.renderAdminVendorsTable();
+                        }
+                    });
+
                     // 2. Control de estado de autenticación
                     onAuthStateChanged(authInstance, (user) => {
                         if (user && !user.isAnonymous && user.email === 'admin@experienceqr.com') {
@@ -1966,7 +2097,7 @@ service cloud.firestore {
                     console.error(`Error guardando en Firestore (${colName}/${docId}):`, err);
                     if (err.code === 'permission-denied') {
                         updateCloudStatusBadge('permission_denied');
-                        alert("Permiso denegado por Firestore: para crear o modificar este elemento debés tener sesión iniciada como admin@experienceqr.com.");
+                        UIModule.showNotice("Permiso denegado por Firestore: para crear o modificar este elemento debés tener sesión iniciada como admin@experienceqr.com.");
                     }
                 }
             };
@@ -1983,7 +2114,7 @@ service cloud.firestore {
                     console.error(`Error eliminando en Firestore (${colName}/${docId}):`, err);
                     if (err.code === 'permission-denied') {
                         updateCloudStatusBadge('permission_denied');
-                        alert("Permiso denegado: solo admin@experienceqr.com puede borrar este registro.");
+                        UIModule.showNotice("Permiso denegado: solo admin@experienceqr.com puede borrar este registro.");
                     }
                 }
             };
@@ -2019,6 +2150,48 @@ service cloud.firestore {
                 }
             };
 
+            const getAggregatedClients = () => {
+                const clientsMap = {};
+                state.tickets.forEach(t => {
+                    const cleanEmail = (t.buyerEmail || '').trim().toLowerCase();
+                    const cleanPhone = (t.buyerPhone || '').replace(/[^0-9]/g, '');
+                    const cleanName = (t.buyerName || 'Cliente Sin Nombre').trim();
+
+                    // Clave única resiliente: prioriza teléfono real o email real (ignorando placeholders genéricos), o nombre normalizado
+                    const isPlaceholderEmail = !cleanEmail || cleanEmail === 'ticket@experienceqr.com' || cleanEmail === 'pasajero@experienceqr.com';
+                    const clientKey = cleanPhone
+                        ? `tel_${cleanPhone}`
+                        : (!isPlaceholderEmail ? `mail_${cleanEmail}` : `name_${cleanName.toLowerCase()}`);
+
+                    if (!clientsMap[clientKey]) {
+                        clientsMap[clientKey] = {
+                            name: cleanName,
+                            email: !isPlaceholderEmail ? (t.buyerEmail || '').trim() : 'Sin correo',
+                            phone: (t.buyerPhone || '').trim(),
+                            ticketsCount: 0,
+                            totalSpent: 0,
+                            lastPurchase: t.createdAt || ''
+                        };
+                    } else {
+                        // Completar datos si en una compra posterior sí cargó email o teléfono
+                        if (clientsMap[clientKey].email === 'Sin correo' && !isPlaceholderEmail) {
+                            clientsMap[clientKey].email = (t.buyerEmail || '').trim();
+                        }
+                        if (!clientsMap[clientKey].phone && t.buyerPhone) {
+                            clientsMap[clientKey].phone = t.buyerPhone.trim();
+                        }
+                        if ((t.createdAt || '') > clientsMap[clientKey].lastPurchase) {
+                            clientsMap[clientKey].lastPurchase = t.createdAt;
+                        }
+                    }
+
+                    clientsMap[clientKey].ticketsCount += 1;
+                    clientsMap[clientKey].totalSpent += (Number(t.amountPaid) || 0);
+                });
+
+                return Object.values(clientsMap).sort((a, b) => (b.lastPurchase || '').localeCompare(a.lastPurchase || ''));
+            };
+
             return {
                 get: () => state,
                 formatARS,
@@ -2029,12 +2202,13 @@ service cloud.firestore {
                 saveSettingsCloud,
                 adminSignIn,
                 adminSignOut,
+                getAggregatedClients,
                 isFirebaseConnected: () => isFirebaseConnected
             };
         })();
 
         /* ==========================================================
-           2. SERVICE FEE ENGINE (ServiceFeeModule)
+2. SERVICE FEE ENGINE (ServiceFeeModule)
         ========================================================== */
         const ServiceFeeModule = (() => {
             const calculateFee = (amount, targetId = null, isBus = false) => {
@@ -2311,7 +2485,7 @@ service cloud.firestore {
         })();
 
         /* ==========================================================
-           3. MERCADO PAGO SIMULATED GATEWAY (MercadoPagoModule)
+3. MERCADO PAGO SIMULATED GATEWAY (MercadoPagoModule)
         ========================================================== */
         const MercadoPagoModule = (() => {
             const syncUI = () => {
@@ -2437,7 +2611,7 @@ service cloud.firestore {
         })();
 
         /* ==========================================================
-           4. TICKETING & QR VISOR (TicketingModule)
+4. TICKETING & QR VISOR (TicketingModule)
         ========================================================== */
         const TicketingModule = (() => {
             let activeBatchTickets = [];
@@ -2639,7 +2813,7 @@ service cloud.firestore {
         })();
 
         /* ==========================================================
-           5. TURNSTILE QR ACCESS CONTROL & AUDIO (TurnstileModule)
+5. TURNSTILE QR ACCESS CONTROL & AUDIO (TurnstileModule)
         ========================================================== */
         const TurnstileModule = (() => {
             let html5QrScannerInstance = null;
@@ -2896,7 +3070,7 @@ service cloud.firestore {
         })();
 
         /* ==========================================================
-           6. EXPORT REPORTS ENGINE (ExportModule)
+6. EXPORT REPORTS ENGINE (ExportModule)
         ========================================================== */
         const ExportModule = (() => {
             const exportCurrentEventSalesToXLSX = () => {
@@ -2927,24 +3101,15 @@ service cloud.firestore {
             };
 
             const exportClientsToXLSX = () => {
-                const state = StateModule.get();
-                const clientsMap = {};
+                const clients = StateModule.getAggregatedClients();
+                const dataToExport = clients.map(c => ({
+                    'Nombre y Apellido': c.name,
+                    'Email': c.email,
+                    'Celular': c.phone || 'Sin teléfono',
+                    'Entradas Emitidas': c.ticketsCount,
+                    'Total Invertido (ARS)': c.totalSpent
+                }));
 
-                state.tickets.forEach(t => {
-                    if (!clientsMap[t.buyerEmail]) {
-                        clientsMap[t.buyerEmail] = {
-                            'Nombre y Apellido': t.buyerName,
-                            'Email': t.buyerEmail,
-                            'Celular': t.buyerPhone,
-                            'Entradas Emitidas': 0,
-                            'Total Invertido (ARS)': 0
-                        };
-                    }
-                    clientsMap[t.buyerEmail]['Entradas Emitidas'] += 1;
-                    clientsMap[t.buyerEmail]['Total Invertido (ARS)'] += t.amountPaid;
-                });
-
-                const dataToExport = Object.values(clientsMap);
                 const worksheet = XLSX.utils.json_to_sheet(dataToExport);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
@@ -2958,7 +3123,7 @@ service cloud.firestore {
         })();
 
         /* ==========================================================
-           7. UI CONTROLLER & VIEW ROUTER (UIModule)
+7. UI CONTROLLER & VIEW ROUTER (UIModule)
         ========================================================== */
         const UIModule = (() => {
             let salesTrendChartInstance = null;
@@ -2966,6 +3131,15 @@ service cloud.firestore {
             let vendorsBarChartInstance = null;
             let clientsMonthlyChartInstance = null;
             let activeAuditEvtId = null;
+
+            const showNotice = (msg) => {
+                const resContainer = document.getElementById('scanResultContainer');
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-16 sm:bottom-6 right-4 z-[9999] max-w-sm bg-slate-900/95 border border-amber-500/50 text-amber-200 px-4 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-3 backdrop-blur-md';
+                toast.innerHTML = `<i class="fa-solid fa-circle-exclamation text-amber-400 text-base shrink-0"></i><span>${msg}</span>`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            };
 
             const openModal = (id) => {
                 const modal = document.getElementById(id);
@@ -3564,7 +3738,7 @@ service cloud.firestore {
                 const state = StateModule.get();
 
                 if (!state.selectedSeatNumber) {
-                    alert('Por favor elegí primero una butaca en el mapa interactivo del colectivo.');
+                    showNotice('Por favor elegí primero una butaca en el mapa interactivo del colectivo.');
                     return;
                 }
 
@@ -3576,7 +3750,7 @@ service cloud.firestore {
                 const phone = document.getElementById('busPassengerPhone')?.value.trim();
 
                 if (!name || !dni || !phone) {
-                    alert('Por favor completá Nombre, DNI y Celular del pasajero antes de contactar al promotor.');
+                    showNotice('Por favor completá Nombre, DNI y Celular del pasajero antes de contactar al promotor.');
                     return;
                 }
 
@@ -3611,7 +3785,7 @@ service cloud.firestore {
                 const state = StateModule.get();
 
                 if (!state.selectedSeatNumber) {
-                    alert('Por favor elegí una butaca en el mapa interactivo antes de continuar.');
+                    showNotice('Por favor elegí una butaca en el mapa interactivo antes de continuar.');
                     return;
                 }
 
@@ -3620,7 +3794,7 @@ service cloud.firestore {
                 const phone = document.getElementById('busPassengerPhone')?.value.trim();
 
                 if (!name || !dni || !phone) {
-                    alert('Por favor completá los datos obligatorios del pasajero.');
+                    showNotice('Por favor completá los datos obligatorios del pasajero.');
                     return;
                 }
 
@@ -3655,7 +3829,7 @@ service cloud.firestore {
                 // Si tiene costo, conectar con el promotor para pago en efectivo
                 const vendor = state.vendors[0];
                 if (!vendor) {
-                    alert('No hay promotores registrados para asignar esta venta en este momento.');
+                    showNotice('No hay promotores registrados para asignar esta venta en este momento.');
                     return;
                 }
 
@@ -3707,7 +3881,7 @@ service cloud.firestore {
                 const state = StateModule.get();
                 const vendor = state.vendors.find(v => v.code === code);
                 if (!vendor) {
-                    alert('Código no encontrado o incorrecto.');
+                    showNotice('Código no encontrado o incorrecto.');
                     return;
                 }
 
@@ -3734,11 +3908,13 @@ service cloud.firestore {
                 document.getElementById('vdActiveZone').innerText = `Zona: ${v.zone}`;
 
                 const vendorTickets = state.tickets.filter(t => t.channel === v.code);
-                const totalCollected = vendorTickets.reduce((acc, t) => acc + t.amountPaid, 0);
+                const unsettledTickets = vendorTickets.filter(t => !t.settled);
+                const totalCollected = vendorTickets.reduce((acc, t) => acc + (Number(t.amountPaid) || 0), 0);
+                const pendingCashDue = unsettledTickets.reduce((acc, t) => acc + (Number(t.amountPaid) || 0), 0);
 
                 document.getElementById('vdQtySold').innerText = vendorTickets.length;
                 document.getElementById('vdTotalCollected').innerText = StateModule.formatARS(totalCollected);
-                document.getElementById('vdCashDue').innerText = StateModule.formatARS(totalCollected);
+                document.getElementById('vdCashDue').innerText = StateModule.formatARS(pendingCashDue);
 
                 const tbody = document.getElementById('vdSalesTableBody');
                 if (vendorTickets.length === 0) {
@@ -3750,10 +3926,13 @@ service cloud.firestore {
                     const evt = state.events.find(e => e.id === t.eventId);
                     const cleanPhone = (t.buyerPhone || '').replace(/[^0-9]/g, '');
                     const eventTitle = evt ? evt.title : 'Evento';
+                    const settledBadge = t.settled
+                        ? `<span class="ml-1.5 text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Rendido</span>`
+                        : `<span class="ml-1.5 text-[9px] uppercase font-black px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">En Caja</span>`;
 
                     return `
                         <tr class="hover:bg-slate-900/40">
-                            <td class="py-3 font-mono font-bold text-purple-400">${t.id}</td>
+                            <td class="py-3 font-mono font-bold text-purple-400">${t.id}${settledBadge}</td>
                             <td class="py-3">
                                 <div class="font-bold text-white">${t.buyerName}</div>
                                 <div class="text-[10px] text-slate-400 font-mono">${t.buyerPhone || 'Sin tel.'}</div>
@@ -4103,11 +4282,11 @@ service cloud.firestore {
                     buyerDni = document.getElementById('vdsBuyerDni')?.value.trim();
                     const seatVal = parseInt(document.getElementById('vdsBusSeatSelect')?.value);
                     if (!seatVal) {
-                        alert('No hay butacas disponibles en este colectivo para emitir la venta.');
+                        showNotice('No hay butacas disponibles en este colectivo para emitir la venta.');
                         return;
                     }
                     if (!buyerDni) {
-                        alert('Por favor ingresá el DNI del pasajero para el seguro de viaje.');
+                        showNotice('Por favor ingresá el DNI del pasajero para el seguro de viaje.');
                         return;
                     }
                     busSeat = seatVal;
@@ -4132,6 +4311,7 @@ service cloud.firestore {
                         buyerEmail: `${buyerPhone.replace(/[^0-9]/g, '') || 'ticket'}@experienceqr.com`,
                         buyerPhone: buyerPhone,
                         channel: state.currentActiveVendor.code,
+                        baseUnitPrice: (isBus ? (item.price || 0) : (isCombo ? ((item.combo?.price || 0) / (item.combo?.ticketsCount || 1)) : (item.price || 0))),
                         amountPaid: unitPrice,
                         status: 'VALID',
                         usedAt: null,
@@ -4182,8 +4362,10 @@ service cloud.firestore {
 
             const renderAdminFullDashboard = () => {
                 const state = StateModule.get();
-                const totalRevenue = state.tickets.reduce((acc, t) => acc + t.amountPaid, 0);
-                const totalCashPending = state.tickets.filter(t => t.channel.startsWith('PROM-')).reduce((acc, t) => acc + t.amountPaid, 0);
+                const totalRevenue = state.tickets.reduce((acc, t) => acc + (Number(t.amountPaid) || 0), 0);
+                const unsettledVendorTickets = state.tickets.filter(t => (t.channel || '').startsWith('PROM-') && !t.settled);
+                const pendingMetrics = calculateVendorTicketsSettlementMetrics(unsettledVendorTickets);
+                const totalCashPending = pendingMetrics.netToSettle;
                 const totalCheckedIn = state.tickets.filter(t => t.status === 'USED').length;
 
                 document.getElementById('adminKpiRevenue').innerText = StateModule.formatARS(totalRevenue);
@@ -4196,6 +4378,7 @@ service cloud.firestore {
                 renderAdminClientsTable();
                 renderAdminBusesTable();
                 renderAdminVendorsTable();
+                renderSettlementsHistoryTable();
                 initOrUpdateSalesTrendChart();
                 initOrUpdateVendorsPieChart();
                 initOrUpdateVendorsHorizontalBarChart();
@@ -4222,7 +4405,11 @@ service cloud.firestore {
 
                 if (tabName === 'combos') renderAdminCombosTable();
                 if (tabName === 'clients') setTimeout(() => initOrUpdateClientsMonthlyLineChart(), 60);
-                if (tabName === 'vendors') setTimeout(() => initOrUpdateVendorsHorizontalBarChart(), 60);
+                if (tabName === 'vendors') {
+                    renderAdminVendorsTable();
+                    renderSettlementsHistoryTable();
+                    setTimeout(() => initOrUpdateVendorsHorizontalBarChart(), 60);
+                }
             };
 
             const changeSalesChartPeriod = (days) => {
@@ -4352,7 +4539,7 @@ service cloud.firestore {
                 const labels = [];
                 const dataCounts = [];
 
-                const onlineCount = state.tickets.filter(t => t.channel.startsWith('ONLINE_')).length;
+                const onlineCount = state.tickets.filter(t => (t.channel || '').startsWith('ONLINE_')).length;
                 labels.push('Tienda Online');
                 dataCounts.push(onlineCount);
 
@@ -4652,7 +4839,7 @@ service cloud.firestore {
                 if (!select) return;
 
                 if (state.events.length === 0) {
-                    alert('Primero debés tener creado al menos un evento para poder asignarle un combo.');
+                    showNotice('Primero debés tener creado al menos un evento para poder asignarle un combo.');
                     return;
                 }
 
@@ -4703,7 +4890,6 @@ service cloud.firestore {
                 const priceInput = document.getElementById('comboFormPrice');
 
                 if (evt && priceInput && !priceInput.value) {
-                    // Sugerir un 3x2 por defecto: valor de 2 entradas si el combo es de 3
                     const count = parseInt(document.getElementById('comboFormTicketsCount')?.value) || 3;
                     const suggestedTicketsToPay = Math.max(1, count - 1);
                     priceInput.value = (evt.price || 0) * suggestedTicketsToPay;
@@ -4738,7 +4924,7 @@ service cloud.firestore {
                 const evt = state.events.find(ev => ev.id === selectedEventId);
 
                 if (!evt) {
-                    alert('Seleccioná un evento válido.');
+                    showNotice('Seleccioná un evento válido.');
                     return;
                 }
 
@@ -4766,9 +4952,6 @@ service cloud.firestore {
                 const evt = state.events.find(e => e.id === eventId);
                 if (!evt || !evt.combo) return;
 
-                const confirmed = window.confirm(`¿Estás seguro de que deseas eliminar la promoción "${evt.combo.name}" del evento "${evt.title}"?\n\nLos tickets individuales emitidos previamente se mantendrán vigentes.`);
-                if (!confirmed) return;
-
                 evt.combo = {
                     enabled: false,
                     name: '',
@@ -4777,6 +4960,7 @@ service cloud.firestore {
                 };
 
                 StateModule.saveDocument('events', evt.id, evt);
+                showNotice(`Promoción eliminada del evento "${evt.title}".`);
 
                 renderAdminCombosTable();
                 renderAdminEventsTable();
@@ -4842,9 +5026,6 @@ service cloud.firestore {
 
                 const ticket = state.tickets[ticketIndex];
 
-                const confirmed = window.confirm(`¿Estás seguro de que deseas anular y borrar la venta ${ticket.id} de ${ticket.buyerName}?\n\nEsta acción ajustará la recaudación, liberará el cupo de ocupación y actualizará la rendición del vendedor.`);
-                if (!confirmed) return;
-
                 // 1. Ajustar ocupación del evento
                 const evt = state.events.find(e => e.id === ticket.eventId);
                 if (evt && evt.ticketsSold > 0) {
@@ -4873,7 +5054,9 @@ service cloud.firestore {
                 }
 
                 // 4. Eliminar el ticket de memoria y almacenamiento
+                state.tickets.splice(ticketIndex, 1);
                 StateModule.removeDocument('tickets', ticketId);
+                showNotice(`Venta ${ticket.id} (${ticket.buyerName}) anulada y eliminada.`);
 
                 // 5. Refrescar auditoría actual y el dashboard de administración
                 if (activeAuditEvtId) {
@@ -4886,50 +5069,50 @@ service cloud.firestore {
 
             const renderAdminClientsTable = () => {
                 const tbody = document.getElementById('adminClientsTableBody');
+                const countBadge = document.getElementById('adminClientsCountBadge');
                 if (!tbody) return;
-                const state = StateModule.get();
                 const searchVal = (document.getElementById('adminClientsSearchInput')?.value || '').toLowerCase().trim();
 
-                const clientsMap = {};
-                state.tickets.forEach(t => {
-                    if (!clientsMap[t.buyerEmail]) {
-                        clientsMap[t.buyerEmail] = {
-                            name: t.buyerName,
-                            email: t.buyerEmail,
-                            phone: t.buyerPhone,
-                            ticketsCount: 0,
-                            totalSpent: 0
-                        };
-                    }
-                    clientsMap[t.buyerEmail].ticketsCount += 1;
-                    clientsMap[t.buyerEmail].totalSpent += t.amountPaid;
+                const allClients = StateModule.getAggregatedClients();
+                const clientsList = allClients.filter(c => {
+                    const nameStr = (c.name || '').toLowerCase();
+                    const emailStr = (c.email || '').toLowerCase();
+                    const phoneStr = (c.phone || '').toLowerCase();
+                    return nameStr.includes(searchVal) ||
+                           emailStr.includes(searchVal) ||
+                           phoneStr.includes(searchVal);
                 });
 
-                const clientsList = Object.values(clientsMap).filter(c => {
-                    return c.name.toLowerCase().includes(searchVal) ||
-                           c.email.toLowerCase().includes(searchVal) ||
-                           c.phone.includes(searchVal);
-                });
+                if (countBadge) {
+                    countBadge.innerText = searchVal
+                        ? `Mostrando ${clientsList.length} de ${allClients.length} clientes`
+                        : `${allClients.length} cliente(s) registrados`;
+                }
 
                 if (clientsList.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">No se encontraron clientes registrados.</td></tr>`;
                     return;
                 }
 
-                tbody.innerHTML = clientsList.map(c => `
-                    <tr class="hover:bg-slate-900/40">
-                        <td class="py-3 font-bold text-white">${c.name}</td>
-                        <td class="py-3 text-slate-300 font-mono">${c.email}</td>
-                        <td class="py-3 text-slate-300 font-mono">${c.phone}</td>
-                        <td class="py-3 font-bold font-mono">${c.ticketsCount} entrada(s)</td>
-                        <td class="py-3 font-mono font-bold text-emerald-400">${StateModule.formatARS(c.totalSpent)}</td>
-                        <td class="py-3 text-right">
-                            <a href="https://wa.me/${c.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${c.name}, te escribimos desde la producción de ExperienceQR.`)}" target="_blank" class="px-2.5 py-1 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1">
-                                <i class="fa-brands fa-whatsapp"></i> Chat
-                            </a>
-                        </td>
-                    </tr>
-                `).join('');
+                tbody.innerHTML = clientsList.map(c => {
+                    const cleanPhone = (c.phone || '').replace(/[^0-9]/g, '');
+                    return `
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-3 font-bold text-white">${c.name}</td>
+                            <td class="py-3 text-slate-300 font-mono">${c.email}</td>
+                            <td class="py-3 text-slate-300 font-mono">${c.phone || 'Sin WhatsApp'}</td>
+                            <td class="py-3 font-bold font-mono">${c.ticketsCount} entrada(s)</td>
+                            <td class="py-3 font-mono font-bold text-emerald-400">${StateModule.formatARS(c.totalSpent)}</td>
+                            <td class="py-3 text-right">
+                                ${cleanPhone ? `
+                                    <a href="https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hola ${c.name}, te escribimos desde la producción de ExperienceQR.`)}" target="_blank" class="px-2.5 py-1 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1">
+                                        <i class="fa-brands fa-whatsapp"></i> Chat
+                                    </a>
+                                ` : '<span class="text-slate-500 text-[11px]">-</span>'}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
             };
 
             const renderAdminBusesTable = () => {
@@ -4974,35 +5157,320 @@ service cloud.firestore {
                 }).join('');
             };
 
+            const getTicketBaseValueWithoutServiceFee = (tck) => {
+                if (typeof tck.baseUnitPrice === 'number' && !isNaN(tck.baseUnitPrice)) {
+                    return tck.baseUnitPrice;
+                }
+                const state = StateModule.get();
+                const paid = Number(tck.amountPaid) || 0;
+                if (paid <= 0) return 0;
+
+                // Si es traslado en colectivo
+                if (tck.busSeat) {
+                    const bus = state.busCombos.find(b => b.eventId === tck.eventId);
+                    if (bus) {
+                        const fee = ServiceFeeModule.calculateFee(bus.price, bus.id, true);
+                        if (Math.abs((bus.price + fee) - paid) <= 5) return bus.price;
+                    }
+                }
+
+                // Si es entrada de evento (individual o combo)
+                const evt = state.events.find(e => e.id === tck.eventId);
+                if (evt) {
+                    const fee = ServiceFeeModule.calculateFee(evt.price, evt.id, false);
+                    if (Math.abs((evt.price + fee) - paid) <= 5) return evt.price;
+
+                    if (evt.combo && evt.combo.enabled && evt.combo.ticketsCount > 0) {
+                        const comboUnitBase = evt.combo.price / evt.combo.ticketsCount;
+                        const comboTotalFee = ServiceFeeModule.calculateFee(evt.combo.price, evt.id, false);
+                        const comboUnitPaid = (evt.combo.price + comboTotalFee) / evt.combo.ticketsCount;
+                        if (Math.abs(comboUnitPaid - paid) <= 5) return Math.round(comboUnitBase);
+                    }
+
+                    // Fallback inverso según tarifa configurada del evento
+                    const cfg = (state.serviceFee.eventFees && state.serviceFee.eventFees[evt.id]) || state.serviceFee;
+                    if (cfg.type === 'percent' && cfg.value > 0) {
+                        return Math.round(paid / (1 + cfg.value / 100));
+                    } else if (cfg.type === 'fixed' && cfg.value > 0) {
+                        return Math.max(0, Math.round(paid - cfg.value));
+                    }
+                }
+
+                return paid;
+            };
+
+            const calculateVendorTicketsSettlementMetrics = (ticketsList) => {
+                let grossCollected = 0;
+                let baseNetTotal = 0;
+
+                ticketsList.forEach(t => {
+                    grossCollected += (Number(t.amountPaid) || 0);
+                    baseNetTotal += getTicketBaseValueWithoutServiceFee(t);
+                });
+
+                const vendorCommission = Math.round(baseNetTotal * 0.10);
+                const netToSettle = Math.max(0, grossCollected - vendorCommission);
+
+                return {
+                    grossCollected,
+                    baseNetTotal,
+                    vendorCommission,
+                    netToSettle
+                };
+            };
+
             const renderAdminVendorsTable = () => {
                 const tbody = document.getElementById('adminVendorsTableBody');
                 if (!tbody) return;
                 const state = StateModule.get();
 
                 if (state.vendors.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-500">No hay promotores registrados. Hacé clic en "Registrar Nuevo Promotor".</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-500">No hay promotores registrados. Hacé clic en "Registrar Nuevo Promotor".</td></tr>`;
                     return;
                 }
 
                 tbody.innerHTML = state.vendors.map(v => {
                     const vendorTickets = state.tickets.filter(t => t.channel === v.code);
-                    const totalCash = vendorTickets.reduce((acc, t) => acc + t.amountPaid, 0);
+                    const unsettledTickets = vendorTickets.filter(t => !t.settled);
+                    const pendingMetrics = calculateVendorTicketsSettlementMetrics(unsettledTickets);
+                    const hasPending = unsettledTickets.length > 0 || pendingMetrics.netToSettle > 0;
 
                     return `
                         <tr class="hover:bg-slate-900/40">
-                            <td class="py-3 font-bold text-white">${v.name}</td>
+                            <td class="py-3 font-bold text-white">
+                                <div>${v.name}</div>
+                                <span class="text-[10px] text-slate-400">${v.zone || ''}</span>
+                            </td>
                             <td class="py-3 font-mono text-purple-400 font-bold">${v.code}</td>
                             <td class="py-3 font-mono text-slate-300">${v.phone}</td>
-                            <td class="py-3 font-mono font-bold">${vendorTickets.length}</td>
-                            <td class="py-3 font-mono font-bold text-indigo-400">${StateModule.formatARS(totalCash)}</td>
-                            <td class="py-3 font-mono font-bold text-amber-400">${StateModule.formatARS(totalCash)}</td>
+                            <td class="py-3 font-mono">
+                                <span class="font-bold text-white">${unsettledTickets.length}</span>
+                                <span class="text-[10px] text-slate-400 block">(${vendorTickets.length} hist.)</span>
+                            </td>
+                            <td class="py-3 font-mono font-bold text-slate-200">${StateModule.formatARS(pendingMetrics.grossCollected)}</td>
+                            <td class="py-3 font-mono font-bold text-purple-400">
+                                -${StateModule.formatARS(pendingMetrics.vendorCommission)}
+                                <span class="block text-[9px] text-slate-400 font-sans">Base: ${StateModule.formatARS(pendingMetrics.baseNetTotal)}</span>
+                            </td>
+                            <td class="py-3 font-mono font-bold ${hasPending ? 'text-amber-400' : 'text-emerald-400'}">
+                                ${StateModule.formatARS(pendingMetrics.netToSettle)}
+                                ${!hasPending ? `<span class="block text-[10px] font-sans font-semibold text-emerald-400/80"><i class="fa-solid fa-check-circle"></i> Al día</span>` : ''}
+                            </td>
                             <td class="py-3 text-right space-x-1.5 whitespace-nowrap">
-                                <button onclick="UIModule.openEditVendorModal('${v.id}')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-slate-700/80" title="Editar Promotor">
+                                <button onclick="UIModule.openVendorSettlementModal('${v.id}')" ${!hasPending ? 'disabled' : ''} class="px-3 py-1.5 ${hasPending ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20' : 'bg-slate-800/60 text-slate-500 cursor-not-allowed'} rounded-lg font-black text-[11px] inline-flex items-center gap-1 transition-all" title="${hasPending ? 'Liquidar y cerrar caja' : 'Sin saldo pendiente'}">
+                                    <i class="fa-solid fa-cash-register"></i> Liquidar Caja
+                                </button>
+                                <button onclick="UIModule.openEditVendorModal('${v.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-slate-700/80" title="Editar Promotor">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
-                                <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te recordamos rendir la caja de $ ${totalCash} correspondiente a tus ventas de ExperienceQR.`)}" target="_blank" class="px-2.5 py-1 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1">
+                                <a href="https://wa.me/${v.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${v.name}, te recordamos rendir la caja neta de ${StateModule.formatARS(pendingMetrics.netToSettle)} (ya descontada tu comisión del 10% de ${StateModule.formatARS(pendingMetrics.vendorCommission)}) correspondiente a tus ventas pendientes de ExperienceQR.`)}" target="_blank" class="px-2.5 py-1.5 bg-emerald-600/30 text-emerald-300 hover:bg-emerald-600 hover:text-white rounded-lg font-bold text-[11px] inline-flex items-center gap-1">
                                     <i class="fa-brands fa-whatsapp"></i> Rendición
                                 </a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            };
+
+            const openVendorSettlementModal = (vendorId) => {
+                const state = StateModule.get();
+                const vendor = state.vendors.find(v => v.id === vendorId);
+                if (!vendor) return;
+
+                const unsettledTickets = state.tickets.filter(t => t.channel === vendor.code && !t.settled);
+                if (unsettledTickets.length === 0) {
+                    showNotice(`${vendor.name} no tiene ventas pendientes de rendición.`);
+                    return;
+                }
+
+                document.getElementById('settlementVendorId').value = vendor.id;
+                document.getElementById('settlementVendorCode').innerText = vendor.code;
+                document.getElementById('settlementVendorName').innerText = vendor.name;
+                document.getElementById('settlementNotesInput').value = '';
+
+                // Agrupar eventos que tienen tickets pendientes de este promotor
+                const eventIdsWithPending = [...new Set(unsettledTickets.map(t => t.eventId))];
+                const selectEl = document.getElementById('settlementEventSelect');
+
+                let optionsHtml = `<option value="ALL">🌐 Todos los eventos pendientes (${unsettledTickets.length} entradas)</option>`;
+                eventIdsWithPending.forEach(evtId => {
+                    const evt = state.events.find(e => e.id === evtId);
+                    const countForEvt = unsettledTickets.filter(t => t.eventId === evtId).length;
+                    const evtLabel = evt ? `${evt.title}${StateModule.isEventConcluded(evt) ? ' [Finalizado]' : ''}` : `Evento (${evtId})`;
+                    optionsHtml += `<option value="${evtId}">${evtLabel} — ${countForEvt} entrada(s)</option>`;
+                });
+
+                selectEl.innerHTML = optionsHtml;
+                // Si hay un evento finalizado pendiente, preseleccionarlo por comodidad
+                const concludedEvtId = eventIdsWithPending.find(id => {
+                    const ev = state.events.find(e => e.id === id);
+                    return ev && StateModule.isEventConcluded(ev);
+                });
+                selectEl.value = concludedEvtId || 'ALL';
+
+                updateSettlementPreview();
+                openModal('modalVendorSettlement');
+            };
+
+            const updateSettlementPreview = () => {
+                const state = StateModule.get();
+                const vendorId = document.getElementById('settlementVendorId')?.value;
+                const selectedEventId = document.getElementById('settlementEventSelect')?.value || 'ALL';
+                const vendor = state.vendors.find(v => v.id === vendorId);
+                if (!vendor) return;
+
+                let matchingTickets = state.tickets.filter(t => t.channel === vendor.code && !t.settled);
+                if (selectedEventId !== 'ALL') {
+                    matchingTickets = matchingTickets.filter(t => t.eventId === selectedEventId);
+                }
+
+                const metrics = calculateVendorTicketsSettlementMetrics(matchingTickets);
+
+                document.getElementById('settlementTicketsCountText').innerText = `${matchingTickets.length} entrada(s)`;
+                document.getElementById('settlementGrossCollectedText').innerText = StateModule.formatARS(metrics.grossCollected);
+                document.getElementById('settlementBaseNetText').innerText = StateModule.formatARS(metrics.baseNetTotal);
+                document.getElementById('settlementCommissionText').innerText = `-${StateModule.formatARS(metrics.vendorCommission)}`;
+                document.getElementById('settlementAmountDueText').innerText = StateModule.formatARS(metrics.netToSettle);
+
+                const confirmBtn = document.getElementById('btnConfirmSettlement');
+                if (confirmBtn) confirmBtn.disabled = matchingTickets.length === 0;
+            };
+
+            const handleConfirmSettlementSubmit = async (e) => {
+                e.preventDefault();
+                const state = StateModule.get();
+                const vendorId = document.getElementById('settlementVendorId')?.value;
+                const selectedEventId = document.getElementById('settlementEventSelect')?.value || 'ALL';
+                const notes = document.getElementById('settlementNotesInput')?.value.trim() || 'Cierre de caja y liquidación completada';
+                const vendor = state.vendors.find(v => v.id === vendorId);
+                if (!vendor) return;
+
+                let ticketsToSettle = state.tickets.filter(t => t.channel === vendor.code && !t.settled);
+                if (selectedEventId !== 'ALL') {
+                    ticketsToSettle = ticketsToSettle.filter(t => t.eventId === selectedEventId);
+                }
+
+                if (ticketsToSettle.length === 0) {
+                    showNotice('No hay entradas pendientes para liquidar en la selección.');
+                    return;
+                }
+
+                const metrics = calculateVendorTicketsSettlementMetrics(ticketsToSettle);
+                const settledAmount = metrics.netToSettle;
+                const settlementId = 'LIQ-' + Math.floor(100000 + Math.random() * 900000);
+                const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+                let eventTitle = 'Varios Eventos / Todos los Pendientes';
+                if (selectedEventId !== 'ALL') {
+                    const evt = state.events.find(ev => ev.id === selectedEventId);
+                    eventTitle = evt ? evt.title : selectedEventId;
+                } else {
+                    const uniqueEvtIds = [...new Set(ticketsToSettle.map(t => t.eventId))];
+                    if (uniqueEvtIds.length === 1) {
+                        const evt = state.events.find(ev => ev.id === uniqueEvtIds[0]);
+                        eventTitle = evt ? evt.title : uniqueEvtIds[0];
+                    }
+                }
+
+                // 1. Marcar cada ticket rendido como liquidado (settled: true) y sincronizar en Firestore
+                for (const tck of ticketsToSettle) {
+                    tck.settled = true;
+                    tck.settlementId = settlementId;
+                    tck.settledAt = nowStr;
+                    StateModule.saveDocument('tickets', tck.id, tck);
+                }
+
+                // 2. Actualizar saldo pendiente neto del promotor a 0 (o al remanente si liquidó un solo evento)
+                const remainingUnsettled = state.tickets.filter(t => t.channel === vendor.code && !t.settled);
+                const remainingMetrics = calculateVendorTicketsSettlementMetrics(remainingUnsettled);
+                vendor.cashDue = remainingMetrics.netToSettle;
+                StateModule.saveDocument('vendors', vendor.id, vendor);
+
+                // 3. Registrar el comprobante de cierre en el historial de liquidaciones
+                const settlementRecord = {
+                    id: settlementId,
+                    vendorId: vendor.id,
+                    vendorName: vendor.name,
+                    vendorCode: vendor.code,
+                    eventId: selectedEventId,
+                    eventTitle: eventTitle,
+                    ticketsCount: ticketsToSettle.length,
+                    grossCollected: metrics.grossCollected,
+                    baseNetTotal: metrics.baseNetTotal,
+                    vendorCommission: metrics.vendorCommission,
+                    amountSettled: settledAmount,
+                    notes: notes,
+                    settledAt: nowStr
+                };
+
+                state.settlements.unshift(settlementRecord);
+                try {
+                    localStorage.setItem('eqr_settlements', JSON.stringify(state.settlements));
+                } catch (err) {}
+                StateModule.saveDocument('settlements', settlementRecord.id, settlementRecord);
+
+                closeModal('modalVendorSettlement');
+                showNotice(`¡Caja liquidada! Neto rendido: ${StateModule.formatARS(settledAmount)} (Comisión 10% descontada: ${StateModule.formatARS(metrics.vendorCommission)}).`);
+
+                renderAdminFullDashboard();
+                if (state.currentActiveVendor && state.currentActiveVendor.id === vendor.id) {
+                    renderVendorDashboard();
+                }
+            };
+
+            const renderSettlementsHistoryTable = () => {
+                const tbody = document.getElementById('adminSettlementsHistoryBody');
+                const filterSelect = document.getElementById('settlementHistoryEventFilter');
+                if (!tbody) return;
+                const state = StateModule.get();
+
+                // Poblar filtro de eventos manteniendo la selección actual
+                if (filterSelect) {
+                    const currentVal = filterSelect.value || 'ALL';
+                    const uniqueEventsMap = {};
+                    state.events.forEach(e => { uniqueEventsMap[e.id] = e.title; });
+                    state.settlements.forEach(s => {
+                        if (s.eventId && s.eventId !== 'ALL' && !uniqueEventsMap[s.eventId]) {
+                            uniqueEventsMap[s.eventId] = s.eventTitle || s.eventId;
+                        }
+                    });
+
+                    filterSelect.innerHTML = `<option value="ALL">Todos los eventos</option>` +
+                        Object.entries(uniqueEventsMap).map(([id, title]) => `<option value="${id}">${title}</option>`).join('');
+                    filterSelect.value = Object.keys(uniqueEventsMap).includes(currentVal) ? currentVal : 'ALL';
+                }
+
+                const selectedFilter = filterSelect ? filterSelect.value : 'ALL';
+                const list = state.settlements.filter(s => selectedFilter === 'ALL' || s.eventId === selectedFilter);
+
+                if (list.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-500">Aún no se registran liquidaciones ni cierres de caja.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = list.map(s => {
+                    const gross = s.grossCollected !== undefined ? s.grossCollected : s.amountSettled;
+                    const comm = s.vendorCommission || 0;
+                    return `
+                        <tr class="hover:bg-slate-900/40">
+                            <td class="py-3 font-mono font-bold text-emerald-400">${s.id}</td>
+                            <td class="py-3 text-slate-300 font-mono">${s.settledAt || '-'}</td>
+                            <td class="py-3">
+                                <div class="font-bold text-white">${s.vendorName}</div>
+                                <span class="text-[10px] font-mono text-purple-400">${s.vendorCode}</span>
+                            </td>
+                            <td class="py-3">
+                                <div class="font-semibold text-slate-200">${s.eventTitle}</div>
+                                ${s.notes ? `<span class="text-[10px] text-slate-400 italic">${s.notes}</span>` : ''}
+                            </td>
+                            <td class="py-3 font-mono font-bold text-white">${s.ticketsCount}</td>
+                            <td class="py-3 font-mono text-slate-300">${StateModule.formatARS(gross)}</td>
+                            <td class="py-3 font-mono font-bold text-purple-400">-${StateModule.formatARS(comm)}</td>
+                            <td class="py-3 font-mono font-extrabold text-emerald-400">${StateModule.formatARS(s.amountSettled)}</td>
+                            <td class="py-3 text-right">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                                    <i class="fa-solid fa-lock"></i> Liquidado
+                                </span>
                             </td>
                         </tr>
                     `;
@@ -5219,15 +5687,6 @@ service cloud.firestore {
                 const evt = state.events.find(e => e.id === eventId);
                 if (!evt) return;
 
-                const soldTickets = state.tickets.filter(t => t.eventId === eventId).length;
-                let warningMessage = `¿Estás seguro de que deseas eliminar permanentemente el evento "${evt.title}"?`;
-                if (soldTickets > 0) {
-                    warningMessage = `⚠️ ¡ATENCIÓN! Este evento ya tiene ${soldTickets} entrada(s) emitida(s).\n\nSi lo eliminás, el evento desaparecerá de la tienda pública y del panel.\n\n¿Confirmás la eliminación permanente de "${evt.title}"?`;
-                }
-
-                const confirmed = window.confirm(warningMessage);
-                if (!confirmed) return;
-
                 // 1. Quitar evento del estado
                 state.events = state.events.filter(e => e.id !== eventId);
 
@@ -5239,6 +5698,8 @@ service cloud.firestore {
                     delete state.serviceFee.eventFees[eventId];
                     StateModule.saveSettingsCloud();
                 }
+
+                showNotice(`Evento "${evt.title}" eliminado correctamente.`);
 
                 // 4. Refrescar vistas
                 renderAdminEventsTable();
@@ -5295,16 +5756,9 @@ service cloud.firestore {
                 const bus = state.busCombos.find(b => b.id === busId);
                 if (!bus) return;
 
-                const occupied = bus.occupiedSeats ? bus.occupiedSeats.length : 0;
-                const warningMsg = occupied > 0 
-                    ? `Esta unidad tiene ${occupied} butaca(s) reservada(s). Si la eliminás, se cancelará el servicio del traslado.\n\n` 
-                    : '';
-
-                const confirmed = window.confirm(`${warningMsg}¿Deseas eliminar permanentemente el colectivo "${bus.name}"?`);
-                if (!confirmed) return;
-
                 state.busCombos = state.busCombos.filter(b => b.id !== busId);
                 StateModule.removeDocument('busCombos', busId);
+                showNotice(`Colectivo "${bus.name}" eliminado.`);
 
                 renderAdminBusesTable();
                 renderPublicBuses();
@@ -5500,6 +5954,7 @@ service cloud.firestore {
             };
 
             return {
+                showNotice,
                 openModal,
                 closeModal,
                 toggleTokenVisibility,
@@ -5539,6 +5994,10 @@ service cloud.firestore {
                 renderAdminClientsTable,
                 renderAdminBusesTable,
                 renderAdminVendorsTable,
+                openVendorSettlementModal,
+                updateSettlementPreview,
+                handleConfirmSettlementSubmit,
+                renderSettlementsHistoryTable,
                 handleImageFileSelect,
                 clearEventImagePreview,
                 toggleComboFormFields,
@@ -5572,7 +6031,7 @@ service cloud.firestore {
         })();
 
         /* ==========================================================
-           8. APP INITIALIZATION & BOOTSTRAP
+8. APP INITIALIZATION & BOOTSTRAP
         ========================================================== */
         window.addEventListener('DOMContentLoaded', () => {
             StateModule.initFirebaseCloud();
