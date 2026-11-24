@@ -693,17 +693,28 @@
                 </div>
 
                 <!-- TAB 5: ESCÁNER QR EN PUERTA -->
-                <div id="admtab-scanner" class="hidden space-y-8">
-                    <div class="max-w-3xl mx-auto glass-panel p-6 sm:p-8 rounded-3xl border border-red-500/30 space-y-6">
-                        <div class="text-center space-y-2">
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-bold border border-red-500/30">
-                                <i class="fa-solid fa-camera"></i> Control de Acceso Profesional
+                <div id="admtab-scanner" class="hidden space-y-6">
+                    <div id="scannerMainCard" class="max-w-2xl mx-auto glass-panel p-5 sm:p-8 rounded-3xl border-2 border-slate-800 transition-all duration-300 space-y-5">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-[11px] font-bold border border-red-500/30 mb-1">
+                                    <i class="fa-solid fa-bolt"></i> Escáner Rápido de Puerta
+                                </div>
+                                <h3 class="text-xl sm:text-2xl font-black text-white">Control de Acceso QR</h3>
                             </div>
-                            <h3 class="text-2xl font-black text-white">Validación de Tickets en Puerta</h3>
-                            <p class="text-xs text-slate-400">Escaneá el código QR del comprador en vivo para validar con semáforo verde o rojo.</p>
+                            <div class="flex items-center gap-2">
+                                <span id="scannerLiveCounterBadge" class="text-xs px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono font-bold">
+                                    0 validados
+                                </span>
+                                <span id="cameraStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 font-semibold">Apagada</span>
+                            </div>
                         </div>
 
-                        <div class="relative w-full max-w-sm mx-auto aspect-square rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-800 flex items-center justify-center">
+                        <!-- RESULTADO INMEDIATO DE ALTO IMPACTO (SEMÁFORO GIGANTE) -->
+                        <div id="scanResultContainer" class="hidden"></div>
+
+                        <!-- VISOR DE CÁMARA -->
+                        <div id="scannerViewfinderBox" class="relative w-full max-w-sm mx-auto aspect-square rounded-3xl overflow-hidden bg-slate-950 border-4 border-slate-800 transition-all duration-200 flex items-center justify-center shadow-2xl">
                             <div id="qr-camera-reader" class="w-full h-full"></div>
                             <div id="scannerLaserEffect" class="absolute w-full h-1 scanner-laser hidden pointer-events-none"></div>
                             <div class="viewfinder-corner top-4 left-4 border-t-4 border-l-4 rounded-tl-xl pointer-events-none"></div>
@@ -712,219 +723,27 @@
                             <div class="viewfinder-corner bottom-4 right-4 border-b-4 border-r-4 rounded-br-xl pointer-events-none"></div>
                         </div>
 
-                        <div class="flex flex-wrap items-center justify-center gap-3">
-                            <button id="btnToggleCamera" onclick="TurnstileModule.toggleCameraScanner()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-2">
+                        <div class="flex flex-wrap items-center justify-center gap-2.5">
+                            <button id="btnToggleCamera" onclick="TurnstileModule.toggleCameraScanner()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all">
                                 <i class="fa-solid fa-camera"></i> <span id="cameraBtnLabel">Activar Cámara</span>
                             </button>
-                            <span id="cameraStatusBadge" class="text-xs px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 font-semibold">Cámara Apagada</span>
+                            <button id="btnSwitchCameraQuick" onclick="TurnstileModule.cycleNextCamera()" class="hidden px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-2xl border border-slate-700 flex items-center gap-2">
+                                <i class="fa-solid fa-camera-rotate text-sky-400"></i> Cambiar Lente
+                            </button>
                         </div>
 
                         <div id="cameraDeviceSelectorContainer" class="hidden max-w-sm mx-auto text-center space-y-1">
-                            <label class="text-[11px] font-bold text-slate-400">Lente / Cámara detectada:</label>
-                            <select id="cameraDeviceSelect" onchange="TurnstileModule.changeCameraDevice(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-1.5 text-xs focus:border-red-500 font-medium"></select>
+                            <select id="cameraDeviceSelect" onchange="TurnstileModule.changeCameraDevice(this.value)" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-xs focus:border-indigo-500 font-medium"></select>
                         </div>
 
-                        <div class="space-y-2 pt-2 border-t border-slate-800">
-                            <label class="text-xs font-bold text-slate-400 block text-center">O ingresá el código de ticket manualmente:</label>
-                            <div class="flex gap-2 max-w-sm mx-auto">
-                                <input type="text" id="manualQrInput" placeholder="TCK-984214-883" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono uppercase focus:border-red-500">
-                                <button onclick="TurnstileModule.validateTicketCode(document.getElementById('manualQrInput').value)" class="px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                        <div class="space-y-2 pt-3 border-t border-slate-800">
+                            <label class="text-xs font-bold text-slate-400 block text-center">Validación manual por código:</label>
+                            <form onsubmit="event.preventDefault(); TurnstileModule.validateTicketCode(document.getElementById('manualQrInput').value);" class="flex gap-2 max-w-sm mx-auto">
+                                <input type="text" id="manualQrInput" placeholder="TCK-984214-883" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono uppercase focus:border-indigo-500">
+                                <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-xl whitespace-nowrap">
                                     Validar
                                 </button>
-                            </div>
-                        </div>
-
-                        <div id="scanResultContainer" class="hidden"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL 1: DETALLE Y COMPRA / GENERACIÓN DE ENTRADA -->
-    <div id="modalEventDetail" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-start sm:items-center justify-center p-2 sm:p-4 overflow-y-auto pt-6 sm:pt-4 pb-16">
-        <div class="glass-panel w-full max-w-xl max-h-[88vh] rounded-3xl border border-indigo-500/40 relative shadow-2xl flex flex-col overflow-hidden my-auto">
-            
-            <!-- Header FIJO: Siempre visible con botón X prominente idéntico a Colectivos -->
-            <div class="p-4 sm:p-5 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md flex items-center justify-between gap-3 shrink-0 z-20">
-                <div class="flex items-center gap-3 min-w-0 pr-2">
-                    <img id="detailEvtImg" src="" alt="Flyer" class="w-12 h-12 rounded-xl object-cover border border-slate-700 shadow-md shrink-0">
-                    <div class="space-y-0.5 min-w-0">
-                        <span id="detailEvtBadge" class="text-[10px] font-black uppercase tracking-wider text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20 inline-block">Fiesta</span>
-                        <h3 id="detailEvtTitle" class="text-base sm:text-lg font-black text-white truncate leading-tight">Nombre Evento</h3>
-                        <p id="detailEvtVenue" class="text-xs text-slate-400 truncate"><i class="fa-solid fa-location-dot mr-1"></i> Lugar</p>
-                    </div>
-                </div>
-
-                <!-- Botón de Cierre X grande y siempre visible -->
-                <button type="button" onclick="UIModule.closeModal('modalEventDetail')" class="shrink-0 w-11 h-11 rounded-2xl bg-slate-900 hover:bg-rose-600 text-slate-300 hover:text-white border border-slate-700/80 hover:border-rose-500 flex items-center justify-center transition-all shadow-xl active:scale-95" title="Cerrar ventana">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-
-            <!-- Cuerpo con scroll interno independiente -->
-            <div class="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
-                <form onsubmit="UIModule.handlePurchaseSubmit(event)" class="space-y-4">
-                    <input type="hidden" id="purchaseEventId">
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-xs font-bold text-slate-300 block mb-1">Nombre y Apellido *</label>
-                            <input type="text" id="buyerName" placeholder="Juan Pérez" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-300 block mb-1">Celular / WhatsApp *</label>
-                            <input type="tel" id="buyerPhone" placeholder="+54 9 351 1234567" required class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                        </div>
-                    </div>
-
-                    <!-- Selector de Modalidad: Entrada Individual o Combo Promocional -->
-                    <div id="buyerPackageTypeContainer" class="space-y-2">
-                        <label class="text-xs font-bold text-slate-300 block">Tipo de Pase *</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <label class="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all">
-                                <input type="radio" name="buyerTicketMode" value="SINGLE" checked onchange="UIModule.handleTicketModeChange(this.value)">
-                                <span>Entrada Individual</span>
-                            </label>
-                            <label id="buyerComboOptionLabel" class="hidden flex items-center justify-center gap-2 p-2.5 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-purple-300 transition-all">
-                                <input type="radio" name="buyerTicketMode" value="COMBO" onchange="UIModule.handleTicketModeChange(this.value)">
-                                <span id="buyerComboOptionTitle">Combo Promocional</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="buyerQtyContainer">
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Entradas</label>
-                        <select id="buyerQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                            <option value="1">1 Entrada</option>
-                            <option value="2">2 Entradas</option>
-                            <option value="3">3 Entradas</option>
-                            <option value="4">4 Entradas</option>
-                            <option value="6">6 Entradas</option>
-                        </select>
-                    </div>
-
-                    <div id="buyerComboQtyContainer" class="hidden">
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Cantidad de Combos</label>
-                        <select id="buyerComboQty" onchange="UIModule.calculatePurchaseTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs focus:border-indigo-500">
-                            <option value="1">1 Combo</option>
-                            <option value="2">2 Combos</option>
-                            <option value="3">3 Combos</option>
-                        </select>
-                        <p id="buyerComboDetailNote" class="text-[11px] text-purple-300 mt-1 font-semibold"></p>
-                    </div>
-
-                    <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-2 text-xs">
-                        <div class="flex justify-between text-slate-400">
-                            <span>Subtotal Entradas:</span>
-                            <strong id="purchaseSubtotalText" class="font-mono text-white">$ 0</strong>
-                        </div>
-                        <div class="flex justify-between text-slate-400">
-                            <span id="purchaseFeeLabel">Costo por Servicio:</span>
-                            <strong id="purchaseFeeText" class="font-mono text-amber-400">+$ 0</strong>
-                        </div>
-                        <div class="flex justify-between text-sm font-bold border-t border-slate-800 pt-2 text-white">
-                            <span id="purchaseTotalHeading">Total Final a Pagar:</span>
-                            <strong id="purchaseTotalText" class="font-mono text-emerald-400 text-base">$ 0</strong>
-                        </div>
-                    </div>
-
-                    <!-- Payment Choice Container (Auto hidden if $0) -->
-                    <div id="paymentChoiceContainer" class="grid grid-cols-2 gap-3">
-                        <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-800 bg-slate-900/50 cursor-not-allowed opacity-50 relative overflow-hidden" title="Temporalmente deshabilitado">
-                            <input type="radio" name="purchaseFlow" value="MP" disabled onchange="UIModule.togglePurchaseChoice('MP')">
-                            <div class="flex flex-col">
-                                <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-credit-card mr-1"></i> Mercado Pago</span>
-                                <span class="text-[9px] text-amber-400 font-semibold">(Temporalmente deshabilitado)</span>
-                            </div>
-                        </label>
-                        <label class="flex items-center gap-2 p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 cursor-pointer">
-                            <input type="radio" name="purchaseFlow" value="CASH" checked onchange="UIModule.togglePurchaseChoice('CASH')">
-                            <span class="text-xs font-bold text-emerald-300"><i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Vendedor Efectivo</span>
-                        </label>
-                    </div>
-
-                    <div id="cashVendorSelectionBox" class="hidden p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-slate-300 space-y-2">
-                        <div class="flex items-center justify-between pb-1 border-b border-emerald-500/20">
-                            <p class="font-bold text-emerald-300 flex items-center gap-1.5 text-[11px] sm:text-xs">
-                                <i class="fa-brands fa-whatsapp text-emerald-400"></i> Seleccioná tu promotor oficial:
-                            </p>
-                            <span class="text-[10px] text-emerald-400/80 font-medium">Pago en efectivo</span>
-                        </div>
-                        <div id="cashVendorsContactMiniList" class="space-y-1.5 max-h-56 sm:max-h-64 overflow-y-auto pr-1"></div>
-                    </div>
-
-                    <button type="submit" id="btnSubmitPurchase" class="w-full py-3.5 bg-sky-600 hover:bg-sky-500 text-white font-extrabold rounded-xl shadow-lg shadow-sky-600/30 text-sm transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> Proceder al Pago Seguro
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL 3: VENTA DIRECTA EN MANO (PROMOTOR - SOLO EFECTIVO) -->
-    <div id="modalVendorDirectSale" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="glass-panel w-full max-w-lg rounded-3xl border border-emerald-500/40 p-6 sm:p-8 relative shadow-2xl space-y-5 my-8">
-            <button onclick="UIModule.closeModal('modalVendorDirectSale')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-
-            <div class="flex items-center gap-3 border-b border-slate-800 pb-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
-                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                </div>
-                <div>
-                    <h3 class="text-lg font-black text-white">Venta Directa en Mano</h3>
-                    <p class="text-xs text-slate-400">Cobro en efectivo exclusivo para promotores. Emisión de entrada QR en el acto.</p>
-                </div>
-            </div>
-
-            <form onsubmit="UIModule.handleVendorDirectSaleSubmit(event)" class="space-y-4">
-                <!-- Tipo de Producto a Vender: Evento, Combo o Colectivo -->
-                <div>
-                    <label class="text-xs font-bold text-slate-300 block mb-1">Tipo de Venta *</label>
-                    <div class="grid grid-cols-3 gap-2">
-                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
-                            <input type="radio" name="vdsSaleType" value="EVENT" checked onchange="UIModule.toggleVendorSaleType(this.value)">
-                            <i class="fa-solid fa-ticket text-indigo-400"></i> Evento
-                        </label>
-                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-purple-500/40 bg-purple-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
-                            <input type="radio" name="vdsSaleType" value="COMBO_DIRECT" onchange="UIModule.toggleVendorSaleType(this.value)">
-                            <i class="fa-solid fa-tags text-purple-400"></i> Combo
-                        </label>
-                        <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-sky-500/40 bg-sky-500/10 cursor-pointer text-xs font-bold text-white transition-all text-center">
-                            <input type="radio" name="vdsSaleType" value="BUS" onchange="UIModule.toggleVendorSaleType(this.value)">
-                            <i class="fa-solid fa-bus text-sky-400"></i> Colectivo
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Campo para selección de Evento -->
-                <div id="vdsEventSelectContainer">
-                    <label class="text-xs font-bold text-slate-300 block mb-1">Evento *</label>
-                    <select id="vdsEventSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-emerald-500"></select>
-                </div>
-
-                <!-- Campo para selección de Combo Promocional dedicado -->
-                <div id="vdsComboDirectSelectContainer" class="hidden space-y-2">
-                    <label class="text-xs font-bold text-purple-300 block mb-1">Seleccionar Combo Promocional *</label>
-                    <select id="vdsComboDirectSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-purple-500/50 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-purple-400"></select>
-                    <p id="vdsComboDirectDetailNote" class="text-[11px] text-purple-300 font-semibold"></p>
-                </div>
-
-                <!-- Campo para selección de Colectivo y Butaca (oculto por defecto) -->
-                <div id="vdsBusSelectContainer" class="hidden space-y-3">
-                    <div>
-                        <label class="text-xs font-bold text-slate-300 block mb-1">Unidad / Colectivo *</label>
-                        <select id="vdsBusSelect" onchange="UIModule.handleVendorBusSelectChange()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-bold focus:border-sky-500"></select>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-xs font-bold text-slate-300 block mb-1">Butaca a Asignar *</label>
-                            <select id="vdsBusSeatSelect" onchange="UIModule.calculateVendorDirectSaleTotal()" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono font-bold focus:border-sky-500"></select>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-300 block mb-1">DNI del Pasajero *</label>
-                            <input type="text" id="vdsBuyerDni" placeholder="40123456" class="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-xs font-mono focus:border-sky-500">
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -2817,45 +2636,96 @@ service cloud.firestore {
         ========================================================== */
         const TurnstileModule = (() => {
             let html5QrScannerInstance = null;
+            let nativeStream = null;
+            let nativeRafId = null;
             let isCameraScanningActive = false;
+            let availableCameras = [];
             let currentSelectedCameraId = null;
-            let isCooldownActive = false;
+            let lastScannedCode = '';
+            let lastScannedTimestamp = 0;
+            let resultClearTimeout = null;
+            let sharedAudioCtx = null;
+
+            const getAudioContext = () => {
+                if (!sharedAudioCtx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) sharedAudioCtx = new AudioCtx();
+                }
+                if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+                    sharedAudioCtx.resume().catch(() => {});
+                }
+                return sharedAudioCtx;
+            };
 
             const playSuccessSound = () => {
                 try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const ctx = getAudioContext();
+                    if (!ctx) return;
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-                    osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+                    osc.frequency.setValueAtTime(660, ctx.currentTime);
+                    osc.frequency.setValueAtTime(990, ctx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.35, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.28);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.start();
-                    osc.stop(ctx.currentTime + 0.35);
+                    osc.stop(ctx.currentTime + 0.28);
                 } catch (err) {}
             };
 
             const playErrorSound = () => {
                 try {
-                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const ctx = getAudioContext();
+                    if (!ctx) return;
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(160, ctx.currentTime);
-                    osc.frequency.setValueAtTime(110, ctx.currentTime + 0.15);
-                    gain.gain.setValueAtTime(0.4, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.45);
+                    osc.frequency.setValueAtTime(175, ctx.currentTime);
+                    osc.frequency.setValueAtTime(115, ctx.currentTime + 0.14);
+                    gain.gain.setValueAtTime(0.45, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.42);
                     osc.connect(gain);
                     gain.connect(ctx.destination);
                     osc.start();
-                    osc.stop(ctx.currentTime + 0.45);
+                    osc.stop(ctx.currentTime + 0.42);
                 } catch (err) {}
             };
 
+            const triggerHapticFeedback = (isSuccess) => {
+                try {
+                    if (navigator.vibrate) {
+                        navigator.vibrate(isSuccess ? [80] : [180, 80, 180]);
+                    }
+                } catch (e) {}
+            };
+
+            const clearScanResultBanner = () => {
+                const resContainer = document.getElementById('scanResultContainer');
+                const viewfinder = document.getElementById('scannerViewfinderBox');
+                const mainCard = document.getElementById('scannerMainCard');
+                if (resContainer) resContainer.classList.add('hidden');
+                if (viewfinder) {
+                    viewfinder.classList.remove('border-emerald-500', 'border-rose-500', 'shadow-emerald-500/40', 'shadow-rose-500/40');
+                    viewfinder.classList.add('border-slate-800');
+                }
+                if (mainCard) {
+                    mainCard.classList.remove('border-emerald-500/70', 'border-rose-500/70');
+                    mainCard.classList.add('border-slate-800');
+                }
+                lastScannedCode = '';
+            };
+
             const stopCamera = async () => {
+                if (nativeRafId) {
+                    cancelAnimationFrame(nativeRafId);
+                    nativeRafId = null;
+                }
+                if (nativeStream) {
+                    nativeStream.getTracks().forEach(t => t.stop());
+                    nativeStream = null;
+                }
                 if (html5QrScannerInstance) {
                     try {
                         await html5QrScannerInstance.stop();
@@ -2863,67 +2733,151 @@ service cloud.firestore {
                     } catch (e) {}
                     html5QrScannerInstance = null;
                 }
+                const qrReaderEl = document.getElementById('qr-camera-reader');
+                if (qrReaderEl) qrReaderEl.innerHTML = '';
+
                 isCameraScanningActive = false;
-                isCooldownActive = false;
+                lastScannedCode = '';
 
                 const btn = document.getElementById('btnToggleCamera');
                 const label = document.getElementById('cameraBtnLabel');
                 const badge = document.getElementById('cameraStatusBadge');
                 const laser = document.getElementById('scannerLaserEffect');
                 const selector = document.getElementById('cameraDeviceSelectorContainer');
+                const switchBtn = document.getElementById('btnSwitchCameraQuick');
 
                 if (label) label.innerText = 'Activar Cámara';
                 if (btn) {
-                    btn.classList.remove('bg-red-600', 'hover:bg-red-500');
+                    btn.classList.remove('bg-rose-600', 'hover:bg-rose-500');
                     btn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
                 }
                 if (badge) {
-                    badge.innerText = 'Cámara Apagada';
+                    badge.innerText = 'Apagada';
                     badge.className = 'text-xs px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 font-semibold';
                 }
                 if (laser) laser.classList.add('hidden');
                 if (selector) selector.classList.add('hidden');
+                if (switchBtn) switchBtn.classList.add('hidden');
+            };
+
+            const handleDecodedRawText = (decodedText) => {
+                const clean = (decodedText || '').trim().toUpperCase();
+                if (!clean) return;
+                const now = Date.now();
+                // Evita leer exactamente el mismo QR repetidamente mientras sigue frente al lente (2.5s),
+                // pero permite escanear un ticket diferente de inmediato sin demoras.
+                if (clean === lastScannedCode && (now - lastScannedTimestamp) < 2500) {
+                    return;
+                }
+                lastScannedCode = clean;
+                lastScannedTimestamp = now;
+                validateTicketCode(clean);
+            };
+
+            const startNativeHardwareScanner = async (cameraConfig) => {
+                const qrReaderEl = document.getElementById('qr-camera-reader');
+                if (!qrReaderEl || !('BarcodeDetector' in window)) return false;
+
+                try {
+                    const supported = await window.BarcodeDetector.getSupportedFormats();
+                    if (!supported || !supported.includes('qr_code')) return false;
+
+                    const constraints = {
+                        audio: false,
+                        video: typeof cameraConfig === 'string'
+                            ? { deviceId: { exact: cameraConfig }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                            : { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                    };
+
+                    nativeStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    qrReaderEl.innerHTML = '';
+
+                    const video = document.createElement('video');
+                    video.setAttribute('playsinline', 'true');
+                    video.setAttribute('autoplay', 'true');
+                    video.muted = true;
+                    video.className = 'w-full h-full object-cover';
+                    video.srcObject = nativeStream;
+                    qrReaderEl.appendChild(video);
+
+                    await video.play();
+
+                    const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+                    let isDetectingFrame = false;
+
+                    const scanLoop = async () => {
+                        if (!nativeStream) return;
+                        if (!isDetectingFrame && video.readyState >= 2) {
+                            isDetectingFrame = true;
+                            try {
+                                const codes = await detector.detect(video);
+                                if (codes && codes.length > 0 && codes[0].rawValue) {
+                                    handleDecodedRawText(codes[0].rawValue);
+                                }
+                            } catch (e) {}
+                            isDetectingFrame = false;
+                        }
+                        nativeRafId = requestAnimationFrame(scanLoop);
+                    };
+
+                    nativeRafId = requestAnimationFrame(scanLoop);
+                    return true;
+                } catch (e) {
+                    if (nativeStream) {
+                        nativeStream.getTracks().forEach(t => t.stop());
+                        nativeStream = null;
+                    }
+                    return false;
+                }
             };
 
             const startScannerWithConstraint = async (cameraConfig) => {
                 const qrReaderEl = document.getElementById('qr-camera-reader');
                 if (!qrReaderEl) return;
 
+                if (nativeRafId) {
+                    cancelAnimationFrame(nativeRafId);
+                    nativeRafId = null;
+                }
+                if (nativeStream) {
+                    nativeStream.getTracks().forEach(t => t.stop());
+                    nativeStream = null;
+                }
                 if (html5QrScannerInstance) {
                     try {
                         await html5QrScannerInstance.stop();
+                        html5QrScannerInstance.clear();
                     } catch (e) {}
+                    html5QrScannerInstance = null;
                 }
 
-                html5QrScannerInstance = new Html5Qrcode("qr-camera-reader", {
-                    verbose: false,
-                    experimentalFeatures: { useBarCodeDetectorIfSupported: true }
-                });
+                // 1. Intentar primero el motor nativo de hardware (instantáneo y cero lag)
+                const startedNative = await startNativeHardwareScanner(cameraConfig);
 
-                const config = {
-                    fps: 25,
-                    qrbox: (w, h) => {
-                        const minDim = Math.min(w, h);
-                        return { width: Math.floor(minDim * 0.75), height: Math.floor(minDim * 0.75) };
-                    },
-                    aspectRatio: 1.0,
-                    videoConstraints: typeof cameraConfig === 'string'
-                        ? { deviceId: { exact: cameraConfig } }
-                        : { facingMode: { ideal: "environment" } }
-                };
+                // 2. Respaldo con Html5Qrcode optimizado (30 FPS, sin espejo)
+                if (!startedNative) {
+                    qrReaderEl.innerHTML = '';
+                    html5QrScannerInstance = new Html5Qrcode("qr-camera-reader", {
+                        verbose: false,
+                        experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+                    });
 
-                await html5QrScannerInstance.start(
-                    cameraConfig,
-                    config,
-                    (decodedText) => {
-                        if (!isCooldownActive) {
-                            isCooldownActive = true;
-                            validateTicketCode(decodedText);
-                            setTimeout(() => { isCooldownActive = false; }, 2000);
-                        }
-                    },
-                    () => {}
-                );
+                    const config = {
+                        fps: 30,
+                        disableFlip: true,
+                        aspectRatio: 1.0,
+                        videoConstraints: typeof cameraConfig === 'string'
+                            ? { deviceId: { exact: cameraConfig } }
+                            : { facingMode: { ideal: "environment" } }
+                    };
+
+                    await html5QrScannerInstance.start(
+                        cameraConfig,
+                        config,
+                        (decodedText) => handleDecodedRawText(decodedText),
+                        () => {}
+                    );
+                }
 
                 isCameraScanningActive = true;
 
@@ -2935,16 +2889,17 @@ service cloud.firestore {
                 if (label) label.innerText = 'Detener Cámara';
                 if (btn) {
                     btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
-                    btn.classList.add('bg-red-600', 'hover:bg-red-500');
+                    btn.classList.add('bg-rose-600', 'hover:bg-rose-500');
                 }
                 if (badge) {
-                    badge.innerText = 'Escaneando en Vivo';
+                    badge.innerText = startedNative ? 'Turbo Activo (Hardware)' : 'Escaneando en Vivo';
                     badge.className = 'text-xs px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold';
                 }
                 if (laser) laser.classList.remove('hidden');
             };
 
             const toggleCameraScanner = async () => {
+                getAudioContext();
                 const badge = document.getElementById('cameraStatusBadge');
                 if (isCameraScanningActive) {
                     await stopCamera();
@@ -2952,25 +2907,42 @@ service cloud.firestore {
                 }
 
                 if (badge) {
-                    badge.innerText = 'Iniciando cámara...';
+                    badge.innerText = 'Iniciando...';
                     badge.className = 'text-xs px-3 py-1.5 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/30 font-semibold';
                 }
 
                 try {
-                    let cameras = [];
+                    availableCameras = [];
                     try {
-                        cameras = await Html5Qrcode.getCameras();
+                        availableCameras = await Html5Qrcode.getCameras();
                     } catch (e) {
-                        cameras = [];
+                        availableCameras = [];
                     }
 
-                    if (cameras && cameras.length > 0) {
-                        let backCamera = cameras.find(c => {
+                    if (availableCameras && availableCameras.length > 0) {
+                        let backCamera = availableCameras.find(c => {
                             const lbl = (c.label || '').toLowerCase();
-                            return lbl.includes('back') || lbl.includes('rear') || lbl.includes('trasera');
-                        }) || cameras[cameras.length - 1];
+                            return lbl.includes('back') || lbl.includes('rear') || lbl.includes('trasera') || lbl.includes('environment');
+                        }) || availableCameras[availableCameras.length - 1];
 
                         currentSelectedCameraId = backCamera.id;
+
+                        const selectorContainer = document.getElementById('cameraDeviceSelectorContainer');
+                        const selectEl = document.getElementById('cameraDeviceSelect');
+                        const switchBtn = document.getElementById('btnSwitchCameraQuick');
+
+                        if (availableCameras.length > 1) {
+                            if (selectEl && selectorContainer) {
+                                selectEl.innerHTML = availableCameras.map(c => `
+                                    <option value="${c.id}" ${c.id === currentSelectedCameraId ? 'selected' : ''}>
+                                        ${c.label || 'Cámara ' + c.id.substring(0, 6)}
+                                    </option>
+                                `).join('');
+                                selectorContainer.classList.remove('hidden');
+                            }
+                            if (switchBtn) switchBtn.classList.remove('hidden');
+                        }
+
                         await startScannerWithConstraint(currentSelectedCameraId);
                     } else {
                         await startScannerWithConstraint({ facingMode: "environment" });
@@ -2987,16 +2959,34 @@ service cloud.firestore {
             const changeCameraDevice = async (newDeviceId) => {
                 if (!newDeviceId) return;
                 currentSelectedCameraId = newDeviceId;
+                const selectEl = document.getElementById('cameraDeviceSelect');
+                if (selectEl) selectEl.value = newDeviceId;
                 if (isCameraScanningActive) {
                     await startScannerWithConstraint(newDeviceId);
                 }
+            };
+
+            const cycleNextCamera = async () => {
+                if (!availableCameras || availableCameras.length <= 1) return;
+                const currentIndex = availableCameras.findIndex(c => c.id === currentSelectedCameraId);
+                const nextIndex = (currentIndex + 1) % availableCameras.length;
+                await changeCameraDevice(availableCameras[nextIndex].id);
             };
 
             const validateTicketCode = (code) => {
                 const cleanCode = (code || '').trim().toUpperCase();
                 if (!cleanCode) return;
 
+                if (resultClearTimeout) {
+                    clearTimeout(resultClearTimeout);
+                    resultClearTimeout = null;
+                }
+
                 const resContainer = document.getElementById('scanResultContainer');
+                const viewfinder = document.getElementById('scannerViewfinderBox');
+                const mainCard = document.getElementById('scannerMainCard');
+                const counterBadge = document.getElementById('scannerLiveCounterBadge');
+
                 resContainer.classList.remove('hidden');
 
                 const state = StateModule.get();
@@ -3004,60 +2994,109 @@ service cloud.firestore {
 
                 if (!tck) {
                     playErrorSound();
+                    triggerHapticFeedback(false);
+                    if (viewfinder) {
+                        viewfinder.classList.remove('border-slate-800', 'border-emerald-500');
+                        viewfinder.classList.add('border-rose-500', 'shadow-rose-500/40');
+                    }
+                    if (mainCard) {
+                        mainCard.classList.remove('border-slate-800', 'border-emerald-500/70');
+                        mainCard.classList.add('border-rose-500/70');
+                    }
                     resContainer.innerHTML = `
-                        <div class="p-5 rounded-3xl bg-rose-500/25 border-2 border-rose-500 text-center space-y-2 shake-alert shadow-xl shadow-rose-900/30">
-                            <div class="w-12 h-12 rounded-full bg-rose-600 text-white flex items-center justify-center text-2xl mx-auto shadow-lg shadow-rose-600/50">
+                        <div class="p-6 rounded-3xl bg-rose-600 text-white text-center space-y-2 shake-alert shadow-2xl shadow-rose-600/40">
+                            <div class="w-14 h-14 rounded-full bg-white text-rose-600 flex items-center justify-center text-3xl mx-auto shadow-md">
                                 <i class="fa-solid fa-xmark"></i>
                             </div>
-                            <h4 class="text-xl font-black text-rose-300">SEMÁFORO ROJO: ¡INVÁLIDO!</h4>
-                            <p class="text-xs text-rose-200">El código <span class="font-mono font-bold">${cleanCode}</span> no existe en el sistema.</p>
+                            <div class="text-xs font-black uppercase tracking-widest text-rose-100">ACCESO DENEGADO</div>
+                            <h4 class="text-2xl sm:text-3xl font-black tracking-tight">QR INVÁLIDO</h4>
+                            <p class="text-xs text-rose-100 font-medium">El código <span class="font-mono font-bold bg-rose-800/60 px-2 py-0.5 rounded">${cleanCode}</span> no existe.</p>
+                            <button type="button" onclick="TurnstileModule.clearScanResultBanner()" class="mt-2 px-5 py-2 bg-white text-rose-700 font-black text-xs rounded-xl shadow hover:bg-rose-50 transition-all">
+                                Cerrar y Seguir Escaneando
+                            </button>
                         </div>
                     `;
+                    resultClearTimeout = setTimeout(clearScanResultBanner, 4500);
                     return;
                 }
 
                 if (tck.status === 'USED') {
                     playErrorSound();
+                    triggerHapticFeedback(false);
+                    if (viewfinder) {
+                        viewfinder.classList.remove('border-slate-800', 'border-emerald-500');
+                        viewfinder.classList.add('border-rose-500', 'shadow-rose-500/40');
+                    }
+                    if (mainCard) {
+                        mainCard.classList.remove('border-slate-800', 'border-emerald-500/70');
+                        mainCard.classList.add('border-rose-500/70');
+                    }
                     resContainer.innerHTML = `
-                        <div class="p-5 rounded-3xl bg-rose-600/30 border-2 border-rose-500 text-center space-y-3 shake-alert shadow-xl shadow-rose-900/40">
-                            <div class="w-12 h-12 rounded-full bg-rose-600 text-white flex items-center justify-center text-2xl mx-auto shadow-lg shadow-rose-600/50 animate-pulse">
+                        <div class="p-6 rounded-3xl bg-rose-600 text-white text-center space-y-2.5 shake-alert shadow-2xl shadow-rose-600/40">
+                            <div class="w-14 h-14 rounded-full bg-white text-rose-600 flex items-center justify-center text-3xl mx-auto shadow-md animate-pulse">
                                 <i class="fa-solid fa-ban"></i>
                             </div>
-                            <h4 class="text-xl font-black text-rose-200">SEMÁFORO ROJO: YA INGRESADO</h4>
-                            <p class="text-xs text-rose-300 font-bold">ACCESO DENEGADO (ENTRADA DUPLICADA)</p>
-                            <div class="text-xs text-slate-300 bg-slate-950/80 p-3 rounded-2xl border border-rose-500/30 text-left space-y-1">
-                                <div>Titular: <strong class="text-white">${tck.buyerName}</strong></div>
-                                <div>Primer ingreso a las: <strong class="text-rose-400 font-mono">${tck.usedAt || 'Horas previas'}</strong></div>
+                            <div class="text-xs font-black uppercase tracking-widest text-rose-100">NO PERMITIR INGRESO</div>
+                            <h4 class="text-2xl sm:text-3xl font-black tracking-tight">YA UTILIZADO</h4>
+                            <div class="text-xs bg-rose-950/60 p-3 rounded-2xl border border-rose-400/30 space-y-1">
+                                <div class="font-bold text-white text-sm">${tck.buyerName}</div>
+                                <div class="text-rose-200">Ingresó a las: <strong class="font-mono text-white">${tck.usedAt || 'Anteriormente'}</strong></div>
                             </div>
+                            <button type="button" onclick="TurnstileModule.clearScanResultBanner()" class="mt-1 px-5 py-2 bg-white text-rose-700 font-black text-xs rounded-xl shadow hover:bg-rose-50 transition-all">
+                                Cerrar y Seguir Escaneando
+                            </button>
                         </div>
                     `;
+                    resultClearTimeout = setTimeout(clearScanResultBanner, 5000);
                     return;
                 }
 
+                // TICKET VÁLIDO: Marcar de inmediato en memoria y guardar en nube en segundo plano sin trabar la cámara
                 tck.status = 'USED';
                 tck.usedAt = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
                 StateModule.saveDocument('tickets', tck.id, tck);
+
                 playSuccessSound();
+                triggerHapticFeedback(true);
+
+                if (viewfinder) {
+                    viewfinder.classList.remove('border-slate-800', 'border-rose-500');
+                    viewfinder.classList.add('border-emerald-500', 'shadow-emerald-500/40');
+                }
+                if (mainCard) {
+                    mainCard.classList.remove('border-slate-800', 'border-rose-500/70');
+                    mainCard.classList.add('border-emerald-500/70');
+                }
+
+                const totalUsedNow = state.tickets.filter(t => t.status === 'USED').length;
+                if (counterBadge) counterBadge.innerText = `${totalUsedNow} validados`;
+                const kpiCheckedIn = document.getElementById('adminKpiCheckedIn');
+                if (kpiCheckedIn) kpiCheckedIn.innerText = totalUsedNow;
 
                 const evt = state.events.find(e => e.id === tck.eventId);
                 resContainer.innerHTML = `
-                    <div class="p-5 rounded-3xl bg-emerald-500/25 border-2 border-emerald-500 text-center space-y-3 shadow-xl shadow-emerald-900/30">
-                        <div class="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center text-2xl mx-auto shadow-lg shadow-emerald-600/50">
+                    <div class="p-6 rounded-3xl bg-emerald-600 text-white text-center space-y-2.5 shadow-2xl shadow-emerald-600/40">
+                        <div class="w-14 h-14 rounded-full bg-white text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-md">
                             <i class="fa-solid fa-check"></i>
                         </div>
-                        <h4 class="text-xl font-black text-emerald-300">SEMÁFORO VERDE: ¡AUTORIZADO!</h4>
-                        <p class="text-xs text-emerald-200 font-bold">PRIMER INGRESO VÁLIDO</p>
-                        <div class="text-xs text-slate-200 bg-slate-950/80 p-4 rounded-2xl border border-emerald-500/30 text-left space-y-1">
-                            <div>Evento: <strong class="text-white">${evt ? evt.title : 'Evento'}</strong></div>
-                            <div>Titular: <strong class="text-white">${tck.buyerName}</strong></div>
-                            <div>Ticket ID: <strong class="font-mono text-indigo-400">${tck.id}</strong></div>
-                            <div>Tipo: <strong class="text-amber-400 font-bold">${tck.amountPaid === 0 ? '$ 0' : StateModule.formatARS(tck.amountPaid)}</strong></div>
-                            ${tck.busSeat ? `<div>Butaca Colectivo: <strong class="text-sky-400">#${tck.busSeat}</strong></div>` : ''}
+                        <div class="text-xs font-black uppercase tracking-widest text-emerald-100">PASE HABILITADO</div>
+                        <h4 class="text-2xl sm:text-3xl font-black tracking-tight">¡ENTRADA VÁLIDA!</h4>
+                        <div class="text-xs bg-emerald-950/50 p-3.5 rounded-2xl border border-emerald-300/30 space-y-1">
+                            <div class="text-base font-black text-white">${tck.buyerName}</div>
+                            <div class="text-emerald-100 font-semibold">${evt ? evt.title : 'Evento'}</div>
+                            <div class="font-mono text-emerald-200 text-[11px]">${tck.id} • ${tck.amountPaid === 0 ? 'Costo $ 0' : StateModule.formatARS(tck.amountPaid)}</div>
+                            ${tck.busSeat ? `<div class="font-bold text-white bg-sky-600/80 inline-block px-2.5 py-0.5 rounded-lg mt-1">Butaca Colectivo #${tck.busSeat}</div>` : ''}
                         </div>
+                        <button type="button" onclick="TurnstileModule.clearScanResultBanner()" class="mt-1 px-5 py-2 bg-white text-emerald-800 font-black text-xs rounded-xl shadow hover:bg-emerald-50 transition-all">
+                            Listo • Siguiente Entrada
+                        </button>
                     </div>
                 `;
 
-                if (state.adminUnlockedSession) UIModule.renderAdminFullDashboard();
+                const manualInput = document.getElementById('manualQrInput');
+                if (manualInput) manualInput.value = '';
+
+                resultClearTimeout = setTimeout(clearScanResultBanner, 4000);
             };
 
             return {
@@ -3065,6 +3104,8 @@ service cloud.firestore {
                 playErrorSound,
                 toggleCameraScanner,
                 changeCameraDevice,
+                cycleNextCamera,
+                clearScanResultBanner,
                 validateTicketCode
             };
         })();
